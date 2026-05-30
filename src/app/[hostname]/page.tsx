@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import ClientPage from "./ClientPage";
 import LocalSEO from "@/components/LocalSEO";
 import PendingApproval from "@/components/PendingApproval";
+import { getSiteGate } from "@/lib/siteGate";
 import { cookies } from "next/headers";
 
 export default async function Page({ params }: { params: Promise<{ hostname: string }> }) {
@@ -15,8 +16,14 @@ export default async function Page({ params }: { params: Promise<{ hostname: str
 
   const cookieStore = await cookies();
   const isAdminBypass = cookieStore.get('admin_bypass')?.value === 'true';
+  const gate = getSiteGate(config, isAdminBypass);
 
-  if (config.siteStatus === 'pending_approval' && !isAdminBypass) {
+  // Suspended sites are taken offline entirely.
+  if (gate === 'blocked') {
+    notFound();
+  }
+
+  if (gate === 'pending') {
     return (
       <>
         <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}`} />

@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Product, ThemeType } from '@/types/config';
+import { getThemeStyles, getSectionTokens } from '@/lib/theme';
 
 interface ProductDetailSheetProps {
   isOpen: boolean;
@@ -15,31 +16,17 @@ interface ProductDetailSheetProps {
 export default function ProductDetailSheet({ isOpen, onClose, product, theme }: ProductDetailSheetProps) {
   if (!product) return null;
 
-  const styles: Record<string, any> = {
-    'luxury-minimal': {
-      panelBg: 'bg-white',
-      textMain: 'text-stone-900 font-playfair tracking-wide',
-      textSub: 'text-stone-500 font-sans font-light',
-      specBg: 'bg-stone-50 border border-stone-100',
-      closeBtn: 'text-stone-400 hover:text-stone-900 font-sans'
-    },
-    'brutalist': {
-      panelBg: 'bg-[#050505] border-l border-white/10',
-      textMain: 'text-white font-inter font-black uppercase tracking-tighter',
-      textSub: 'text-slate-400 font-sans text-sm',
-      specBg: 'bg-white/5 border border-white/10 font-sans text-sm',
-      closeBtn: 'text-yellow-400 hover:text-white font-inter uppercase font-bold'
-    },
-    'classic-warm': {
-      panelBg: 'bg-[#faf8f5] border-l border-amber-900/10',
-      textMain: 'text-amber-950 font-lora',
-      textSub: 'text-amber-900/70 font-sans',
-      specBg: 'bg-white rounded-xl border border-amber-900/5',
-      closeBtn: 'text-amber-900/50 hover:text-amber-900 font-sans font-medium'
-    }
+  // Derive styling from the central theme tokens so every theme renders with
+  // its own palette instead of falling back to luxury-minimal.
+  const t = getThemeStyles(theme);
+  const section = getSectionTokens(theme);
+  const activeStyles = {
+    panelBg: `${t.pageBackground} border-l ${section.surfaceBorder}`,
+    textMain: `${t.headingFont} ${t.textPrimary}`,
+    textSub: `${t.bodyFont} ${t.textSecondary}`,
+    specBg: `${section.surface} border ${section.surfaceBorder}`,
+    closeBtn: `${section.accent} ${t.bodyFont} transition-opacity hover:opacity-70`,
   };
-
-  const activeStyles = styles[theme] || styles['luxury-minimal'];
 
   const details = product.details || {
     subtitle: "Premium Design Line",

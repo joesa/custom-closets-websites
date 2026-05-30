@@ -3,6 +3,7 @@
 import React from 'react';
 import * as motion from 'framer-motion/client';
 import { ProcessConfig, ThemeType } from '@/types/config';
+import { getThemeStyles, getSectionTokens } from '@/lib/theme';
 
 interface ProcessSectionProps {
   theme: ThemeType;
@@ -10,41 +11,19 @@ interface ProcessSectionProps {
 }
 
 export default function ProcessSection({ theme, process }: ProcessSectionProps) {
-  // Theme-specific styling tokens
-  const styles: Record<string, any> = {
-    'luxury-minimal': {
-      bg: 'bg-white',
-      titleFont: 'font-playfair tracking-wide text-stone-900',
-      stepNum: 'font-playfair text-amber-600/30 font-light',
-      stepTitle: 'font-playfair text-stone-800 tracking-tight',
-      descFont: 'font-sans text-stone-500 font-light leading-relaxed',
-    },
-    'brutalist': {
-      bg: 'bg-[#050505] border-t border-white/10',
-      titleFont: 'font-inter font-black tracking-tighter text-white uppercase md:text-5xl',
-      stepNum: 'font-inter font-black text-white/10 text-6xl block mb-2',
-      stepTitle: 'font-inter font-bold text-yellow-400 uppercase tracking-wide',
-      descFont: 'font-sans text-slate-400 text-sm leading-relaxed',
-    },
-    'classic-warm': {
-      bg: 'bg-[#faf8f5]',
-      titleFont: 'font-lora font-semibold text-amber-950 text-4xl md:text-5xl',
-      stepNum: 'font-lora font-bold text-amber-900/10 text-6xl',
-      stepTitle: 'font-lora font-medium text-amber-900',
-      descFont: 'font-sans text-amber-900/70 text-base leading-relaxed',
-    }
-  };
-
-  const activeStyles = styles[theme] || styles['luxury-minimal'];
+  // Derive styling from the central theme tokens so all 13 themes render with
+  // their own palette/typography (instead of falling back to luxury-minimal).
+  const t = getThemeStyles(theme);
+  const section = getSectionTokens(theme);
 
   return (
-    <section className={`py-32 px-6 ${activeStyles.bg}`}>
+    <section className={`py-32 px-6 ${t.pageBackground}`}>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-24">
-          <h2 className={`text-3xl md:text-5xl ${activeStyles.titleFont}`}>
+          <h2 className={`text-3xl md:text-5xl ${t.headingFont} ${t.textPrimary}`}>
             {process.title}
           </h2>
-          <p className="text-sm tracking-widest uppercase mt-4 opacity-60">
+          <p className={`text-sm tracking-widest uppercase mt-4 ${t.textSecondary}`}>
             {process.subtitle}
           </p>
         </div>
@@ -59,13 +38,13 @@ export default function ProcessSection({ theme, process }: ProcessSectionProps) 
               transition={{ duration: 0.8, delay: idx * 0.2 }}
               className="relative flex flex-col group"
             >
-              <div className={`text-6xl md:text-7xl ${activeStyles.stepNum}`}>
+              <div className={`text-6xl md:text-7xl font-bold opacity-15 ${section.accent} ${t.headingFont}`}>
                 {step.number}
               </div>
-              <h3 className={`text-2xl mt-4 mb-4 ${activeStyles.stepTitle}`}>
+              <h3 className={`text-2xl mt-4 mb-4 ${t.headingFont} ${t.textPrimary}`}>
                 {step.title}
               </h3>
-              <p className={activeStyles.descFont}>
+              <p className={`leading-relaxed ${t.bodyFont} ${t.textSecondary}`}>
                 {step.description}
               </p>
             </motion.div>

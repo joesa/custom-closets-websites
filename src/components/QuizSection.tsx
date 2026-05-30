@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeType } from '@/types/config';
+import { getThemeStyles, getSectionTokens } from '@/lib/theme';
 
 interface QuizSectionProps {
   theme: ThemeType;
@@ -47,43 +48,19 @@ export default function QuizSection({ theme, onComplete }: QuizSectionProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isFinished, setIsFinished] = useState(false);
 
-  type QuizStyle = {
-    bg: string;
-    title: string;
-    subtitle: string;
-    card: string;
-    selectedCard: string;
-    button: string;
-  };
+  // Derive styling from the central theme tokens so every theme renders
+  // correctly rather than falling back to the luxury-minimal palette.
+  const t = getThemeStyles(theme);
+  const section = getSectionTokens(theme);
 
-  const styles: Record<string, QuizStyle> = {
-    'luxury-minimal': {
-      bg: 'bg-stone-50',
-      title: 'text-stone-900 font-playfair',
-      subtitle: 'text-stone-500 font-sans tracking-widest uppercase text-sm',
-      card: 'bg-white border-stone-200 hover:border-stone-400 text-stone-700',
-      selectedCard: 'border-stone-900 bg-stone-900 text-white',
-      button: 'bg-stone-900 text-white hover:bg-stone-800'
-    },
-    'brutalist': {
-      bg: 'bg-[#111] border-y border-white/10',
-      title: 'text-white font-inter font-black uppercase tracking-tighter',
-      subtitle: 'text-yellow-400 font-inter font-bold tracking-widest uppercase text-sm',
-      card: 'bg-black border-white/20 hover:border-yellow-400 text-neutral-300 rounded-none',
-      selectedCard: 'border-yellow-400 bg-yellow-400 text-black',
-      button: 'bg-yellow-400 text-black hover:bg-yellow-300 rounded-none font-bold'
-    },
-    'classic-warm': {
-      bg: 'bg-[#f4f1eb]',
-      title: 'text-amber-950 font-lora',
-      subtitle: 'text-amber-800/60 font-sans tracking-widest uppercase text-sm',
-      card: 'bg-white border-amber-900/10 hover:border-amber-900/30 text-amber-900 shadow-sm',
-      selectedCard: 'border-amber-900 bg-amber-900 text-white shadow-md',
-      button: 'bg-amber-900 text-white hover:bg-amber-800'
-    }
+  const activeStyles = {
+    bg: t.pageBackground,
+    title: `${t.headingFont} ${t.textPrimary}`,
+    subtitle: `${t.bodyFont} ${section.accent} tracking-widest uppercase text-sm`,
+    card: `${section.surface} ${section.surfaceBorder} ${t.textSecondary} hover:opacity-100 opacity-90`,
+    selectedCard: `${section.accentBg} ${section.accentText} border-transparent`,
+    button: t.button,
   };
-
-  const activeStyles = styles[theme] || styles['luxury-minimal'];
 
   const handleSelect = (optionId: string) => {
     const questionId = QUESTIONS[currentStep].id;
@@ -113,7 +90,7 @@ export default function QuizSection({ theme, onComplete }: QuizSectionProps) {
               {QUESTIONS.map((_, idx) => (
                 <div 
                   key={idx} 
-                  className={`h-1.5 w-12 transition-all duration-300 ${idx <= currentStep ? (theme === 'brutalist' ? 'bg-yellow-400' : (theme === 'luxury-minimal' ? 'bg-stone-900' : 'bg-amber-900')) : 'bg-black/10'}`} 
+                  className={`h-1.5 w-12 transition-all duration-300 ${idx <= currentStep ? section.accentBg : (section.isDark ? 'bg-white/15' : 'bg-black/10')}`} 
                 />
               ))}
             </div>
@@ -160,7 +137,7 @@ export default function QuizSection({ theme, onComplete }: QuizSectionProps) {
                 <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-green-500/10 text-green-600">
                   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
-                <p className={`text-xl mb-8 ${theme === 'brutalist' ? 'text-white font-inter' : 'text-stone-600 font-sans'}`}>
+                <p className={`text-xl mb-8 ${t.bodyFont} ${t.textSecondary}`}>
                   Your design profile has been pre-loaded into the quoting engine.
                 </p>
                 <a 

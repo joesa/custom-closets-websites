@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, MouseEvent as ReactMouseEvent, Touc
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { BeforeAfterConfig, ThemeType } from '@/types/config';
+import { getThemeStyles, getSectionTokens } from '@/lib/theme';
 
 interface BeforeAfterSliderProps {
   config: BeforeAfterConfig;
@@ -15,32 +16,17 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Theme-specific styles
-  const styles: Record<string, any> = {
-    'luxury-minimal': {
-      bg: 'bg-white',
-      title: 'font-playfair text-3xl md:text-5xl text-stone-900',
-      subtitle: 'font-sans text-xs uppercase tracking-widest text-stone-500 mb-8',
-      handleBg: 'bg-white shadow-[0_0_20px_rgba(0,0,0,0.1)] text-stone-900',
-      line: 'bg-white shadow-[0_0_10px_rgba(0,0,0,0.2)]',
-    },
-    'brutalist': {
-      bg: 'bg-[#050505] border-y border-white/10',
-      title: 'font-inter font-black text-3xl md:text-5xl uppercase tracking-tighter text-white',
-      subtitle: 'font-inter text-sm uppercase tracking-widest text-yellow-400 mb-8 font-bold',
-      handleBg: 'bg-yellow-400 text-black rounded-none shadow-[0_0_20px_rgba(250,204,21,0.3)]',
-      line: 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]',
-    },
-    'classic-warm': {
-      bg: 'bg-[#faf8f5]',
-      title: 'font-lora text-3xl md:text-5xl text-amber-950',
-      subtitle: 'font-sans text-sm tracking-widest text-amber-900/60 mb-8 uppercase',
-      handleBg: 'bg-[#faf8f5] shadow-xl border border-amber-900/10 text-amber-900',
-      line: 'bg-white shadow-lg border-l border-amber-900/10',
-    }
+  // Derive styling from the central theme tokens so all 13 themes render with
+  // the right palette/typography instead of falling back to luxury-minimal.
+  const t = getThemeStyles(theme);
+  const section = getSectionTokens(theme);
+  const activeStyles = {
+    bg: t.pageBackground,
+    title: `${t.headingFont} text-3xl md:text-5xl ${t.textPrimary}`,
+    subtitle: `${t.bodyFont} text-xs uppercase tracking-widest ${section.accent} mb-8`,
+    handleBg: `${section.accentBg} ${section.accentText} shadow-lg`,
+    line: `${section.accentBg} shadow-lg`,
   };
-
-  const activeStyles = styles[theme] || styles['luxury-minimal'];
 
   const handleMove = (clientX: number) => {
     if (!containerRef.current) return;
@@ -126,7 +112,7 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
               sizes="100vw"
             />
             {/* Label */}
-            <div className={`absolute top-4 right-4 z-10 px-4 py-1 text-xs font-bold uppercase tracking-widest bg-black/60 text-white backdrop-blur-sm ${theme === 'brutalist' ? 'rounded-none border border-white/10' : 'rounded-full'}`}>
+            <div className="absolute top-4 right-4 z-10 px-4 py-1 text-xs font-bold uppercase tracking-widest bg-black/60 text-white backdrop-blur-sm rounded-full">
               Before
             </div>
           </div>
@@ -144,7 +130,7 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
               sizes="100vw"
             />
             {/* Label */}
-            <div className={`absolute top-4 left-4 z-10 px-4 py-1 text-xs font-bold uppercase tracking-widest bg-white/90 text-black backdrop-blur-sm ${theme === 'brutalist' ? 'rounded-none border-b-2 border-yellow-400' : 'rounded-full'}`}>
+            <div className="absolute top-4 left-4 z-10 px-4 py-1 text-xs font-bold uppercase tracking-widest bg-white/90 text-black backdrop-blur-sm rounded-full">
               After
             </div>
           </div>

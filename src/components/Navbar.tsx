@@ -45,9 +45,9 @@ export default function Navbar({ brandName, links, themeName }: NavbarProps) {
               {link.label}
             </Link>
           ))}
-          <a href="/#quote" className={`ml-4 px-6 py-2 text-xs uppercase tracking-widest font-bold border border-white/30 text-white hover:bg-white hover:text-black transition-all ${theme.button.includes('rounded-none') ? 'rounded-none' : 'rounded-full'}`}>
+          <Link href="/#quote" className={`ml-4 px-6 py-2 text-xs uppercase tracking-widest font-bold border border-white/30 text-white hover:bg-white hover:text-black transition-all ${theme.button.includes('rounded-none') ? 'rounded-none' : 'rounded-full'}`}>
             Get Quote
-          </a>
+          </Link>
         </div>
       </div>
     </nav>

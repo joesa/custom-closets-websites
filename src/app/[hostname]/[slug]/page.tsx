@@ -1,9 +1,11 @@
 import { getActiveConfig } from "@/lib/getConfig";
 import { notFound } from "next/navigation";
 import LocalSEO from "@/components/LocalSEO";
+import PendingApproval from "@/components/PendingApproval";
 import { getThemeStyles } from "@/lib/theme";
+import { getSiteGate } from "@/lib/siteGate";
+import { cookies } from "next/headers";
 import Image from "next/image";
-import * as motion from "framer-motion/client";
 
 export default async function SubPage({ 
   params 
@@ -15,6 +17,25 @@ export default async function SubPage({
 
   if (!config || !config.pagesConfig) {
     notFound();
+  }
+
+  // Mirror the home-page gate: suspended/pending tenants must not expose their
+  // sub-pages to the public either.
+  const cookieStore = await cookies();
+  const isAdminBypass = cookieStore.get('admin_bypass')?.value === 'true';
+  const gate = getSiteGate(config, isAdminBypass);
+
+  if (gate === 'blocked') {
+    notFound();
+  }
+
+  if (gate === 'pending') {
+    return (
+      <>
+        <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`} />
+        <PendingApproval />
+      </>
+    );
   }
 
   const pageData = config.pagesConfig.find(p => p.slug === `/${resolvedParams.slug}` || p.slug === resolvedParams.slug);

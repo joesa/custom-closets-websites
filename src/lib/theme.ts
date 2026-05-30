@@ -188,3 +188,39 @@ export function getThemeStyles(theme: ThemeType) {
       return getThemeStyles('luxury-minimal');
   }
 }
+
+/**
+ * Complementary, section-level tokens consumed by ProcessSection, QuizSection,
+ * BeforeAfterSlider and ProductDetailSheet. Kept here (alongside getThemeStyles)
+ * so adding/adjusting a theme is a single-file change and every section
+ * component renders correctly for all 13 themes instead of falling back to the
+ * luxury-minimal palette.
+ */
+export interface SectionTokens {
+  isDark: boolean;
+  surface: string;        // elevated card/panel background
+  surfaceBorder: string;  // border for surfaces/cards
+  accent: string;         // accent text color
+  accentBg: string;       // solid accent fill (selected states, slider line/handle)
+  accentText: string;     // readable text color on top of accentBg
+}
+
+const SECTION_TOKENS: Record<ThemeType, SectionTokens> = {
+  'luxury-minimal':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-stone-200',       accent: 'text-amber-700',  accentBg: 'bg-stone-900',  accentText: 'text-white' },
+  'brutalist':           { isDark: true,  surface: 'bg-white/[0.03]',     surfaceBorder: 'border-white/15',        accent: 'text-yellow-400', accentBg: 'bg-yellow-400', accentText: 'text-black' },
+  'classic-warm':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-amber-900/10',    accent: 'text-amber-800',  accentBg: 'bg-amber-900',  accentText: 'text-white' },
+  'modern-office':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-slate-200',       accent: 'text-blue-600',   accentBg: 'bg-blue-600',   accentText: 'text-white' },
+  'playful-kids':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-rose-500',   accentBg: 'bg-rose-500',   accentText: 'text-white' },
+  'rustic-pantry':       { isDark: false, surface: 'bg-[#ece8df]',        surfaceBorder: 'border-[#515c4a]/20',    accent: 'text-[#515c4a]',  accentBg: 'bg-[#515c4a]',  accentText: 'text-white' },
+  'sleek-entertainment': { isDark: true,  surface: 'bg-zinc-900',         surfaceBorder: 'border-zinc-800',        accent: 'text-cyan-400',   accentBg: 'bg-cyan-500',   accentText: 'text-black' },
+  'elegant-dressing':    { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#d4af37]/30',    accent: 'text-[#d4af37]',  accentBg: 'bg-[#d4af37]',  accentText: 'text-white' },
+  'functional-utility':  { isDark: false, surface: 'bg-neutral-50',       surfaceBorder: 'border-neutral-200',     accent: 'text-blue-500',   accentBg: 'bg-neutral-900', accentText: 'text-white' },
+  'creative-craft':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-purple-100',      accent: 'text-purple-600', accentBg: 'bg-purple-600', accentText: 'text-white' },
+  'sophisticated-wine':  { isDark: true,  surface: 'bg-[#24181a]',        surfaceBorder: 'border-[#362427]',       accent: 'text-[#8c2a35]',  accentBg: 'bg-[#5c1c24]',  accentText: 'text-[#e6d5cc]' },
+  'cozy-library':        { isDark: true,  surface: 'bg-[#362c22]',        surfaceBorder: 'border-[#4a3d2f]',       accent: 'text-[#d2a679]',  accentBg: 'bg-[#8b5a2b]',  accentText: 'text-[#f4efe8]' },
+  'minimalist-zen':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#2a2b2a]/15',    accent: 'text-[#7d8276]',  accentBg: 'bg-[#2a2b2a]',  accentText: 'text-white' },
+};
+
+export function getSectionTokens(theme: ThemeType): SectionTokens {
+  return SECTION_TOKENS[theme] || SECTION_TOKENS['luxury-minimal'];
+}

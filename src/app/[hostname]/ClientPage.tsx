@@ -10,6 +10,7 @@ import ProductDetailSheet from "@/components/ProductDetailSheet";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import QuizSection from "@/components/QuizSection";
 import { BrandConfig, Product } from "@/types/config";
+import { PUBLIC_API_URL, WIDGET_CDN_URL } from "@/lib/urls";
 
 interface ClientPageProps {
   config: BrandConfig;
@@ -135,11 +136,11 @@ export default function ClientPage({ config }: ClientPageProps) {
           </p>
           
           <div className="mx-auto w-full text-left">
-            <Script src="https://closet-widget.vercel.app/widget.js" strategy="lazyOnload" />
+            <Script src={WIDGET_CDN_URL} strategy="lazyOnload" />
             {/* @ts-expect-error Custom web component */}
             <closet-quote-widget 
               data-contractor-id={config.widgetId} 
-              data-api-url="https://www.closetquotes.com"
+              data-api-url={PUBLIC_API_URL}
               data-quiz-frustration={quizAnswers.frustration || ''}
               data-quiz-style={quizAnswers.style || ''}
               data-quiz-timeline={quizAnswers.timeline || ''}
@@ -172,21 +173,28 @@ export default function ClientPage({ config }: ClientPageProps) {
     }
   };
 
+  // Multi-page sites render the full <Navbar> in the layout. Rendering this
+  // logo-only header too would double the logo AND, because it's a full-width
+  // z-50 box, swallow clicks meant for the nav links until you scroll past it.
+  const hasNav = !!(config.navLinks && config.navLinks.length > 0);
+
   return (
     <div className={`min-h-screen ${theme.pageBackground} ${theme.textPrimary} ${theme.bodyFont}`}>
-      {/* ─── Global Header ─── */}
-      <header className="absolute top-0 z-50 w-full py-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`text-xl ${theme.headingFont} text-white`}
-          >
-            {config.brandName}
-          </motion.div>
-        </div>
-      </header>
+      {/* ─── Global Header (only when the layout's Navbar isn't present) ─── */}
+      {!hasNav && (
+        <header className="pointer-events-none absolute top-0 z-50 w-full py-8">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className={`text-xl ${theme.headingFont} text-white`}
+            >
+              {config.brandName}
+            </motion.div>
+          </div>
+        </header>
+      )}
 
       {/* Render selected structural layout */}
       {renderLayout()}

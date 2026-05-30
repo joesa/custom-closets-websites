@@ -1,14 +1,27 @@
-import { BrandConfig, ThemeType } from '@/types/config';
+import { BrandConfig } from '@/types/config';
 import { createClient } from '@supabase/supabase-js';
+import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
+import { mapRowToConfig, type SupabaseConfigRow } from './configMapper';
 
-// Fallback if environment variables are missing during build/dev
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+export { mapRowToConfig } from './configMapper';
+export type { SupabaseConfigRow } from './configMapper';
 
-// Create a single supabase client for edge
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Lazily create the Supabase client on first use. Doing this at module scope
+// would throw when env vars are absent (e.g. in unit tests) and would run a
+// side effect just from importing this file's pure helpers.
+let supabaseClient: ReturnType<typeof createClient> | null = null;
+function getSupabase() {
+  if (!supabaseClient) {
+    supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    );
+  }
+  return supabaseClient;
+}
 
-export async function getActiveConfig(hostname: string): Promise<BrandConfig | null> {
+async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
   // If we're hitting localhost:3000 directly without a subdomain, fallback to lumina
   // This is helpful for local development if the developer doesn't change their hosts file
   if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '') {
@@ -16,7 +29,7 @@ export async function getActiveConfig(hostname: string): Promise<BrandConfig | n
   }
 
   // Query Supabase
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('domains')
     .select(`
       hostname,
@@ -47,26 +60,20 @@ export async function getActiveConfig(hostname: string): Promise<BrandConfig | n
     return null;
   }
 
-  // We are heavily relying on the hybrid Relational + JSONB schema
-  // So the data from Supabase maps almost exactly to BrandConfig
-  const tenant = Array.isArray(data.tenants) ? data.tenants[0] : data.tenants;
-  const configRow = Array.isArray(tenant.site_configs) ? tenant.site_configs[0] : tenant.site_configs;
-
-  if (!tenant || !configRow) return null;
-
-  return {
-    brandName: configRow.brand_name,
-    theme: configRow.theme as ThemeType,
-    hero: configRow.hero_config,
-    about: configRow.about_config,
-    process: configRow.process_config,
-    products: configRow.products_config,
-    seo: configRow.seo_config,
-    beforeAfter: configRow.before_after_config,
-    widgetId: tenant.widget_id,
-    defaultRoom: configRow.default_room,
-    siteStatus: tenant.site_status,
-    navLinks: configRow.nav_links || [],
-    pagesConfig: configRow.pages_config || [],
-  };
+  return mapRowToConfig(data as unknown as SupabaseConfigRow);
 }
+
+// Cross-request cache keyed by hostname. Revalidates every 60s so config edits
+// (e.g. site approval, theme changes) propagate without a redeploy. Invalidate
+// on demand with revalidateTag('site-config').
+const getCachedActiveConfig = unstable_cache(
+  (hostname: string) => loadActiveConfig(hostname),
+  ['active-config'],
+  { revalidate: 60, tags: ['site-config'] }
+);
+
+// Per-request memoization so layout.tsx and page.tsx share a single lookup
+// instead of each hitting Supabase independently.
+export const getActiveConfig = cache(
+  (hostname: string): Promise<BrandConfig | null> => getCachedActiveConfig(hostname)
+);
