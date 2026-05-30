@@ -58,6 +58,29 @@ export interface BeforeAfterConfig {
   subtitle: string;
 }
 
+export interface NavLink {
+  label: string;
+  slug: string;
+}
+
+export interface ContentBlock {
+  type: 'text' | 'image_left' | 'image_right' | 'grid';
+  heading: string;
+  body: string;
+  image?: string;
+  items?: Array<{ title: string; description: string }>;
+}
+
+export interface PageConfig {
+  slug: string;
+  title: string;
+  hero: {
+    headline: string;
+    backgroundImage: string;
+  };
+  content_blocks: ContentBlock[];
+}
+
 export interface BrandConfig {
   brandName: string;
   theme: ThemeType;
@@ -76,4 +99,6 @@ export interface BrandConfig {
   defaultRoom?: string;
   siteStatus?: string;
   layoutStyle?: string;
+  navLinks?: NavLink[];
+  pagesConfig?: PageConfig[];
 }

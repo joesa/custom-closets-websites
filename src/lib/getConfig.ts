@@ -33,7 +33,9 @@ export async function getActiveConfig(hostname: string): Promise<BrandConfig | n
           process_config,
           products_config,
           seo_config,
-          before_after_config
+          before_after_config,
+          nav_links,
+          pages_config
         )
       )
     `)
@@ -64,5 +66,7 @@ export async function getActiveConfig(hostname: string): Promise<BrandConfig | n
     widgetId: tenant.widget_id,
     defaultRoom: configRow.default_room,
     siteStatus: tenant.site_status,
+    navLinks: configRow.nav_links || [],
+    pagesConfig: configRow.pages_config || [],
   };
 }
