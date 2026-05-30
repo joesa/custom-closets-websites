@@ -38,7 +38,7 @@ export default async function SubPage({
         <section className="relative flex min-h-[60vh] md:min-h-[70vh] items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
             <Image
-              src={pageData.hero.backgroundImage}
+              src={pageData.hero.backgroundImage || 'https://images.unsplash.com/photo-1558211583-d26f610c1eb1'}
               alt={pageData.hero.headline}
               fill
               className="object-cover"
@@ -75,7 +75,7 @@ export default async function SubPage({
                 <div key={idx} className={`flex flex-col md:flex-row gap-12 items-center ${isLeft ? '' : 'md:flex-row-reverse'}`}>
                   {block.image && (
                     <div className="w-full md:w-1/2 aspect-square md:aspect-[4/3] relative overflow-hidden rounded-xl border border-white/10">
-                      <Image src={block.image} alt={block.heading} fill className="object-cover" />
+                      <Image src={block.image || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2'} alt={block.heading} fill className="object-cover" />
                     </div>
                   )}
                   <div className={`w-full ${block.image ? 'md:w-1/2' : ''}`}>
