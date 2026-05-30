@@ -26,7 +26,7 @@ export default function ClientPage({ config }: ClientPageProps) {
     <section key="hero" className="relative flex min-h-[90vh] items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src={config.hero.backgroundImage}
+          src={config.hero.backgroundImage || 'https://images.unsplash.com/photo-1558211583-d26f610c1eb1'}
           alt={config.hero.headline}
           fill
           className="object-cover"
@@ -95,7 +95,7 @@ export default function ClientPage({ config }: ClientPageProps) {
           >
             <div className="relative aspect-[4/5] w-full overflow-hidden">
               <Image
-                src={product.image}
+                src={product.image || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2'}
                 alt={product.title}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"

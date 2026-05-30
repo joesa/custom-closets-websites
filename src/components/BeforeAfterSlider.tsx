@@ -118,8 +118,8 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
         >
           {/* Base Layer: Before Image */}
           <div className="absolute inset-0">
-            <Image
-              src={config.beforeImage}
+            <Image 
+              src={config.beforeImage || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2'}
               alt="Before Transformation"
               fill
               className="object-cover pointer-events-none"

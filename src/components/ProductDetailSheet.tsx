@@ -85,7 +85,7 @@ export default function ProductDetailSheet({ isOpen, onClose, product, theme }: 
             {/* High-Resolution Concept Asset Window */}
             <div className="relative aspect-[4/3] w-full mb-12 overflow-hidden rounded-sm group shadow-sm">
               <Image
-                src={product.image}
+                src={product.image || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2'}
                 alt={product.title}
                 fill
                 priority
