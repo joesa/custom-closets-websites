@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
+import * as motion from 'framer-motion/client';
 import { ThemeType } from '@/types/config';
 import { getThemeStyles, getSectionTokens } from '@/lib/theme';
+import { useMotionHydrated } from '@/components/MotionHydrationProvider';
+import { motionInitial } from '@/lib/motionInitial';
 
 interface QuizSectionProps {
   theme: ThemeType;
@@ -44,6 +47,7 @@ const QUESTIONS = [
 ];
 
 export default function QuizSection({ theme, onComplete }: QuizSectionProps) {
+  const motionReady = useMotionHydrated();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isFinished, setIsFinished] = useState(false);
@@ -102,7 +106,7 @@ export default function QuizSection({ theme, onComplete }: QuizSectionProps) {
             {!isFinished ? (
               <motion.div
                 key={currentStep}
-                initial={{ opacity: 0, x: 20 }}
+                initial={motionInitial(motionReady, { opacity: 0, x: 20 })}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
@@ -130,7 +134,7 @@ export default function QuizSection({ theme, onComplete }: QuizSectionProps) {
             ) : (
               <motion.div
                 key="finished"
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={motionInitial(motionReady, { opacity: 0, scale: 0.95 })}
                 animate={{ opacity: 1, scale: 1 }}
                 className="absolute inset-0 w-full flex flex-col items-center justify-center text-center"
               >

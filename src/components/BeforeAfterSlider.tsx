@@ -2,9 +2,11 @@
 
 import React, { useState, useRef, useEffect, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import * as motion from 'framer-motion/client';
 import { BeforeAfterConfig, ThemeType } from '@/types/config';
 import { getThemeStyles, getSectionTokens } from '@/lib/theme';
+import { useMotionHydrated } from '@/components/MotionHydrationProvider';
+import { motionInitial } from '@/lib/motionInitial';
 
 interface BeforeAfterSliderProps {
   config: BeforeAfterConfig;
@@ -12,6 +14,7 @@ interface BeforeAfterSliderProps {
 }
 
 export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderProps) {
+  const motionReady = useMotionHydrated();
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -72,7 +75,7 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <motion.p 
-            initial={{ opacity: 0, y: 20 }}
+            initial={motionInitial(motionReady, { opacity: 0, y: 20 })}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className={activeStyles.subtitle}
@@ -80,7 +83,7 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
             {config.subtitle}
           </motion.p>
           <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
+            initial={motionInitial(motionReady, { opacity: 0, y: 20 })}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ delay: 0.1 }}
@@ -91,7 +94,7 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
         </div>
 
         <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }}
+          initial={motionInitial(motionReady, { opacity: 0, scale: 0.98 })}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut" }}

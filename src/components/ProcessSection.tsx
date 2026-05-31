@@ -4,6 +4,8 @@ import React from 'react';
 import * as motion from 'framer-motion/client';
 import { ProcessConfig, ThemeType } from '@/types/config';
 import { getThemeStyles, getSectionTokens } from '@/lib/theme';
+import { useMotionHydrated } from '@/components/MotionHydrationProvider';
+import { motionInitial } from '@/lib/motionInitial';
 
 interface ProcessSectionProps {
   theme: ThemeType;
@@ -11,6 +13,7 @@ interface ProcessSectionProps {
 }
 
 export default function ProcessSection({ theme, process }: ProcessSectionProps) {
+  const motionReady = useMotionHydrated();
   // Derive styling from the central theme tokens so all 13 themes render with
   // their own palette/typography (instead of falling back to luxury-minimal).
   const t = getThemeStyles(theme);
@@ -32,7 +35,7 @@ export default function ProcessSection({ theme, process }: ProcessSectionProps) 
           {process.steps.map((step, idx) => (
             <motion.div
               key={step.number}
-              initial={{ opacity: 0, y: 30 }}
+              initial={motionInitial(motionReady, { opacity: 0, y: 30 })}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.8, delay: idx * 0.2 }}

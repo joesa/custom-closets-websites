@@ -11,12 +11,18 @@ import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import QuizSection from "@/components/QuizSection";
 import { BrandConfig, Product } from "@/types/config";
 import { PUBLIC_API_URL, WIDGET_CDN_URL } from "@/lib/urls";
+import {
+  MotionHydrationProvider,
+  useMotionHydrated,
+} from "@/components/MotionHydrationProvider";
+import { motionInitial } from "@/lib/motionInitial";
 
 interface ClientPageProps {
   config: BrandConfig;
 }
 
-export default function ClientPage({ config }: ClientPageProps) {
+function ClientPageContent({ config }: ClientPageProps) {
+  const motionReady = useMotionHydrated();
   const theme = getThemeStyles(config.theme);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
@@ -39,7 +45,7 @@ export default function ClientPage({ config }: ClientPageProps) {
       
       <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
         <motion.h1 
-          initial={{ opacity: 0, y: 30 }}
+          initial={motionInitial(motionReady, { opacity: 0, y: 30 })}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
           className={`text-5xl md:text-7xl ${theme.headingFont} text-white mb-8 leading-tight`}
@@ -47,7 +53,7 @@ export default function ClientPage({ config }: ClientPageProps) {
           {config.hero.headline}
         </motion.h1>
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={motionInitial(motionReady, { opacity: 0, y: 30 })}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
         >
@@ -62,7 +68,7 @@ export default function ClientPage({ config }: ClientPageProps) {
   const aboutSection = (
     <section key="about" className={theme.containerClasses}>
       <motion.div 
-        initial={{ opacity: 0, y: 40 }}
+        initial={motionInitial(motionReady, { opacity: 0, y: 40 })}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8 }}
@@ -88,7 +94,7 @@ export default function ClientPage({ config }: ClientPageProps) {
         {config.products.map((product, idx) => (
           <motion.div 
             key={idx}
-            initial={{ opacity: 0, y: 50 }}
+            initial={motionInitial(motionReady, { opacity: 0, y: 50 })}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: idx * 0.2 }}
@@ -124,7 +130,7 @@ export default function ClientPage({ config }: ClientPageProps) {
     <section key="widget" id="quote" className={`py-32 ${theme.pageBackground}`}>
       <div className="mx-auto max-w-5xl px-6 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={motionInitial(motionReady, { opacity: 0, y: 30 })}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
@@ -191,7 +197,7 @@ export default function ClientPage({ config }: ClientPageProps) {
         <header className="pointer-events-none absolute top-0 z-50 w-full py-8">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
             <motion.div 
-              initial={{ opacity: 0, y: -20 }}
+              initial={motionInitial(motionReady, { opacity: 0, y: -20 })}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
               className={`text-xl ${theme.headingFont} text-white`}
@@ -224,5 +230,13 @@ export default function ClientPage({ config }: ClientPageProps) {
         theme={config.theme} 
       />
     </div>
+  );
+}
+
+export default function ClientPage(props: ClientPageProps) {
+  return (
+    <MotionHydrationProvider>
+      <ClientPageContent {...props} />
+    </MotionHydrationProvider>
   );
 }
