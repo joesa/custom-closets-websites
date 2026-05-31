@@ -76,6 +76,7 @@ export default function ProductDetailSheet({ isOpen, onClose, product, theme }: 
                 alt={product.title}
                 fill
                 priority
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
               />
             </div>

@@ -109,7 +109,7 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
               alt="Before Transformation"
               fill
               className="object-cover pointer-events-none"
-              sizes="100vw"
+              sizes="(max-width: 1152px) 100vw, 1152px"
             />
             {/* Label */}
             <div className="absolute top-4 right-4 z-10 px-4 py-1 text-xs font-bold uppercase tracking-widest bg-black/60 text-white backdrop-blur-sm rounded-full">
@@ -127,7 +127,7 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
               alt="After Transformation"
               fill
               className="object-cover"
-              sizes="100vw"
+              sizes="(max-width: 1152px) 100vw, 1152px"
             />
             {/* Label */}
             <div className="absolute top-4 left-4 z-10 px-4 py-1 text-xs font-bold uppercase tracking-widest bg-white/90 text-black backdrop-blur-sm rounded-full">

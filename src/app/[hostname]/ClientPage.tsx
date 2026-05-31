@@ -30,6 +30,7 @@ export default function ClientPage({ config }: ClientPageProps) {
           src={config.hero.backgroundImage || 'https://images.unsplash.com/photo-1558211583-d26f610c1eb1'}
           alt={config.hero.headline}
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
