@@ -26,6 +26,7 @@ export default async function HostnameLayout({
           brandName={config.brandName} 
           links={config.navLinks || []} 
           themeName={config.theme} 
+          logoUrl={config.logoUrl}
         />
       )}
       {children}

@@ -101,4 +101,8 @@ export interface BrandConfig {
   layoutStyle?: string;
   navLinks?: NavLink[];
   pagesConfig?: PageConfig[];
+  // Prospect-supplied logo (shown in the header/nav instead of the text brand
+  // name) and free-text pricing guidance (shown near the quote CTA).
+  logoUrl?: string;
+  pricingNotes?: string;
 }

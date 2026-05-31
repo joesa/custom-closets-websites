@@ -24,6 +24,8 @@ type SiteConfigRow = {
   before_after_config: BeforeAfterConfig;
   nav_links?: NavLink[] | null;
   pages_config?: PageConfig[] | null;
+  logo_url?: string | null;
+  pricing_notes?: string | null;
 };
 type TenantRow = {
   widget_id?: string;
@@ -65,5 +67,7 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     siteStatus: tenant.site_status,
     navLinks: configRow.nav_links || [],
     pagesConfig: configRow.pages_config || [],
+    logoUrl: configRow.logo_url ?? undefined,
+    pricingNotes: configRow.pricing_notes ?? undefined,
   };
 }

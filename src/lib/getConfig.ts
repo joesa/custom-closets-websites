@@ -48,7 +48,9 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
           seo_config,
           before_after_config,
           nav_links,
-          pages_config
+          pages_config,
+          logo_url,
+          pricing_notes
         )
       )
     `)

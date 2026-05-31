@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getThemeStyles } from '@/lib/theme';
 import { NavLink, ThemeType } from '@/types/config';
 
@@ -9,9 +10,10 @@ interface NavbarProps {
   brandName: string;
   links: NavLink[];
   themeName: ThemeType;
+  logoUrl?: string;
 }
 
-export default function Navbar({ brandName, links, themeName }: NavbarProps) {
+export default function Navbar({ brandName, links, themeName, logoUrl }: NavbarProps) {
   const theme = getThemeStyles(themeName);
   const [scrolled, setScrolled] = useState(false);
 
@@ -33,7 +35,18 @@ export default function Navbar({ brandName, links, themeName }: NavbarProps) {
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link href="/" className={`text-xl font-bold tracking-wider text-white ${theme.headingFont}`}>
-          {brandName}
+          {logoUrl ? (
+            <Image
+              src={logoUrl}
+              alt={brandName}
+              width={180}
+              height={48}
+              className="h-9 w-auto object-contain"
+              priority
+            />
+          ) : (
+            brandName
+          )}
         </Link>
         <div className="hidden md:flex items-center gap-8">
           {links.map((link, i) => (

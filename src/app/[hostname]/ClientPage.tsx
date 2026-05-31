@@ -132,9 +132,14 @@ export default function ClientPage({ config }: ClientPageProps) {
           <h2 className={`mb-4 text-4xl ${theme.headingFont}`}>
             Get an Instant Quote
           </h2>
-          <p className={`mb-12 text-lg ${theme.textSecondary}`}>
+          <p className={`${config.pricingNotes ? 'mb-4' : 'mb-12'} text-lg ${theme.textSecondary}`}>
             Configure your <strong>{config.defaultRoom}</strong> and get a price estimate instantly.
           </p>
+          {config.pricingNotes && (
+            <p className={`mx-auto mb-12 max-w-2xl text-sm ${theme.textSecondary} opacity-80`}>
+              {config.pricingNotes}
+            </p>
+          )}
           
           <div className="mx-auto w-full text-left">
             <Script src={WIDGET_CDN_URL} strategy="lazyOnload" />
@@ -191,7 +196,18 @@ export default function ClientPage({ config }: ClientPageProps) {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className={`text-xl ${theme.headingFont} text-white`}
             >
-              {config.brandName}
+              {config.logoUrl ? (
+                <Image
+                  src={config.logoUrl}
+                  alt={config.brandName}
+                  width={180}
+                  height={48}
+                  className="h-10 w-auto object-contain"
+                  priority
+                />
+              ) : (
+                config.brandName
+              )}
             </motion.div>
           </div>
         </header>
