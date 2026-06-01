@@ -1,6 +1,20 @@
 import { ThemeType } from '@/types/config';
 
-export function getThemeStyles(theme: ThemeType) {
+export type ThemeStyles = {
+  pageBackground: string;
+  textPrimary: string;
+  textSecondary: string;
+  headingFont: string;
+  bodyFont: string;
+  containerClasses: string;
+  button: string;
+  productCard: string;
+  productImageHover: string;
+  accentColor: string;
+  heroGradient: string;
+};
+
+function coreThemeStyles(theme: ThemeType): ThemeStyles {
   switch (theme) {
     case 'luxury-minimal':
       return {
@@ -184,8 +198,91 @@ export function getThemeStyles(theme: ThemeType) {
         accentColor: 'text-[#7d8276]',
         heroGradient: 'bg-gradient-to-t from-[#faf9f7]/80 to-transparent',
       };
+    case 'pantry-fresh':
+      return {
+        ...coreThemeStyles('rustic-pantry'),
+        pageBackground: 'bg-emerald-50/40',
+        accentColor: 'text-emerald-800',
+      };
+    case 'laundry-clean':
+      return {
+        pageBackground: 'bg-sky-50',
+        textPrimary: 'text-slate-800',
+        textSecondary: 'text-slate-500',
+        headingFont: 'font-sans font-semibold tracking-tight',
+        bodyFont: 'font-sans',
+        containerClasses: 'max-w-6xl mx-auto px-6 py-20',
+        button: 'bg-sky-600 text-white hover:bg-sky-700 transition-colors rounded-lg px-8 py-3 font-medium',
+        productCard: 'group overflow-hidden rounded-xl bg-white border border-sky-100 shadow-sm',
+        productImageHover: 'transition-transform duration-500 group-hover:scale-105',
+        accentColor: 'text-sky-600',
+        heroGradient: 'bg-gradient-to-t from-sky-900/50 to-transparent',
+      };
+    case 'coastal-climate':
+      return {
+        pageBackground: 'bg-slate-50',
+        textPrimary: 'text-slate-800',
+        textSecondary: 'text-slate-500',
+        headingFont: 'font-playfair tracking-wide',
+        bodyFont: 'font-sans font-light',
+        containerClasses: 'max-w-6xl mx-auto px-8 py-28',
+        button: 'bg-teal-700 text-white hover:bg-teal-800 transition-colors rounded-md px-8 py-4',
+        productCard: 'group overflow-hidden rounded-lg bg-white shadow-md border border-teal-100',
+        productImageHover: 'transition-transform duration-700 group-hover:scale-105',
+        accentColor: 'text-teal-700',
+        heroGradient: 'bg-gradient-to-t from-teal-950/60 via-teal-900/20 to-transparent',
+      };
+    case 'historic-classic':
+      return {
+        ...coreThemeStyles('classic-warm'),
+        pageBackground: 'bg-[#f0ebe3]',
+        textPrimary: 'text-stone-900',
+      };
+    case 'office-executive':
+      return {
+        ...coreThemeStyles('modern-office'),
+        pageBackground: 'bg-slate-900',
+        textPrimary: 'text-slate-100',
+        textSecondary: 'text-slate-400',
+        button: 'bg-amber-500 text-slate-900 hover:bg-amber-400 transition-colors rounded-sm px-8 py-4 font-semibold',
+        accentColor: 'text-amber-400',
+        heroGradient: 'bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent',
+      };
     default:
-      return getThemeStyles('luxury-minimal');
+      return {
+        pageBackground: 'bg-white',
+        textPrimary: 'text-stone-900',
+        textSecondary: 'text-stone-500',
+        headingFont: 'font-playfair tracking-wide',
+        bodyFont: 'font-sans font-light',
+        containerClasses: 'max-w-6xl mx-auto px-8 py-32',
+        button: 'bg-stone-900 text-white hover:bg-stone-800 transition-colors rounded-none px-8 py-4 uppercase tracking-widest text-sm',
+        productCard: 'group overflow-hidden rounded-none',
+        productImageHover: 'transition-transform duration-1000 group-hover:scale-105',
+        accentColor: 'text-amber-700',
+        heroGradient: 'bg-gradient-to-t from-black/60 via-black/20 to-transparent',
+      };
+  }
+}
+
+export function getThemeStyles(theme: ThemeType): ThemeStyles {
+  switch (theme) {
+    case 'garage-industrial':
+      return coreThemeStyles('brutalist');
+    case 'mudroom-family':
+      return coreThemeStyles('classic-warm');
+    case 'commercial-pro':
+      return coreThemeStyles('modern-office');
+    case 'luxury-gallery':
+      return coreThemeStyles('elegant-dressing');
+    case 'kids-playful':
+      return coreThemeStyles('playful-kids');
+    case 'media-theater':
+      return coreThemeStyles('sleek-entertainment');
+    case 'wine-cellar':
+      return coreThemeStyles('sophisticated-wine');
+    default:
+      return coreThemeStyles(theme);
   }
 }
 
@@ -219,6 +316,18 @@ const SECTION_TOKENS: Record<ThemeType, SectionTokens> = {
   'sophisticated-wine':  { isDark: true,  surface: 'bg-[#24181a]',        surfaceBorder: 'border-[#362427]',       accent: 'text-[#8c2a35]',  accentBg: 'bg-[#5c1c24]',  accentText: 'text-[#e6d5cc]' },
   'cozy-library':        { isDark: true,  surface: 'bg-[#362c22]',        surfaceBorder: 'border-[#4a3d2f]',       accent: 'text-[#d2a679]',  accentBg: 'bg-[#8b5a2b]',  accentText: 'text-[#f4efe8]' },
   'minimalist-zen':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#2a2b2a]/15',    accent: 'text-[#7d8276]',  accentBg: 'bg-[#2a2b2a]',  accentText: 'text-white' },
+  'garage-industrial':   { isDark: true,  surface: 'bg-white/[0.03]',     surfaceBorder: 'border-white/15',        accent: 'text-yellow-400', accentBg: 'bg-yellow-400', accentText: 'text-black' },
+  'pantry-fresh':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-emerald-200',     accent: 'text-emerald-800', accentBg: 'bg-emerald-800', accentText: 'text-white' },
+  'laundry-clean':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-sky-200',         accent: 'text-sky-600',    accentBg: 'bg-sky-600',    accentText: 'text-white' },
+  'mudroom-family':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-amber-900/10',    accent: 'text-amber-800',  accentBg: 'bg-amber-900',  accentText: 'text-white' },
+  'commercial-pro':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-slate-200',       accent: 'text-blue-600',   accentBg: 'bg-blue-600',   accentText: 'text-white' },
+  'coastal-climate':     { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-teal-200',        accent: 'text-teal-700',   accentBg: 'bg-teal-700',   accentText: 'text-white' },
+  'historic-classic':    { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-amber-900/10',    accent: 'text-amber-800',  accentBg: 'bg-amber-900',  accentText: 'text-white' },
+  'luxury-gallery':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#d4af37]/30',    accent: 'text-[#d4af37]',  accentBg: 'bg-[#d4af37]',  accentText: 'text-white' },
+  'kids-playful':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-rose-500',   accentBg: 'bg-rose-500',   accentText: 'text-white' },
+  'media-theater':       { isDark: true,  surface: 'bg-zinc-900',         surfaceBorder: 'border-zinc-800',        accent: 'text-cyan-400',   accentBg: 'bg-cyan-500',   accentText: 'text-black' },
+  'office-executive':    { isDark: true,  surface: 'bg-slate-800',        surfaceBorder: 'border-slate-700',       accent: 'text-amber-400',  accentBg: 'bg-amber-500',  accentText: 'text-slate-900' },
+  'wine-cellar':         { isDark: true,  surface: 'bg-[#24181a]',        surfaceBorder: 'border-[#362427]',       accent: 'text-[#8c2a35]',  accentBg: 'bg-[#5c1c24]',  accentText: 'text-[#e6d5cc]' },
 };
 
 export function getSectionTokens(theme: ThemeType): SectionTokens {

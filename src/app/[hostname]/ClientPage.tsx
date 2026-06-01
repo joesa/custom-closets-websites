@@ -179,6 +179,14 @@ function ClientPageContent({ config }: ClientPageProps) {
         return [heroSection, quizSection, widgetSection];
       case 'visual-impact':
         return [heroSection, beforeAfterSection, portfolioSection, widgetSection];
+      case 'trust-builder':
+        return [heroSection, aboutSection, processSection, beforeAfterSection, portfolioSection, quizSection, widgetSection];
+      case 'gallery-showcase':
+        return [heroSection, portfolioSection, beforeAfterSection, aboutSection, quizSection, widgetSection];
+      case 'local-expert':
+        return [heroSection, aboutSection, processSection, portfolioSection, beforeAfterSection, quizSection, widgetSection];
+      case 'compact-quote':
+        return [heroSection, quizSection, widgetSection];
       case 'standard':
       default:
         return [heroSection, aboutSection, processSection, beforeAfterSection, portfolioSection, quizSection, widgetSection];

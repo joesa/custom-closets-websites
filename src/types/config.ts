@@ -1,6 +1,6 @@
-export type ThemeType = 
-  | 'luxury-minimal' 
-  | 'brutalist' 
+export type ThemeType =
+  | 'luxury-minimal'
+  | 'brutalist'
   | 'classic-warm'
   | 'modern-office'
   | 'playful-kids'
@@ -11,7 +11,19 @@ export type ThemeType =
   | 'creative-craft'
   | 'sophisticated-wine'
   | 'cozy-library'
-  | 'minimalist-zen';
+  | 'minimalist-zen'
+  | 'garage-industrial'
+  | 'pantry-fresh'
+  | 'laundry-clean'
+  | 'mudroom-family'
+  | 'commercial-pro'
+  | 'coastal-climate'
+  | 'historic-classic'
+  | 'luxury-gallery'
+  | 'kids-playful'
+  | 'media-theater'
+  | 'office-executive'
+  | 'wine-cellar';
 
 export interface ProductDetails {
   subtitle: string;
