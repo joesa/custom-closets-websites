@@ -52,6 +52,7 @@ export interface ProcessConfig {
 
 export interface SEOConfig {
   legalName: string;
+  email?: string;
   phone: string;
   streetAddress: string;
   addressLocality: string;
@@ -76,11 +77,12 @@ export interface NavLink {
 }
 
 export interface ContentBlock {
-  type: 'text' | 'image_left' | 'image_right' | 'grid';
+  type: 'text' | 'image_left' | 'image_right' | 'grid' | 'gallery';
   heading: string;
   body: string;
   image?: string;
-  items?: Array<{ title: string; description: string }>;
+  images?: string[];
+  items?: Array<{ title: string; description: string; image?: string }>;
 }
 
 export interface PageConfig {
@@ -88,7 +90,8 @@ export interface PageConfig {
   title: string;
   hero: {
     headline: string;
-    backgroundImage: string;
+    backgroundImage?: string;
+    subheadline?: string;
   };
   content_blocks: ContentBlock[];
 }

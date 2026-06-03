@@ -59,7 +59,7 @@ export default async function SubPage({
         <section className="relative flex min-h-[60vh] md:min-h-[70vh] items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
             <Image
-              src={pageData.hero.backgroundImage || 'https://images.unsplash.com/photo-1558211583-d26f610c1eb1'}
+              src={pageData.hero.backgroundImage || config.hero.backgroundImage}
               alt={pageData.hero.headline}
               fill
               sizes="100vw"
@@ -108,6 +108,35 @@ export default async function SubPage({
               );
             }
 
+            if (block.type === 'gallery' && block.images && block.images.length > 0) {
+              return (
+                <div key={idx} className="w-full">
+                  <h2 className={`text-3xl md:text-4xl ${theme.headingFont} mb-6 text-center ${theme.accentColor}`}>
+                    {block.heading}
+                  </h2>
+                  {block.body ? (
+                    <p className="text-center text-neutral-300 mb-12 max-w-3xl mx-auto">{block.body}</p>
+                  ) : null}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {block.images.map((src, i) => (
+                      <div
+                        key={i}
+                        className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10"
+                      >
+                        <Image
+                          src={src}
+                          alt={`${pageData.title} project ${i + 1}`}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className="object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
             if (block.type === 'grid' && block.items) {
               return (
                 <div key={idx} className="w-full">
@@ -115,9 +144,22 @@ export default async function SubPage({
                   <p className="text-center text-neutral-300 mb-12 max-w-3xl mx-auto">{block.body}</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {block.items.map((item, i) => (
-                      <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-xl hover:bg-white/10 transition-colors">
-                        <h3 className={`text-xl font-bold mb-4 text-white`}>{item.title}</h3>
-                        <p className="text-neutral-400 leading-relaxed">{item.description}</p>
+                      <div key={i} className="bg-white/5 border border-white/10 overflow-hidden rounded-xl hover:bg-white/10 transition-colors">
+                        {item.image ? (
+                          <div className="relative aspect-[4/3] w-full">
+                            <Image
+                              src={item.image}
+                              alt={item.title}
+                              fill
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : null}
+                        <div className="p-8">
+                          <h3 className={`text-xl font-bold mb-4 text-white`}>{item.title}</h3>
+                          <p className="text-neutral-400 leading-relaxed">{item.description}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -128,6 +170,36 @@ export default async function SubPage({
             return null;
           })}
         </section>
+
+        {/* Contact details — always shown on the contact page so prospects can
+            reach the business even when the AI copy omits them. */}
+        {resolvedParams.slug === 'contact' && (
+          <section className="pb-24 px-6 mx-auto max-w-3xl">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-8 md:p-12 text-center">
+              <h2 className={`text-2xl md:text-3xl ${theme.headingFont} mb-8 ${theme.accentColor}`}>Get In Touch</h2>
+              <div className="flex flex-col gap-4 text-lg text-neutral-200">
+                {config.seo.phone && (
+                  <a href={`tel:${config.seo.phone.replace(/[^0-9+]/g, '')}`} className="hover:text-white transition-colors">
+                    <span className="text-neutral-400">Phone:</span> {config.seo.phone}
+                  </a>
+                )}
+                {config.seo.email && (
+                  <a href={`mailto:${config.seo.email}`} className="hover:text-white transition-colors break-words">
+                    <span className="text-neutral-400">Email:</span> {config.seo.email}
+                  </a>
+                )}
+                {config.seo.streetAddress && (
+                  <p className="text-neutral-300">
+                    <span className="text-neutral-400">Address:</span>{' '}
+                    {[config.seo.streetAddress, config.seo.addressLocality, config.seo.addressRegion, config.seo.postalCode]
+                      .filter(Boolean)
+                      .join(', ')}
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
       </main>
     </>
   );
