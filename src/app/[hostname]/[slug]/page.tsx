@@ -2,6 +2,7 @@ import { getActiveConfig } from "@/lib/getConfig";
 import { notFound } from "next/navigation";
 import LocalSEO from "@/components/LocalSEO";
 import PendingApproval from "@/components/PendingApproval";
+import LaunchPaywall from "@/components/LaunchPaywall";
 import { getThemeStyles } from "@/lib/theme";
 import { getSiteGate } from "@/lib/siteGate";
 import { cookies } from "next/headers";
@@ -34,6 +35,24 @@ export default async function SubPage({
       <>
         <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`} />
         <PendingApproval />
+      </>
+    );
+  }
+
+  if (gate === 'launch_locked') {
+    const payUrl = config.launchPayUrl;
+    if (!payUrl) {
+      return (
+        <>
+          <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`} />
+          <PendingApproval />
+        </>
+      );
+    }
+    return (
+      <>
+        <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`} />
+        <LaunchPaywall brandName={config.brandName} launchPayUrl={payUrl} />
       </>
     );
   }

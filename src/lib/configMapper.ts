@@ -26,6 +26,7 @@ type SiteConfigRow = {
   pages_config?: PageConfig[] | null;
   logo_url?: string | null;
   pricing_notes?: string | null;
+  launch_pay_url?: string | null;
 };
 type TenantRow = {
   widget_id?: string;
@@ -69,5 +70,6 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     pagesConfig: configRow.pages_config || [],
     logoUrl: configRow.logo_url ?? undefined,
     pricingNotes: configRow.pricing_notes ?? undefined,
+    launchPayUrl: configRow.launch_pay_url ?? undefined,
   };
 }

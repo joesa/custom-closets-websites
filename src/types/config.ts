@@ -113,6 +113,8 @@ export interface BrandConfig {
   widgetId: string;
   defaultRoom?: string;
   siteStatus?: string;
+  /** Intake pay-to-launch URL while site_status is awaiting_launch_payment */
+  launchPayUrl?: string;
   layoutStyle?: string;
   navLinks?: NavLink[];
   pagesConfig?: PageConfig[];

@@ -50,7 +50,8 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
           nav_links,
           pages_config,
           logo_url,
-          pricing_notes
+          pricing_notes,
+          launch_pay_url
         )
       )
     `)
