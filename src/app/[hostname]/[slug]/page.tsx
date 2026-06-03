@@ -67,8 +67,8 @@ export default async function SubPage({
               priority
             />
             <div className={`absolute inset-0 ${theme.heroGradient}`} />
-            {/* Add extra dark overlay for subpages to ensure nav visibility */}
-            <div className="absolute inset-0 bg-black/40" />
+            {/* Stronger top scrim so fixed nav + headline stay readable on busy photos */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/35 to-black/50" />
           </div>
           
           <div className="relative z-10 mx-auto max-w-5xl px-6 text-center mt-16">
