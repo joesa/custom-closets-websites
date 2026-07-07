@@ -5,7 +5,7 @@ import type { BrandConfig } from '@/types/config';
 function config(siteStatus: string, launchPayUrl?: string): BrandConfig {
   return {
     brandName: 'Test Co',
-    theme: 'modern',
+    theme: 'luxury-minimal',
     hero: {} as BrandConfig['hero'],
     about: {} as BrandConfig['about'],
     process: {} as BrandConfig['process'],
@@ -31,5 +31,15 @@ describe('getSiteGate', () => {
 
   it('blocks suspended tenants', () => {
     expect(getSiteGate(config('suspended'), false)).toBe('blocked');
+  });
+
+  it('forces pending holding page when validation has failed, even if active', () => {
+    const cfg = { ...config('active'), validationStatus: 'failed' };
+    expect(getSiteGate(cfg, false)).toBe('pending');
+  });
+
+  it('admin bypass still wins over a failed validation status', () => {
+    const cfg = { ...config('active'), validationStatus: 'failed' };
+    expect(getSiteGate(cfg, true)).toBe('ok');
   });
 });

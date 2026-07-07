@@ -1,6 +1,6 @@
 # Custom Closets Websites
 
-Multi-tenant marketing sites for ClosetQuote contractors. One Next.js 16 (App
+Multi-tenant marketing sites for DitchTheForm contractors. One Next.js 16 (App
 Router) deployment serves every contractor's site, resolving branding, content,
 and theme per request from the hostname.
 

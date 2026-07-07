@@ -4,6 +4,14 @@
   --font-inter: var(--font-inter);
   --font-playfair: var(--font-playfair);
   --font-lora: var(--font-lora);
+  --font-cormorant: var(--font-cormorant);
+  --font-fraunces: var(--font-fraunces);
+  --font-space-grotesk: var(--font-space-grotesk);
+  --font-archivo: var(--font-archivo);
+  --font-dm-serif: var(--font-dm-serif);
+  --font-manrope: var(--font-manrope);
+  --font-libre-baskerville: var(--font-libre-baskerville);
+  --font-syne: var(--font-syne);
 }
 
 body {

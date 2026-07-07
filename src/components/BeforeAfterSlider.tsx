@@ -4,16 +4,18 @@ import React, { useState, useRef, useEffect, MouseEvent as ReactMouseEvent, Touc
 import Image from 'next/image';
 import * as motion from 'framer-motion/client';
 import { BeforeAfterConfig, ThemeType } from '@/types/config';
-import { getThemeStyles, getSectionTokens } from '@/lib/theme';
+import { getThemeStyles, getSectionTokens, applyVoice, ThemeTokenSelection } from '@/lib/theme';
 import { useMotionHydrated } from '@/components/MotionHydrationProvider';
 import { motionInitial } from '@/lib/motionInitial';
 
 interface BeforeAfterSliderProps {
-  config: BeforeAfterConfig;
+  config?: BeforeAfterConfig | null;
   theme: ThemeType;
+  themeTokens?: ThemeTokenSelection | null;
+  fontSeed?: string;
 }
 
-export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderProps) {
+export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed }: BeforeAfterSliderProps) {
   const motionReady = useMotionHydrated();
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
@@ -21,8 +23,8 @@ export default function BeforeAfterSlider({ config, theme }: BeforeAfterSliderPr
 
   // Derive styling from the central theme tokens so all 13 themes render with
   // the right palette/typography instead of falling back to luxury-minimal.
-  const t = getThemeStyles(theme);
-  const section = getSectionTokens(theme);
+  const t = applyVoice(getThemeStyles(theme, themeTokens), theme, fontSeed ?? '', themeTokens);
+  const section = getSectionTokens(theme, fontSeed ?? '', themeTokens);
   const activeStyles = {
     bg: t.pageBackground,
     title: `${t.headingFont} text-3xl md:text-5xl ${t.textPrimary}`,

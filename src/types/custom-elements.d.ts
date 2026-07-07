@@ -7,6 +7,11 @@ declare global {
         'data-contractor-id'?: string;
         'data-api-url'?: string;
       };
+      'closet-order-widget': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        'data-contractor-id'?: string;
+        'data-api-url'?: string;
+        'data-preview-color'?: string;
+      };
     }
   }
 }

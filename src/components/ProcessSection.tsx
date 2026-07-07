@@ -3,21 +3,23 @@
 import React from 'react';
 import * as motion from 'framer-motion/client';
 import { ProcessConfig, ThemeType } from '@/types/config';
-import { getThemeStyles, getSectionTokens } from '@/lib/theme';
+import { getThemeStyles, getSectionTokens, applyVoice, ThemeTokenSelection } from '@/lib/theme';
 import { useMotionHydrated } from '@/components/MotionHydrationProvider';
 import { motionInitial } from '@/lib/motionInitial';
 
 interface ProcessSectionProps {
   theme: ThemeType;
+  themeTokens?: ThemeTokenSelection | null;
   process: ProcessConfig;
+  fontSeed?: string;
 }
 
-export default function ProcessSection({ theme, process }: ProcessSectionProps) {
+export default function ProcessSection({ theme, themeTokens, process, fontSeed }: ProcessSectionProps) {
   const motionReady = useMotionHydrated();
   // Derive styling from the central theme tokens so all 13 themes render with
   // their own palette/typography (instead of falling back to luxury-minimal).
-  const t = getThemeStyles(theme);
-  const section = getSectionTokens(theme);
+  const t = applyVoice(getThemeStyles(theme, themeTokens), theme, fontSeed ?? '', themeTokens);
+  const section = getSectionTokens(theme, fontSeed ?? '', themeTokens);
 
   return (
     <section className={`py-32 px-6 ${t.pageBackground}`}>
@@ -34,7 +36,7 @@ export default function ProcessSection({ theme, process }: ProcessSectionProps) 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 relative">
           {process.steps.map((step, idx) => (
             <motion.div
-              key={step.number}
+              key={`${idx}-${step.number}`}
               initial={motionInitial(motionReady, { opacity: 0, y: 30 })}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}

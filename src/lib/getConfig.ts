@@ -36,6 +36,7 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
       tenants (
         widget_id,
         site_status,
+        validation_status,
         site_configs (
           brand_name,
           theme,
@@ -51,7 +52,11 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
           pages_config,
           logo_url,
           pricing_notes,
-          launch_pay_url
+          launch_pay_url,
+          design_variant,
+          theme_tokens,
+          quiz_config,
+          engagement_model
         )
       )
     `)

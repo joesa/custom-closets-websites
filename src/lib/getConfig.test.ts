@@ -81,4 +81,23 @@ describe('mapRowToConfig', () => {
     (row.tenants as { site_configs?: unknown }).site_configs = null;
     expect(mapRowToConfig(row)).toBeNull();
   });
+
+  it('debugs database config', async () => {
+    const { createClient } = await import('@supabase/supabase-js');
+    const sb = createClient(
+      'https://vtlvqatzsolycqzeknru.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0bHZxYXR6c29seWNxemVrbnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MzMxNDEsImV4cCI6MjA4MDAwOTE0MX0.vDy9lhF6_2NUswkGOlg4xi8JgQN-AYfUUkdLryR6iZc'
+    );
+    const d1 = await sb.from('domains').select('*').eq('hostname', 'javiel-bespoke.localhost');
+    console.log("DOMAINS ALONE:", JSON.stringify(d1, null, 2));
+
+    if (d1.data && d1.data.length > 0) {
+      const tenantId = d1.data[0].tenant_id;
+      const t1 = await sb.from('tenants').select('*').eq('id', tenantId);
+      console.log("TENANTS ALONE:", JSON.stringify(t1, null, 2));
+
+      const sc1 = await sb.from('site_configs').select('*').eq('tenant_id', tenantId);
+      console.log("SITE_CONFIGS ALONE:", JSON.stringify(sc1, null, 2));
+    }
+  });
 });

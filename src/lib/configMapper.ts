@@ -21,16 +21,21 @@ type SiteConfigRow = {
   process_config: ProcessConfig;
   products_config: Product[];
   seo_config: SEOConfig;
-  before_after_config: BeforeAfterConfig;
+  before_after_config?: BeforeAfterConfig | null;
   nav_links?: NavLink[] | null;
   pages_config?: PageConfig[] | null;
   logo_url?: string | null;
   pricing_notes?: string | null;
   launch_pay_url?: string | null;
+  design_variant?: string | null;
+  theme_tokens?: BrandConfig['themeTokens'] | null;
+  quiz_config?: BrandConfig['quiz'] | null;
+  engagement_model?: string | null;
 };
 type TenantRow = {
   widget_id?: string;
   site_status?: string;
+  validation_status?: string | null;
   site_configs?: SiteConfigRow | SiteConfigRow[] | null;
 };
 export type SupabaseConfigRow = {
@@ -61,15 +66,20 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     process: configRow.process_config,
     products: configRow.products_config,
     seo: configRow.seo_config,
-    beforeAfter: configRow.before_after_config,
+    beforeAfter: configRow.before_after_config ?? undefined,
     widgetId: tenant.widget_id ?? '',
     defaultRoom: configRow.default_room,
     layoutStyle: configRow.layout_style,
     siteStatus: tenant.site_status,
+    validationStatus: tenant.validation_status ?? undefined,
     navLinks: configRow.nav_links || [],
     pagesConfig: configRow.pages_config || [],
     logoUrl: configRow.logo_url ?? undefined,
     pricingNotes: configRow.pricing_notes ?? undefined,
     launchPayUrl: configRow.launch_pay_url ?? undefined,
+    designVariant: configRow.design_variant ?? undefined,
+    quiz: configRow.quiz_config ?? undefined,
+    engagementModel: (configRow.engagement_model as 'quote' | 'order' | 'booking' | 'ticket') || 'quote',
+    themeTokens: configRow.theme_tokens ?? undefined,
   };
 }

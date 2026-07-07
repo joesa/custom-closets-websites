@@ -4,58 +4,74 @@ import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import * as motion from 'framer-motion/client';
 import { ThemeType } from '@/types/config';
-import { getThemeStyles, getSectionTokens } from '@/lib/theme';
+import type { QuizConfig } from '@/types/config';
+import { getThemeStyles, getSectionTokens, applyVoice, ThemeTokenSelection } from '@/lib/theme';
 import { useMotionHydrated } from '@/components/MotionHydrationProvider';
 import { motionInitial } from '@/lib/motionInitial';
 
 interface QuizSectionProps {
   theme: ThemeType;
+  themeTokens?: ThemeTokenSelection | null;
+  /** AI-generated, industry-specific quiz content. Falls back to the generic
+   *  DEFAULT_QUIZ below when absent (e.g. an un-regenerated tenant). */
+  quizConfig?: QuizConfig | null;
   onComplete: (answers: Record<string, string>) => void;
+  fontSeed?: string;
 }
 
-const QUESTIONS = [
-  {
-    id: 'frustration',
-    title: "What's the biggest issue with your current space?",
-    options: [
-      { id: 'clutter', label: "Too much clutter, no organization" },
-      { id: 'aesthetic', label: "It looks outdated and messy" },
-      { id: 'space', label: "I need to maximize a small space" },
-      { id: 'flow', label: "The layout doesn't work for me" }
-    ]
-  },
-  {
-    id: 'style',
-    title: "How do you want your new space to feel?",
-    options: [
-      { id: 'luxurious', label: "Luxurious & Boutique-like" },
-      { id: 'minimal', label: "Clean, Minimal, & Hidden" },
-      { id: 'warm', label: "Warm, Classic, & Inviting" },
-      { id: 'industrial', label: "Bold, Durable, & Functional" }
-    ]
-  },
-  {
-    id: 'timeline',
-    title: "When are you looking to start your project?",
-    options: [
-      { id: 'asap', label: "Immediately" },
-      { id: '1month', label: "Within 30 Days" },
-      { id: '3months', label: "Within 3 Months" },
-      { id: 'exploring', label: "Just Exploring" }
-    ]
-  }
-];
+/** Generic, industry-agnostic fallback — deliberately NOT closet-specific,
+ *  since this renders for ANY trade that hasn't had a quiz generated yet. */
+const DEFAULT_QUIZ: Required<QuizConfig> = {
+  eyebrow: 'Get Your Estimate',
+  headline: 'Take our 3-question quiz.',
+  questions: [
+    {
+      id: 'frustration',
+      title: "What's the biggest challenge you're facing right now?",
+      options: [
+        { id: 'urgent', label: 'I need this handled quickly' },
+        { id: 'quality', label: "I haven't found the right pro yet" },
+        { id: 'budget', label: 'I want the best value for my budget' },
+        { id: 'unsure', label: "I'm not sure where to start" },
+      ],
+    },
+    {
+      id: 'style',
+      title: 'What matters most to you?',
+      options: [
+        { id: 'quality', label: 'Top-quality work' },
+        { id: 'speed', label: 'Fast turnaround' },
+        { id: 'value', label: 'Best value' },
+        { id: 'trust', label: 'A trusted, experienced pro' },
+      ],
+    },
+    {
+      id: 'timeline',
+      title: 'When are you looking to start?',
+      options: [
+        { id: 'asap', label: 'Immediately' },
+        { id: '1month', label: 'Within 30 Days' },
+        { id: '3months', label: 'Within 3 Months' },
+        { id: 'exploring', label: 'Just Exploring' },
+      ],
+    },
+  ],
+};
 
-export default function QuizSection({ theme, onComplete }: QuizSectionProps) {
+export default function QuizSection({ theme, themeTokens, quizConfig, onComplete, fontSeed }: QuizSectionProps) {
   const motionReady = useMotionHydrated();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isFinished, setIsFinished] = useState(false);
 
+  const QUESTIONS = quizConfig?.questions?.length === 3 ? quizConfig.questions : DEFAULT_QUIZ.questions;
+  const eyebrowText = quizConfig?.eyebrow || DEFAULT_QUIZ.eyebrow;
+  const headlineText = quizConfig?.headline || DEFAULT_QUIZ.headline;
+
   // Derive styling from the central theme tokens so every theme renders
   // correctly rather than falling back to the luxury-minimal palette.
-  const t = getThemeStyles(theme);
-  const section = getSectionTokens(theme);
+  const t = applyVoice(getThemeStyles(theme, themeTokens), theme, fontSeed ?? '', themeTokens);
+  const section = getSectionTokens(theme, fontSeed ?? '', themeTokens);
 
   const activeStyles = {
     bg: t.pageBackground,
@@ -85,9 +101,9 @@ export default function QuizSection({ theme, onComplete }: QuizSectionProps) {
     <section className={`py-24 px-6 ${activeStyles.bg}`}>
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
-          <h3 className={`mb-4 ${activeStyles.subtitle}`}>Design Your Space</h3>
+          <h3 className={`mb-4 ${activeStyles.subtitle}`}>{eyebrowText}</h3>
           <h2 className={`text-3xl md:text-5xl mb-6 ${activeStyles.title}`}>
-            {isFinished ? "Perfect! We have what we need." : "Take our 3-question AI design quiz."}
+            {isFinished ? "Perfect! We have what we need." : headlineText}
           </h2>
           {!isFinished && (
             <div className="flex justify-center gap-2 mb-8">

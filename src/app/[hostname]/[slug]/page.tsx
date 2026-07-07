@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import LocalSEO from "@/components/LocalSEO";
 import PendingApproval from "@/components/PendingApproval";
 import LaunchPaywall from "@/components/LaunchPaywall";
-import { getThemeStyles } from "@/lib/theme";
+import GalleryLightbox from "@/components/GalleryLightbox";
+import HeroSection from "@/components/HeroSection";
+import { getThemeStyles, getGridClasses, applyVoice, getSectionTokens } from "@/lib/theme";
+import { siteSeed, getDesignVariant, heroHeadlineClasses, hashSeed } from "@/lib/designVariants";
 import { getSiteGate } from "@/lib/siteGate";
 import { cookies } from "next/headers";
 import Image from "next/image";
@@ -58,12 +61,26 @@ export default async function SubPage({
   }
 
   const pageData = config.pagesConfig.find(p => p.slug === `/${resolvedParams.slug}` || p.slug === resolvedParams.slug);
-  
+
   if (!pageData) {
     notFound();
   }
 
-  const theme = getThemeStyles(config.theme);
+  if (pageData.is_active === false) {
+    notFound();
+  }
+
+  const theme = applyVoice(getThemeStyles(config.theme, config.themeTokens), config.theme, config.designVariant || config.widgetId || config.brandName, config.themeTokens);
+  
+  const fontSeed = siteSeed(config);
+  const variant = getDesignVariant(fontSeed, config.theme);
+  const tokens = getSectionTokens(config.theme, fontSeed, config.themeTokens);
+  const heroImage = pageData.hero.backgroundImage || config.hero.backgroundImage;
+  
+  const ORNAMENTS = ['line', 'dot', 'bar', 'double'] as const;
+  const signatureSeed = fontSeed;
+  const ornament: (typeof ORNAMENTS)[number] =
+    ORNAMENTS[hashSeed(`${signatureSeed}:ornament`) % ORNAMENTS.length];
 
   return (
     <>
@@ -74,29 +91,17 @@ export default async function SubPage({
       />
       
       <main className="bg-neutral-900 min-h-screen text-white">
-        {/* Hero Section */}
-        <section className="relative flex min-h-[60vh] md:min-h-[70vh] items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            <Image
-              src={pageData.hero.backgroundImage || config.hero.backgroundImage}
-              alt={pageData.hero.headline}
-              fill
-              sizes="100vw"
-              className="object-cover"
-              priority
-            />
-            <div className={`absolute inset-0 ${theme.heroGradient}`} />
-            {/* Stronger top scrim so fixed nav + headline stay readable on busy photos */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/35 to-black/50" />
-          </div>
-          
-          <div className="relative z-10 mx-auto max-w-5xl px-6 text-center mt-16">
-            <h1 className={`text-4xl md:text-6xl ${theme.headingFont} text-white mb-6 leading-tight`}>
-              {pageData.hero.headline}
-            </h1>
-            <div className={`w-24 h-1 mx-auto bg-white/20`} />
-          </div>
-        </section>
+        <HeroSection
+          variant={variant}
+          theme={theme}
+          tokens={tokens}
+          headline={pageData.hero.headline}
+          heroImage={heroImage}
+          brandName={config.brandName}
+          heroHeadlineClasses={heroHeadlineClasses(variant.typeScale)}
+          ornament={ornament}
+        />
+
 
         {/* Content Blocks */}
         <section className={`py-24 px-6 mx-auto max-w-screen-xl flex flex-col gap-24`}>
@@ -104,8 +109,10 @@ export default async function SubPage({
             if (block.type === 'text') {
               return (
                 <div key={idx} className="max-w-4xl mx-auto text-center">
-                  <h2 className={`text-3xl md:text-4xl ${theme.headingFont} mb-8 ${theme.accentColor}`}>{block.heading}</h2>
-                  <p className={`text-lg md:text-xl leading-relaxed text-neutral-300`}>{block.body}</p>
+                  {block.heading ? (
+                    <h2 className={`text-3xl md:text-4xl ${theme.headingFont} mb-8 ${theme.accentColor}`}>{block.heading}</h2>
+                  ) : null}
+                  <p className={`text-lg md:text-xl leading-relaxed text-neutral-300 whitespace-pre-line`}>{block.body}</p>
                 </div>
               );
             }
@@ -116,12 +123,14 @@ export default async function SubPage({
                 <div key={idx} className={`flex flex-col md:flex-row gap-12 items-center ${isLeft ? '' : 'md:flex-row-reverse'}`}>
                   {block.image && (
                     <div className="w-full md:w-1/2 aspect-square md:aspect-[4/3] relative overflow-hidden rounded-xl border border-white/10">
-                      <Image src={block.image || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2'} alt={block.heading} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                      <Image src={block.image || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2'} alt={block.heading || 'Section image'} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                     </div>
                   )}
                   <div className={`w-full ${block.image ? 'md:w-1/2' : ''}`}>
-                    <h2 className={`text-3xl md:text-4xl ${theme.headingFont} mb-6 ${theme.accentColor}`}>{block.heading}</h2>
-                    <p className={`text-lg leading-relaxed text-neutral-300 whitespace-pre-wrap`}>{block.body}</p>
+                    {block.heading ? (
+                      <h2 className={`text-3xl md:text-4xl ${theme.headingFont} mb-6 ${theme.accentColor}`}>{block.heading}</h2>
+                    ) : null}
+                    <p className={`text-lg leading-relaxed text-neutral-300 whitespace-pre-line`}>{block.body}</p>
                   </div>
                 </div>
               );
@@ -136,22 +145,7 @@ export default async function SubPage({
                   {block.body ? (
                     <p className="text-center text-neutral-300 mb-12 max-w-3xl mx-auto">{block.body}</p>
                   ) : null}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {block.images.map((src, i) => (
-                      <div
-                        key={i}
-                        className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10"
-                      >
-                        <Image
-                          src={src}
-                          alt={`${pageData.title} project ${i + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  <GalleryLightbox images={block.images} altPrefix={`${pageData.title} project`} />
                 </div>
               );
             }
@@ -161,7 +155,7 @@ export default async function SubPage({
                 <div key={idx} className="w-full">
                   <h2 className={`text-3xl md:text-4xl ${theme.headingFont} mb-12 text-center ${theme.accentColor}`}>{block.heading}</h2>
                   <p className="text-center text-neutral-300 mb-12 max-w-3xl mx-auto">{block.body}</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className={getGridClasses(block.items.length)}>
                     {block.items.map((item, i) => (
                       <div key={i} className="bg-white/5 border border-white/10 overflow-hidden rounded-xl hover:bg-white/10 transition-colors">
                         {item.image ? (

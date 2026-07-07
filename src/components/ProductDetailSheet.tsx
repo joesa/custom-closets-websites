@@ -4,22 +4,24 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Product, ThemeType } from '@/types/config';
-import { getThemeStyles, getSectionTokens } from '@/lib/theme';
+import { getThemeStyles, getSectionTokens, applyVoice, ThemeTokenSelection } from '@/lib/theme';
 
 interface ProductDetailSheetProps {
   isOpen: boolean;
   onClose: () => void;
   product: Product | null;
   theme: ThemeType;
+  themeTokens?: ThemeTokenSelection | null;
+  fontSeed?: string;
 }
 
-export default function ProductDetailSheet({ isOpen, onClose, product, theme }: ProductDetailSheetProps) {
+export default function ProductDetailSheet({ isOpen, onClose, product, theme, themeTokens, fontSeed }: ProductDetailSheetProps) {
   if (!product) return null;
 
   // Derive styling from the central theme tokens so every theme renders with
   // its own palette instead of falling back to luxury-minimal.
-  const t = getThemeStyles(theme);
-  const section = getSectionTokens(theme);
+  const t = applyVoice(getThemeStyles(theme, themeTokens), theme, fontSeed ?? '', themeTokens);
+  const section = getSectionTokens(theme, fontSeed ?? '', themeTokens);
   const activeStyles = {
     panelBg: `${t.pageBackground} border-l ${section.surfaceBorder}`,
     textMain: `${t.headingFont} ${t.textPrimary}`,
