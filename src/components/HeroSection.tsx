@@ -375,7 +375,10 @@ export default function HeroSection({
 
     case 'duotone':
       return (
-        <section key="hero" className="relative flex min-h-[90vh] items-center justify-center overflow-hidden">
+        // pt-44/pb-16 keep tall (multi-line monumental) content clear of the
+        // fixed navbar — without them, flex-centering lets the brand eyebrow
+        // rise to the top edge where a centered nav logo renders on top of it.
+        <section key="hero" className="relative flex min-h-[90vh] items-center justify-center overflow-hidden pt-44 pb-16">
           <div className="absolute inset-0 z-0">
             <Image src={heroImage} alt={headline} fill sizes="100vw" className="object-cover" priority />
             <div className={`absolute inset-0 ${tokens.accentBg} opacity-30 mix-blend-multiply`} />
@@ -445,7 +448,7 @@ export default function HeroSection({
 
     case 'ribbon':
       return (
-        <section key="hero" className="relative flex min-h-[90vh] items-center overflow-hidden">
+        <section key="hero" className="relative flex min-h-[90vh] items-center overflow-hidden pt-40 pb-16">
           <div className="absolute inset-0 z-0">
             <Image src={heroImage} alt={headline} fill sizes="100vw" className="object-cover" priority />
             <div className="absolute inset-0 bg-black/30" />
@@ -585,7 +588,7 @@ export default function HeroSection({
     case 'cinematic':
     default:
       return (
-        <section key="hero" className="relative flex min-h-[90vh] items-center justify-center overflow-hidden">
+        <section key="hero" className="relative flex min-h-[90vh] items-center justify-center overflow-hidden pt-40 pb-16">
           <div className="absolute inset-0 z-0">
             <Image src={heroImage} alt={headline} fill sizes="100vw" className="object-cover" priority />
             <div className={`absolute inset-0 ${theme.heroGradient}`} />
