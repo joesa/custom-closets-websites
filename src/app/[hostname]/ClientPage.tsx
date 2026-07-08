@@ -72,7 +72,10 @@ function ClientPageContent({ config }: ClientPageProps) {
   
   // Vary the hero CTA label across sites (seeded, stable) so the call-to-action
   // doesn't read as templated. All options anchor to the #quote widget.
-  const QUOTE_CTA_LABELS = ['Request a Consultation', 'Book a Design Consultation', 'Start Your Project', 'Get Your Free Quote', 'Schedule a Visit'];
+  // Trade-neutral quote CTAs so a tree service, plumber, cleaner, or closet
+  // builder all read naturally — no design/build-specific verbiage that only
+  // fits one trade (e.g. "Book a Design Consultation").
+  const QUOTE_CTA_LABELS = ['Get Your Free Quote', 'Request a Quote', 'Get a Free Estimate', 'Request a Consultation', 'Schedule a Visit'];
   const ORDER_CTA_LABELS = ['Order Now', 'View Menu', 'Start Your Order', 'Order Online', 'Place an Order'];
   const BOOKING_CTA_LABELS = ['Book an Appointment', 'Schedule Now', 'Book a Session', 'Reserve a Time', 'Book Service'];
   const TICKET_CTA_LABELS = ['Get Tickets', 'Buy Tickets', 'Reserve Your Spot', 'Find Tickets', 'Book Event'];
