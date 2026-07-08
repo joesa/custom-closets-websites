@@ -331,7 +331,7 @@ function ClientPageContent({ config }: ClientPageProps) {
     </section>
   );
 
-  const quizSection = <QuizSection key="quiz" theme={config.theme} themeTokens={config.themeTokens} quizConfig={config.quiz} fontSeed={fontSeed} onComplete={setQuizAnswers} />;
+  const quizSection = <QuizSection key="quiz" theme={config.theme} themeTokens={config.themeTokens} quizConfig={config.quiz} fontSeed={fontSeed} onComplete={setQuizAnswers} engagementModel={config.engagementModel} />;
 
   // Deterministic quote-vs-order detection happens above.
 

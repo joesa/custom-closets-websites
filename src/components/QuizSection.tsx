@@ -17,6 +17,9 @@ interface QuizSectionProps {
   quizConfig?: QuizConfig | null;
   onComplete: (answers: Record<string, string>) => void;
   fontSeed?: string;
+  /** Drives the finish-screen CTA copy — a medical/booking business must not
+   *  see "Get Your Instant Quote" (see EngagementModel in the dashboard). */
+  engagementModel?: string;
 }
 
 /** Generic, industry-agnostic fallback — deliberately NOT closet-specific,
@@ -58,7 +61,7 @@ const DEFAULT_QUIZ: Required<QuizConfig> = {
   ],
 };
 
-export default function QuizSection({ theme, themeTokens, quizConfig, onComplete, fontSeed }: QuizSectionProps) {
+export default function QuizSection({ theme, themeTokens, quizConfig, onComplete, fontSeed, engagementModel }: QuizSectionProps) {
   const motionReady = useMotionHydrated();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -158,13 +161,25 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
                   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
                 <p className={`text-xl mb-8 ${t.bodyFont} ${t.textSecondary}`}>
-                  Your design profile has been pre-loaded into the quoting engine.
+                  {engagementModel === 'booking'
+                    ? 'Your answers have been saved — pick a time that works for you.'
+                    : engagementModel === 'order'
+                      ? 'Your preferences have been saved — browse the menu and order.'
+                      : engagementModel === 'ticket'
+                        ? 'Your preferences have been saved — grab your tickets below.'
+                        : 'Your design profile has been pre-loaded into the quoting engine.'}
                 </p>
                 <a 
                   href="#quote" 
                   className={`inline-block py-4 px-8 text-lg ${activeStyles.button}`}
                 >
-                  Get Your Instant Quote
+                  {engagementModel === 'booking'
+                    ? 'Book Your Appointment'
+                    : engagementModel === 'order'
+                      ? 'Order Now'
+                      : engagementModel === 'ticket'
+                        ? 'Get Tickets'
+                        : 'Get Your Instant Quote'}
                 </a>
               </motion.div>
             )}
