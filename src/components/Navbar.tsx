@@ -80,7 +80,7 @@ export default function Navbar({
   themeTokens,
   logoUrl,
   fontSeed,
-  navStyle = 'classic',
+  navStyle = 'classic::glass::fade',
   phone,
   engagementModel,
 }: NavbarProps) {

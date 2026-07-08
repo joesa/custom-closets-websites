@@ -354,6 +354,15 @@ function navHoverIndex(seed: string, theme?: string | null): number {
  */
 export function composeVariant(seed: string, theme?: string | null): DesignVariant {
   const hero = HERO_AXIS[heroIndex(seed, theme)];
+  // 'bottom-floating' is retired from the auto rotation: real visitors read a
+  // bottom-pinned nav as a broken header (and the top of the page is left with
+  // no navigation at all), which undermines trust on a lead-gen site. Seeds
+  // that land on it are remapped to its top-anchored twin, boxed-floating,
+  // instead of removing the axis entry — dropping the entry would change the
+  // modulo arithmetic and silently re-roll the nav of every existing site.
+  // The render branch in Navbar.tsx stays for any explicitly-stored config.
+  let navLayout = NAV_LAYOUT_AXIS[navLayoutIndex(seed, theme)];
+  if (navLayout === 'bottom-floating') navLayout = 'boxed-floating';
   return {
     id: `auto:${hero}`,
     label: 'Auto (seeded)',
@@ -362,7 +371,7 @@ export function composeVariant(seed: string, theme?: string | null): DesignVaria
     about: axisPick(seed, 'about', ABOUT_AXIS),
     portfolio: axisPick(seed, 'portfolio', PORTFOLIO_AXIS),
     typeScale: TYPE_AXIS[typeIndex(seed, theme)],
-    nav: `${NAV_LAYOUT_AXIS[navLayoutIndex(seed, theme)]}::${NAV_BG_AXIS[navBgIndex(seed, theme)]}::${NAV_HOVER_AXIS[navHoverIndex(seed, theme)]}` as NavComposition,
+    nav: `${navLayout}::${NAV_BG_AXIS[navBgIndex(seed, theme)]}::${NAV_HOVER_AXIS[navHoverIndex(seed, theme)]}` as NavComposition,
   };
 }
 

@@ -46,11 +46,20 @@ describe('nav composition selection', () => {
     const layouts = new Set(navs.map(n => n.split('::')[0]));
     const bgs = new Set(navs.map(n => n.split('::')[1]));
     const hovers = new Set(navs.map(n => n.split('::')[2]));
-    
-    // We expect 10 layouts, 4 bgs, 5 hovers
-    expect(layouts.size).toBe(10);
+
+    // 9 layouts (bottom-floating is retired from auto rotation), 4 bgs, 5 hovers
+    expect(layouts.size).toBe(9);
+    expect(layouts.has('bottom-floating')).toBe(false);
     expect(bgs.size).toBe(4);
     expect(hovers.size).toBe(5);
+  });
+
+  it('never auto-composes the retired bottom-floating layout for any seed', () => {
+    for (const theme of ['luxury-minimal', 'brutalist', 'fresh-clean', null]) {
+      for (const nav of sampleNav(theme, 2000)) {
+        expect(nav.split('::')[0]).not.toBe('bottom-floating');
+      }
+    }
   });
 
   it('falls back to uniform hashing for unknown/absent themes', () => {
@@ -60,10 +69,16 @@ describe('nav composition selection', () => {
       const layout = nav.split('::')[0];
       counts.set(layout, (counts.get(layout) ?? 0) + 1);
     }
-    // Uniform over 10 buckets across 5000 samples = ~500 each
-    for (const count of counts.values()) {
-      expect(count).toBeGreaterThan(400);
-      expect(count).toBeLessThan(600);
+    // Uniform over 10 hash buckets across 5000 samples = ~500 each, except
+    // boxed-floating also absorbs the retired bottom-floating bucket (~1000).
+    for (const [layout, count] of counts.entries()) {
+      if (layout === 'boxed-floating') {
+        expect(count).toBeGreaterThan(800);
+        expect(count).toBeLessThan(1200);
+      } else {
+        expect(count).toBeGreaterThan(400);
+        expect(count).toBeLessThan(600);
+      }
     }
   });
 
