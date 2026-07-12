@@ -1084,6 +1084,6 @@ export function getThemePrimaryHex(theme: ThemeType, seed = '', tokens?: ThemeTo
     case 'office-executive':
       return '#fbbf24';
     default:
-      return '#6366f1';
+      return '#2d2d2d';
   }
 }

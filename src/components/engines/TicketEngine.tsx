@@ -18,7 +18,7 @@ type TicketEvent = {
 
 export default function TicketEngine({ 
   contractorId, 
-  accentColor = '#E11D48',
+  accentColor = '#2d2d2d',
   radius = 'soft',
 }: { 
   contractorId: string

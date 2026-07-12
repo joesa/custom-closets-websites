@@ -18,8 +18,6 @@ interface ProductDetailSheetProps {
 export default function ProductDetailSheet({ isOpen, onClose, product, theme, themeTokens, fontSeed }: ProductDetailSheetProps) {
   if (!product) return null;
 
-  // Derive styling from the central theme tokens so every theme renders with
-  // its own palette instead of falling back to luxury-minimal.
   const t = applyVoice(getThemeStyles(theme, themeTokens), theme, fontSeed ?? '', themeTokens);
   const section = getSectionTokens(theme, fontSeed ?? '', themeTokens);
   const activeStyles = {
@@ -30,17 +28,18 @@ export default function ProductDetailSheet({ isOpen, onClose, product, theme, th
     closeBtn: `${section.accent} ${t.bodyFont} transition-opacity hover:opacity-70`,
   };
 
-  const details = product.details || {
-    subtitle: "Premium Design Line",
-    longDescription: product.description,
-    specifications: ["Bespoke spatial sizing", "Professional premium fabrication", "Fully managed execution"]
-  };
+  const details = product.details;
+  const subtitle = details?.subtitle?.trim() || null;
+  const longDescription =
+    details?.longDescription?.trim() || product.description?.trim() || null;
+  const specifications = (details?.specifications || []).filter(
+    (s) => typeof s === 'string' && s.trim().length > 0
+  );
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop Blur Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -49,7 +48,6 @@ export default function ProductDetailSheet({ isOpen, onClose, product, theme, th
             className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 cursor-pointer"
           />
 
-          {/* Slide-out Sidebar Panel */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -59,9 +57,9 @@ export default function ProductDetailSheet({ isOpen, onClose, product, theme, th
           >
             <div className="flex justify-between items-start mb-12">
               <div>
-                <span className={`text-xs uppercase tracking-widest opacity-60 block mb-2 ${activeStyles.textSub}`}>
-                  {details.subtitle}
-                </span>
+                {subtitle ? (
+                  <span className={`text-xs block mb-2 ${activeStyles.textSub}`}>{subtitle}</span>
+                ) : null}
                 <h3 className={`text-3xl md:text-4xl leading-tight ${activeStyles.textMain}`}>
                   {product.title}
                 </h3>
@@ -71,41 +69,42 @@ export default function ProductDetailSheet({ isOpen, onClose, product, theme, th
               </button>
             </div>
 
-            {/* High-Resolution Concept Asset Window */}
-            <div className="relative aspect-[4/3] w-full mb-12 overflow-hidden rounded-sm group shadow-sm">
-              <Image
-                src={product.image || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2'}
-                alt={product.title}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-              />
-            </div>
+            {product.image ? (
+              <div className="relative aspect-[4/3] w-full mb-12 overflow-hidden rounded-sm group shadow-sm">
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+            ) : null}
 
-            {/* Core Narrative Text Block */}
-            <div className="mb-12">
-              <h4 className={`text-sm uppercase tracking-widest mb-4 opacity-80 ${activeStyles.textMain}`}>
-                The Architectural Vision
-              </h4>
-              <p className={`${activeStyles.textSub} leading-relaxed text-lg`}>
-                {details.longDescription}
-              </p>
-            </div>
+            {longDescription ? (
+              <div className="mb-12">
+                <h4 className={`text-sm mb-4 opacity-80 ${activeStyles.textMain}`}>Overview</h4>
+                <p className={`${activeStyles.textSub} leading-relaxed text-lg`}>
+                  {longDescription}
+                </p>
+              </div>
+            ) : null}
 
-            {/* Structural Material Spec Box */}
-            <div>
-              <h4 className={`text-sm uppercase tracking-widest mb-4 opacity-80 ${activeStyles.textMain}`}>
-                System Specifications
-              </h4>
-              <ul className="space-y-3">
-                {details.specifications.map((spec, index) => (
-                  <li key={index} className={`p-5 text-sm ${activeStyles.specBg} ${activeStyles.textSub} leading-relaxed`}>
-                    {spec}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {specifications.length > 0 ? (
+              <div>
+                <h4 className={`text-sm mb-4 opacity-80 ${activeStyles.textMain}`}>
+                  What&apos;s included
+                </h4>
+                <ul className="space-y-3">
+                  {specifications.map((spec, index) => (
+                    <li key={index} className={`p-5 text-sm ${activeStyles.specBg} ${activeStyles.textSub} leading-relaxed`}>
+                      {spec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </motion.div>
         </>
       )}

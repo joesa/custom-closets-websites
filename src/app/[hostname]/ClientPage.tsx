@@ -33,7 +33,7 @@ interface ClientPageProps {
   config: BrandConfig;
 }
 
-const HERO_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1558211583-d26f610c1eb1';
+const HERO_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c';
 
 function ClientPageContent({ config }: ClientPageProps) {
   const motionReady = useMotionHydrated();
@@ -93,6 +93,28 @@ function ClientPageContent({ config }: ClientPageProps) {
     </a>
   );
 
+  const PORTFOLIO_TITLES_QUOTE = ['Our Work', 'Recent Projects', 'Featured Jobs', 'What we build', 'Selected projects'];
+  const PORTFOLIO_TITLES_ORDER = ['Menu', 'What we serve', 'From the kitchen', 'Popular picks', 'Order favorites'];
+  const PORTFOLIO_TITLES_BOOKING = ['Services', 'What we offer', 'Appointments', 'Treatments', 'Book these'];
+  const PORTFOLIO_TITLES_TICKET = ['Events', 'Upcoming', 'On the calendar', 'Experiences', 'Get tickets for'];
+  const portfolioTitles = isOrderBusiness
+    ? PORTFOLIO_TITLES_ORDER
+    : isBookingBusiness
+      ? PORTFOLIO_TITLES_BOOKING
+      : isTicketBusiness
+        ? PORTFOLIO_TITLES_TICKET
+        : PORTFOLIO_TITLES_QUOTE;
+  const portfolioTitle = portfolioTitles[hashSeed(`${fontSeed}:portfolioTitle`) % portfolioTitles.length];
+  const widgetTitle = isOrderBusiness
+    ? 'Place an order'
+    : isBookingBusiness
+      ? 'Book a time'
+      : isTicketBusiness
+        ? 'Get tickets'
+        : 'Get an estimate';
+  const cardRadiusClass =
+    widgetRadius === 'sharp' ? 'rounded-none' : widgetRadius === 'pill' ? 'rounded-2xl' : 'rounded-lg';
+  const sectionPadClass = siteMotion.personality === 'commercial' ? 'pb-20' : siteMotion.personality === 'luxury' ? 'pb-36' : 'pb-32';
   const aboutEyebrow = signature.eyebrow;
   const ornament = signature.motif;
 
@@ -317,7 +339,7 @@ function ClientPageContent({ config }: ClientPageProps) {
   };
 
   const portfolioSection = (
-    <section key="portfolio" id="portfolio" className={`px-6 pb-32 max-w-screen-2xl mx-auto`}>
+    <section key="portfolio" id="portfolio" className={`px-6 ${sectionPadClass} max-w-screen-2xl mx-auto`}>
       {variant.portfolio !== 'grid' && (
         <div className={variant.portfolio === 'editorial' ? 'mb-12' : 'mb-12 flex flex-col items-center'}>
           {renderOrnament(variant.portfolio !== 'editorial')}
@@ -328,7 +350,7 @@ function ClientPageContent({ config }: ClientPageProps) {
             transition={{ duration: 0.6 }}
             className={`${variant.portfolio === 'editorial' ? 'text-left text-4xl md:text-5xl' : 'text-center text-3xl md:text-4xl'} ${theme.headingFont} ${theme.textPrimary}`}
           >
-            Selected Work
+            {portfolioTitle}
           </motion.h2>
         </div>
       )}
@@ -340,17 +362,25 @@ function ClientPageContent({ config }: ClientPageProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: idx * 0.2 }}
-            className={`flex flex-col cursor-pointer ${theme.productCard} ${portfolioItemExtra}`}
+            className={`flex flex-col cursor-pointer ${theme.productCard} ${portfolioItemExtra} overflow-hidden ${cardRadiusClass}`}
             onClick={() => setSelectedProduct(product)}
           >
             <div className={`relative ${portfolioAspectFor(idx)} w-full overflow-hidden`}>
-              <Image
-                src={product.image || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2'}
-                alt={product.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className={`object-cover ${theme.productImageHover}`}
-              />
+              {product.image ? (
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className={`object-cover ${theme.productImageHover}`}
+                />
+              ) : (
+                <div className={`absolute inset-0 flex items-center justify-center ${tokens.accentBg} opacity-80`}>
+                  <span className={`text-3xl font-semibold ${theme.headingFont} text-white/90`}>
+                    {product.title.slice(0, 1)}
+                  </span>
+                </div>
+              )}
             </div>
             <div className="p-8">
               <h3 className={`mb-4 text-2xl ${theme.headingFont}`}>
@@ -371,13 +401,13 @@ function ClientPageContent({ config }: ClientPageProps) {
   // Deterministic quote-vs-order detection happens above.
 
   const widgetSection = (
-    <section key="widget" id="quote" className={`py-32 ${theme.pageBackground}`}>
+    <section key="widget" id="quote" className={`py-20 md:py-28 ${theme.pageBackground}`}>
       <div className="mx-auto max-w-5xl px-6 text-center">
         <motion.div
           initial={motionInitial(motionReady, { opacity: 0, y: 30 })}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={siteMotion.section}
         >
           <div className="mb-4 flex flex-col items-center">
             {renderOrnament(true)}
@@ -386,10 +416,13 @@ function ClientPageContent({ config }: ClientPageProps) {
             </h2>
           </div>
           <p className={`${config.pricingNotes ? 'mb-4' : 'mb-12'} text-lg ${theme.textSecondary}`}>
-            {isOrderBusiness ? 'Browse our menu and place your order — pickup and delivery available.'
-              : isBookingBusiness ? 'Select a service and time slot to book your appointment.'
-              : isTicketBusiness ? 'Select your event date and reserve your tickets.'
-              : <>Configure your <strong>{config.defaultRoom}</strong> and get a price estimate instantly.</>}
+            {isOrderBusiness
+              ? 'Browse the menu and place your order.'
+              : isBookingBusiness
+                ? 'Pick a service and a time that works for you.'
+                : isTicketBusiness
+                  ? 'Choose a date and reserve your spot.'
+                  : 'Tell us about your project and get a clear estimate.'}
           </p>
           {config.pricingNotes && (
             <p className={`mx-auto mb-12 max-w-2xl text-sm ${theme.textSecondary} opacity-80`}>
@@ -407,6 +440,7 @@ function ClientPageContent({ config }: ClientPageProps) {
                 data-preview-color={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
                 data-radius={widgetRadius}
                 data-font-heading={theme.headingFont}
+                data-widget-title={widgetTitle}
               />
             ) : isBookingBusiness ? (
               <BookingEngine 
@@ -428,6 +462,7 @@ function ClientPageContent({ config }: ClientPageProps) {
                 data-preview-color={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
                 data-radius={widgetRadius}
                 data-font-heading={theme.headingFont}
+                data-widget-title={widgetTitle}
                 data-quiz-frustration={quizAnswers.frustration || ''}
                 data-quiz-style={quizAnswers.style || ''}
                 data-quiz-timeline={quizAnswers.timeline || ''}

@@ -101,7 +101,7 @@ export default async function SubPage({
     signature: config.signature,
   });
   const composition = resolvePageComposition(resolvedParams.slug, fontSeed);
-  const pageBg = theme.pageBackground || "bg-neutral-900";
+  const pageBg = theme.pageBackground || "bg-stone-50";
   const mutedText =
     pageBg.includes("950") || pageBg.includes("900") || pageBg.includes("[#2") || pageBg.includes("[#1")
       ? "text-neutral-300"
@@ -113,6 +113,28 @@ export default async function SubPage({
 
   const textBlocks = pageData.content_blocks.filter((b) => b.type === "text");
   const otherBlocks = pageData.content_blocks.filter((b) => b.type !== "text");
+
+  // Real proof points only — never invent "Licensed & insured" style filler.
+  const credentialBullets: string[] = [];
+  for (const p of config.products || []) {
+    for (const spec of p.details?.specifications || []) {
+      const s = (spec || "").trim();
+      if (s && !credentialBullets.includes(s) && credentialBullets.length < 6) {
+        credentialBullets.push(s);
+      }
+    }
+  }
+  if (config.seo.addressLocality) {
+    credentialBullets.push(`Serving ${config.seo.addressLocality}`);
+  }
+  const contactCta =
+    config.engagementModel === "order"
+      ? "Place an order"
+      : config.engagementModel === "booking"
+        ? "Book a time"
+        : config.engagementModel === "ticket"
+          ? "Get tickets"
+          : "Get a quote";
 
   return (
     <>
@@ -163,11 +185,15 @@ export default async function SubPage({
               </div>
             </div>
           ) : composition.family === "about" && composition.aboutSplit ? (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 items-start">
-              <div className="md:col-span-7 space-y-8">
-                <p className={`text-sm uppercase tracking-[0.2em] ${theme.accentColor}`}>
-                  {signature.eyebrow}
-                </p>
+            <div
+              className={
+                credentialBullets.length > 0
+                  ? "grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 items-start"
+                  : "flex flex-col gap-12 max-w-3xl"
+              }
+            >
+              <div className={credentialBullets.length > 0 ? "md:col-span-7 space-y-8" : "space-y-8"}>
+                <p className={`text-sm ${theme.accentColor}`}>{signature.eyebrow}</p>
                 {textBlocks.map((block, idx) => (
                   <div key={`about-text-${idx}`}>
                     {block.heading ? (
@@ -183,17 +209,26 @@ export default async function SubPage({
                   </div>
                 ))}
               </div>
-              <div className={`md:col-span-5 space-y-6 p-8 border ${cardSurface}`}>
-                <h3 className={`text-xl ${theme.headingFont} ${theme.accentColor}`}>Credentials</h3>
-                <ul className={`space-y-3 text-sm ${mutedText}`}>
-                  <li>Licensed & insured</li>
-                  <li>Local craftsmanship</li>
-                  <li>Clear communication</li>
-                  {config.seo.addressLocality ? (
-                    <li>Serving {config.seo.addressLocality}</li>
-                  ) : null}
-                </ul>
-                {otherBlocks.map((block, idx) =>
+              {credentialBullets.length > 0 ? (
+                <div className={`md:col-span-5 space-y-6 p-8 border ${cardSurface}`}>
+                  <h3 className={`text-xl ${theme.headingFont} ${theme.accentColor}`}>At a glance</h3>
+                  <ul className={`space-y-3 text-sm ${mutedText}`}>
+                    {credentialBullets.map((b) => (
+                      <li key={b}>{b}</li>
+                    ))}
+                  </ul>
+                  {otherBlocks.map((block, idx) =>
+                    renderBlock(block, idx, {
+                      theme,
+                      mutedText,
+                      cardSurface,
+                      pageDataTitle: pageData.title,
+                      composition,
+                    })
+                  )}
+                </div>
+              ) : (
+                otherBlocks.map((block, idx) =>
                   renderBlock(block, idx, {
                     theme,
                     mutedText,
@@ -201,8 +236,8 @@ export default async function SubPage({
                     pageDataTitle: pageData.title,
                     composition,
                   })
-                )}
-              </div>
+                )
+              )}
             </div>
           ) : (
             pageData.content_blocks.map((block, idx) =>
@@ -232,7 +267,7 @@ export default async function SubPage({
             >
               <div className={composition.contactSplit ? "p-8 md:p-12" : ""}>
                 <h2 className={`text-2xl md:text-3xl ${theme.headingFont} mb-8 ${theme.accentColor}`}>
-                  Get In Touch
+                  Contact
                 </h2>
                 <div
                   className={`flex flex-col gap-4 text-lg ${
@@ -278,15 +313,16 @@ export default async function SubPage({
                       : "bg-black/[0.04]"
                   }`}
                 >
-                  <p className={`text-sm uppercase tracking-[0.2em] mb-4 ${theme.accentColor}`}>
-                    {signature.eyebrow}
-                  </p>
-                  <p className={`text-2xl md:text-3xl ${theme.headingFont} mb-4`}>
-                    Ready when you are
-                  </p>
-                  <p className={`text-base ${mutedText}`}>
-                    Reach out for a consultation — we respond quickly and keep the next steps clear.
-                  </p>
+                  <p className={`text-sm mb-4 ${theme.accentColor}`}>{signature.eyebrow}</p>
+                  <p className={`text-2xl md:text-3xl ${theme.headingFont} mb-4`}>{contactCta}</p>
+                  {config.seo.addressLocality || config.seo.addressRegion ? (
+                    <p className={`text-base ${mutedText}`}>
+                      Serving{" "}
+                      {[config.seo.addressLocality, config.seo.addressRegion]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
+                  ) : null}
                 </div>
               ) : null}
             </div>
@@ -356,7 +392,7 @@ function renderBlock(
         {block.image && (
           <div className="w-full md:w-1/2 aspect-square md:aspect-[4/3] relative overflow-hidden border border-black/10">
             <Image
-              src={block.image || "https://images.unsplash.com/photo-1595428774223-ef52624120d2"}
+              src={block.image}
               alt={block.heading || "Section image"}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"

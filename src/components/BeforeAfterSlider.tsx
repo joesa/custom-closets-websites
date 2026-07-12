@@ -110,14 +110,13 @@ export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed
           {/* Base Layer: Before Image */}
           <div className="absolute inset-0">
             <Image 
-              src={config.beforeImage || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2'}
-              alt="Before Transformation"
+              src={config.beforeImage}
+              alt="Before"
               fill
               className="object-cover pointer-events-none"
               sizes="(max-width: 1152px) 100vw, 1152px"
             />
-            {/* Label */}
-            <div className="absolute top-4 right-4 z-10 px-4 py-1 text-xs font-bold uppercase tracking-widest bg-black/60 text-white backdrop-blur-sm rounded-full">
+            <div className="absolute top-4 right-4 z-10 px-4 py-1 text-xs font-bold bg-black/60 text-white backdrop-blur-sm">
               Before
             </div>
           </div>

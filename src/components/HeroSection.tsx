@@ -549,12 +549,12 @@ export default function HeroSection({
               className={`flex items-center justify-between border-y-2 ${tokens.surfaceBorder} py-3`}
             >
               {brandName && (
-                <span className={`text-xs uppercase tracking-[0.3em] font-bold ${theme.accentColor}`}>
+                <span className={`text-xs font-bold ${theme.accentColor}`}>
                   {brandName}
                 </span>
               )}
-              <span className={`text-xs uppercase tracking-[0.3em] ${theme.textSecondary}`}>
-                Est. Quality
+              <span className={`text-xs ${theme.textSecondary}`}>
+                {brandName ? 'Locally owned' : ''}
               </span>
             </motion.div>
             <motion.h1

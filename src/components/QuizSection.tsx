@@ -12,54 +12,12 @@ import { motionInitial } from '@/lib/motionInitial';
 interface QuizSectionProps {
   theme: ThemeType;
   themeTokens?: ThemeTokenSelection | null;
-  /** AI-generated, industry-specific quiz content. Falls back to the generic
-   *  DEFAULT_QUIZ below when absent (e.g. an un-regenerated tenant). */
+  /** AI-generated, industry-specific quiz. When absent/empty, section is hidden. */
   quizConfig?: QuizConfig | null;
   onComplete: (answers: Record<string, string>) => void;
   fontSeed?: string;
-  /** Drives the finish-screen CTA copy — a medical/booking business must not
-   *  see "Get Your Instant Quote" (see EngagementModel in the dashboard). */
   engagementModel?: string;
 }
-
-/** Generic, industry-agnostic fallback — deliberately NOT closet-specific,
- *  since this renders for ANY trade that hasn't had a quiz generated yet. */
-const DEFAULT_QUIZ: Required<QuizConfig> = {
-  eyebrow: 'Get Your Estimate',
-  headline: 'Take our 3-question quiz.',
-  questions: [
-    {
-      id: 'frustration',
-      title: "What's the biggest challenge you're facing right now?",
-      options: [
-        { id: 'urgent', label: 'I need this handled quickly' },
-        { id: 'quality', label: "I haven't found the right pro yet" },
-        { id: 'budget', label: 'I want the best value for my budget' },
-        { id: 'unsure', label: "I'm not sure where to start" },
-      ],
-    },
-    {
-      id: 'style',
-      title: 'What matters most to you?',
-      options: [
-        { id: 'quality', label: 'Top-quality work' },
-        { id: 'speed', label: 'Fast turnaround' },
-        { id: 'value', label: 'Best value' },
-        { id: 'trust', label: 'A trusted, experienced pro' },
-      ],
-    },
-    {
-      id: 'timeline',
-      title: 'When are you looking to start?',
-      options: [
-        { id: 'asap', label: 'Immediately' },
-        { id: '1month', label: 'Within 30 Days' },
-        { id: '3months', label: 'Within 3 Months' },
-        { id: 'exploring', label: 'Just Exploring' },
-      ],
-    },
-  ],
-};
 
 export default function QuizSection({ theme, themeTokens, quizConfig, onComplete, fontSeed, engagementModel }: QuizSectionProps) {
   const motionReady = useMotionHydrated();
@@ -67,25 +25,25 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isFinished, setIsFinished] = useState(false);
 
-  const QUESTIONS = quizConfig?.questions?.length === 3 ? quizConfig.questions : DEFAULT_QUIZ.questions;
-  const eyebrowText = quizConfig?.eyebrow || DEFAULT_QUIZ.eyebrow;
-  const headlineText = quizConfig?.headline || DEFAULT_QUIZ.headline;
+  const QUESTIONS = quizConfig?.questions?.length ? quizConfig.questions : [];
+  const hasQuiz = QUESTIONS.length > 0;
+  const eyebrowText = quizConfig?.eyebrow?.trim() || 'Quick questions';
+  const headlineText = quizConfig?.headline?.trim() || 'A few details help us help you.';
 
-  // Derive styling from the central theme tokens so every theme renders
-  // correctly rather than falling back to the luxury-minimal palette.
   const t = applyVoice(getThemeStyles(theme, themeTokens), theme, fontSeed ?? '', themeTokens);
   const section = getSectionTokens(theme, fontSeed ?? '', themeTokens);
 
   const activeStyles = {
     bg: t.pageBackground,
     title: `${t.headingFont} ${t.textPrimary}`,
-    subtitle: `${t.bodyFont} ${section.accent} tracking-widest uppercase text-sm`,
+    subtitle: `${t.bodyFont} ${section.accent} text-sm`,
     card: `${section.surface} ${section.surfaceBorder} ${t.textSecondary} hover:opacity-100 opacity-90`,
     selectedCard: `${section.accentBg} ${section.accentText} border-transparent`,
     button: t.button,
   };
 
   const handleSelect = (optionId: string) => {
+    if (!hasQuiz) return;
     const questionId = QUESTIONS[currentStep].id;
     const newAnswers = { ...answers, [questionId]: optionId };
     setAnswers(newAnswers);
@@ -100,13 +58,17 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
     }
   };
 
+  if (!hasQuiz) {
+    return null;
+  }
+
   return (
-    <section className={`py-24 px-6 ${activeStyles.bg}`}>
+    <section className={`py-20 px-6 ${activeStyles.bg}`}>
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <h3 className={`mb-4 ${activeStyles.subtitle}`}>{eyebrowText}</h3>
           <h2 className={`text-3xl md:text-5xl mb-6 ${activeStyles.title}`}>
-            {isFinished ? "Perfect! We have what we need." : headlineText}
+            {isFinished ? 'Thanks — that helps.' : headlineText}
           </h2>
           {!isFinished && (
             <div className="flex justify-center gap-2 mb-8">
@@ -157,17 +119,14 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
                 animate={{ opacity: 1, scale: 1 }}
                 className="absolute inset-0 w-full flex flex-col items-center justify-center text-center"
               >
-                <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-green-500/10 text-green-600">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
                 <p className={`text-xl mb-8 ${t.bodyFont} ${t.textSecondary}`}>
                   {engagementModel === 'booking'
-                    ? 'Your answers have been saved — pick a time that works for you.'
+                    ? 'Next, pick a time that works for you.'
                     : engagementModel === 'order'
-                      ? 'Your preferences have been saved — browse the menu and order.'
+                      ? 'Next, browse the menu and place your order.'
                       : engagementModel === 'ticket'
-                        ? 'Your preferences have been saved — grab your tickets below.'
-                        : 'Your design profile has been pre-loaded into the quoting engine.'}
+                        ? 'Next, grab your tickets below.'
+                        : 'Next, tell us a bit more so we can estimate your project.'}
                 </p>
                 <a 
                   href="#quote" 
@@ -179,7 +138,7 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
                       ? 'Order Now'
                       : engagementModel === 'ticket'
                         ? 'Get Tickets'
-                        : 'Get Your Instant Quote'}
+                        : 'Continue to estimate'}
                 </a>
               </motion.div>
             )}

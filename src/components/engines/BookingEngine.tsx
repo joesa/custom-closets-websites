@@ -29,7 +29,7 @@ type BookedSlot = {
 
 export default function BookingEngine({ 
   contractorId, 
-  accentColor = '#4F46E5',
+  accentColor = '#2d2d2d',
   radius = 'soft',
 }: { 
   contractorId: string
