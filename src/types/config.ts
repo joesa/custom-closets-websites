@@ -197,4 +197,18 @@ export interface BrandConfig {
   // business's actual industry/services. Falls back to QuizSection's own
   // built-in generic questions when absent (e.g. not yet regenerated).
   quiz?: QuizConfig;
+  /** Per-site designer signature (process name, motif, eyebrow). */
+  signature?: {
+    processName?: string;
+    motif?:
+      | 'line'
+      | 'dot'
+      | 'bar'
+      | 'double'
+      | 'corner-brackets'
+      | 'rule-stack'
+      | 'seal'
+      | 'ribbon';
+    eyebrow?: string;
+  } | null;
 }

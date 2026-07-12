@@ -494,13 +494,13 @@ export function structuralFingerprint(seed: string, theme?: string | null): stri
 export function heroHeadlineClasses(scale: TypeScale): string {
   switch (scale) {
     case 'monumental':
-      return 'text-6xl md:text-9xl leading-[0.95]';
+      return 'text-6xl md:text-9xl leading-[0.9] tracking-[-0.04em]';
     case 'oversized':
-      return 'text-5xl md:text-8xl leading-[1.02]';
+      return 'text-5xl md:text-8xl leading-[0.98] tracking-[-0.03em]';
     case 'compact':
-      return 'text-4xl md:text-6xl leading-tight';
+      return 'text-4xl md:text-5xl leading-snug tracking-[0.01em]';
     case 'standard':
     default:
-      return 'text-5xl md:text-7xl leading-tight';
+      return 'text-5xl md:text-7xl leading-tight tracking-[-0.02em]';
   }
 }

@@ -18,11 +18,14 @@ type TicketEvent = {
 
 export default function TicketEngine({ 
   contractorId, 
-  accentColor = '#E11D48' 
+  accentColor = '#E11D48',
+  radius = 'soft',
 }: { 
   contractorId: string
   accentColor?: string
+  radius?: 'sharp' | 'soft' | 'pill'
 }) {
+  const radiusPx = radius === 'sharp' ? '4px' : radius === 'pill' ? '9999px' : '16px'
   const [step, setStep] = useState<1 | 2 | 3>(1) // 1: Events, 2: Details & Quantity, 3: Done
   
   const [events, setEvents] = useState<TicketEvent[]>([])
@@ -100,14 +103,14 @@ export default function TicketEngine({
 
   if (loading) {
     return (
-      <div className="flex min-h-[300px] w-full items-center justify-center rounded-2xl bg-white shadow-xl border border-zinc-100">
+      <div className="flex min-h-[300px] w-full items-center justify-center bg-white shadow-xl border border-zinc-100" style={{ borderRadius: radiusPx }}>
         <Loader2 className="h-8 w-8 animate-spin text-zinc-300" />
       </div>
     )
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-xl border border-zinc-100 relative">
+    <div className="mx-auto w-full max-w-2xl overflow-hidden bg-white shadow-xl border border-zinc-100 relative" style={{ borderRadius: radiusPx }}>
       {/* Progress Header */}
       {step < 3 && (
         <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-100 flex items-center justify-between">

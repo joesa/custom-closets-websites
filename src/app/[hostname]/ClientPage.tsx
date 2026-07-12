@@ -6,6 +6,14 @@ import Script from "next/script";
 import * as motion from "framer-motion/client";
 import { getThemeStyles, getGridClasses, getThemePrimaryHex, getSectionTokens, applyVoice } from "@/lib/theme";
 import { getDesignVariant, heroHeadlineClasses, hashSeed, siteSeed } from "@/lib/designVariants";
+import {
+  resolvePageArchitecture,
+  mergeLayoutWithArchitecture,
+  layoutStyleSectionOrder,
+  type SectionKey,
+} from "@/lib/pageArchitectures";
+import { getSiteMotion, motionRise } from "@/lib/siteMotion";
+import { resolveSiteSignature, widgetRadiusFromSeed } from "@/lib/siteSignature";
 import HeroSection from "@/components/HeroSection";
 import ProcessSection from "@/components/ProcessSection";
 import ProductDetailSheet from "@/components/ProductDetailSheet";
@@ -36,10 +44,15 @@ function ClientPageContent({ config }: ClientPageProps) {
   const fontSeed = siteSeed(config);
   const theme = applyVoice(getThemeStyles(config.theme, config.themeTokens), config.theme, fontSeed, config.themeTokens);
   const tokens = getSectionTokens(config.theme, fontSeed, config.themeTokens);
-  // Stable per-site composition: explicit seed wins, else derive from identity
-  // so two sites that resolve to the same theme + layout still diverge. The
-  // theme biases the hero/type toward an on-brand "fit".
   const variant = getDesignVariant(fontSeed, config.theme);
+  const siteMotion = getSiteMotion(fontSeed);
+  const signature = resolveSiteSignature({
+    brandName: config.brandName,
+    seed: fontSeed,
+    signature: config.signature,
+    services: config.products?.map((p) => p.title),
+  });
+  const widgetRadius = widgetRadiusFromSeed(fontSeed);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
 
@@ -49,32 +62,24 @@ function ClientPageContent({ config }: ClientPageProps) {
   const heroHeadline = heroHeadlineClasses(variant.typeScale);
   const heroAlignText = variant.heroAlign === 'left' ? 'text-left' : 'text-center';
 
-  // Supporting line under the hero headline — the "headline + subhead" pairing
-  // that premium sites use. Rendered only when copy is present.
   const heroSubheadline = config.hero.subheadline?.trim();
   const renderHeroSub = (colorClass: string, centered: boolean) =>
     heroSubheadline ? (
       <motion.p
-        initial={motionInitial(motionReady, { opacity: 0, y: 20 })}
+        initial={motionRise(siteMotion, motionReady)}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.32, ease: "easeOut" }}
+        transition={siteMotion.heroLate}
         className={`mb-10 max-w-2xl text-lg md:text-xl leading-relaxed ${colorClass} ${centered ? 'mx-auto' : ''}`}
       >
         {heroSubheadline}
       </motion.p>
     ) : null;
 
-  // Deterministic detection of engagement model
   const engagementModel = config.engagementModel || 'quote';
   const isOrderBusiness = engagementModel === 'order';
   const isBookingBusiness = engagementModel === 'booking';
   const isTicketBusiness = engagementModel === 'ticket';
   
-  // Vary the hero CTA label across sites (seeded, stable) so the call-to-action
-  // doesn't read as templated. All options anchor to the #quote widget.
-  // Trade-neutral quote CTAs so a tree service, plumber, cleaner, or closet
-  // builder all read naturally — no design/build-specific verbiage that only
-  // fits one trade (e.g. "Book a Design Consultation").
   const QUOTE_CTA_LABELS = ['Get Your Free Quote', 'Request a Quote', 'Get a Free Estimate', 'Request a Consultation', 'Schedule a Visit'];
   const ORDER_CTA_LABELS = ['Order Now', 'View Menu', 'Start Your Order', 'Order Online', 'Place an Order'];
   const BOOKING_CTA_LABELS = ['Book an Appointment', 'Schedule Now', 'Book a Session', 'Reserve a Time', 'Book Service'];
@@ -88,21 +93,8 @@ function ClientPageContent({ config }: ClientPageProps) {
     </a>
   );
 
-  // ─── Signature treatment ───
-  // A recurring "designer mark" (ornament) and varied section eyebrow, both
-  // seeded per site so two sites on the same theme still feel hand-designed,
-  // and both themed via the active accent so they read correctly on every
-  // palette. The ornament recurs across About / Portfolio / Quote sections to
-  // give the page a cohesive, intentional identity instead of a templated feel.
-  const EYEBROW_LABELS = [
-    'Our Philosophy', 'Who We Are', 'Our Approach', 'The Difference',
-    'Our Standard', 'Our Story', 'The Craft', 'Why Choose Us',
-  ];
-  const ORNAMENTS = ['line', 'dot', 'bar', 'double'] as const;
-  const signatureSeed = fontSeed;
-  const aboutEyebrow = EYEBROW_LABELS[hashSeed(`${signatureSeed}:eyebrow`) % EYEBROW_LABELS.length];
-  const ornament: (typeof ORNAMENTS)[number] =
-    ORNAMENTS[hashSeed(`${signatureSeed}:ornament`) % ORNAMENTS.length];
+  const aboutEyebrow = signature.eyebrow;
+  const ornament = signature.motif;
 
   const renderOrnament = (centered: boolean) => {
     switch (ornament) {
@@ -121,6 +113,36 @@ function ClientPageContent({ config }: ClientPageProps) {
           <div className={`mb-5 flex flex-col gap-1 ${centered ? 'items-center' : ''}`}>
             <div className={`h-px w-10 ${tokens.accentBg}`} />
             <div className={`h-px w-6 ${tokens.accentBg}`} />
+          </div>
+        );
+      case 'corner-brackets':
+        return (
+          <div className={`mb-5 flex items-center gap-3 ${centered ? 'justify-center' : ''}`}>
+            <span className={`h-3 w-3 border-l-2 border-t-2 ${theme.accentColor}`} />
+            <span className={`h-px w-8 ${tokens.accentBg}`} />
+            <span className={`h-3 w-3 border-r-2 border-t-2 ${theme.accentColor}`} />
+          </div>
+        );
+      case 'rule-stack':
+        return (
+          <div className={`mb-5 flex flex-col gap-1.5 ${centered ? 'items-center' : ''}`}>
+            <div className={`h-px w-16 ${tokens.accentBg}`} />
+            <div className={`h-px w-10 ${tokens.accentBg} opacity-70`} />
+            <div className={`h-px w-6 ${tokens.accentBg} opacity-40`} />
+          </div>
+        );
+      case 'seal':
+        return (
+          <div className={`mb-5 flex ${centered ? 'justify-center' : ''}`}>
+            <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full border-2 ${tokens.surfaceBorder}`}>
+              <span className={`h-2 w-2 rounded-full ${tokens.accentBg}`} />
+            </span>
+          </div>
+        );
+      case 'ribbon':
+        return (
+          <div className={`mb-5 ${centered ? 'flex justify-center' : ''}`}>
+            <span className={`inline-block h-2 w-20 ${tokens.accentBg}`} />
           </div>
         );
       case 'line':
@@ -151,6 +173,7 @@ function ClientPageContent({ config }: ClientPageProps) {
       ctaButton={ctaButton}
       heroHeadlineClasses={heroHeadline}
       ornament={ornament}
+      motionProfile={siteMotion}
     />
   );
 
@@ -258,7 +281,19 @@ function ClientPageContent({ config }: ClientPageProps) {
 
   const aboutSection = renderAbout();
 
-  const processSection = <ProcessSection key="process" theme={config.theme} themeTokens={config.themeTokens} fontSeed={fontSeed} process={config.process} />;
+  const processWithSignature = {
+    ...config.process,
+    title: signature.processName || config.process.title,
+  };
+  const processSection = (
+    <ProcessSection
+      key="process"
+      theme={config.theme}
+      themeTokens={config.themeTokens}
+      fontSeed={fontSeed}
+      process={processWithSignature}
+    />
+  );
 
   const beforeAfterSection = <BeforeAfterSlider key="ba" theme={config.theme} themeTokens={config.themeTokens} fontSeed={fontSeed} config={config.beforeAfter} />;
 
@@ -370,16 +405,20 @@ function ClientPageContent({ config }: ClientPageProps) {
                 data-contractor-id={config.widgetId}
                 data-api-url={PUBLIC_API_URL}
                 data-preview-color={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
+                data-radius={widgetRadius}
+                data-font-heading={theme.headingFont}
               />
             ) : isBookingBusiness ? (
               <BookingEngine 
                 contractorId={config.widgetId}
                 accentColor={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
+                radius={widgetRadius}
               />
             ) : isTicketBusiness ? (
               <TicketEngine 
                 contractorId={config.widgetId}
                 accentColor={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
+                radius={widgetRadius}
               />
             ) : (
               // @ts-expect-error Custom web component
@@ -387,6 +426,8 @@ function ClientPageContent({ config }: ClientPageProps) {
                 data-contractor-id={config.widgetId} 
                 data-api-url={PUBLIC_API_URL}
                 data-preview-color={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
+                data-radius={widgetRadius}
+                data-font-heading={theme.headingFont}
                 data-quiz-frustration={quizAnswers.frustration || ''}
                 data-quiz-style={quizAnswers.style || ''}
                 data-quiz-timeline={quizAnswers.timeline || ''}
@@ -402,64 +443,38 @@ function ClientPageContent({ config }: ClientPageProps) {
 
   const renderLayout = () => {
     const style = config.layoutStyle || 'standard';
+    const architecture = resolvePageArchitecture({
+      engagementModel,
+      layoutStyle: style,
+      seed: fontSeed,
+    });
 
-    const sections = (() => {
-      switch (style) {
-        case 'portfolio-first':
-          return [heroSection, portfolioSection, beforeAfterSection, aboutSection, processSection, quizSection, widgetSection];
-        case 'conversion-focus':
-          return [heroSection, widgetSection, beforeAfterSection, portfolioSection, aboutSection];
-        case 'storyteller':
-          return [heroSection, aboutSection, quizSection, portfolioSection, processSection, widgetSection, beforeAfterSection];
-        case 'minimalist-lead':
-          return [heroSection, quizSection, widgetSection];
-        case 'visual-impact':
-          return [heroSection, beforeAfterSection, portfolioSection, widgetSection];
-        case 'trust-builder':
-          return [heroSection, aboutSection, processSection, beforeAfterSection, portfolioSection, quizSection, widgetSection];
-        case 'gallery-showcase':
-          return [heroSection, portfolioSection, beforeAfterSection, aboutSection, quizSection, widgetSection];
-        case 'local-expert':
-          return [heroSection, aboutSection, processSection, portfolioSection, beforeAfterSection, quizSection, widgetSection];
-        case 'compact-quote':
-          return [heroSection, quizSection, widgetSection];
-        // New trade-vertical layouts
-        case 'emergency-first':
-          return [heroSection, widgetSection, aboutSection, beforeAfterSection, portfolioSection];
-        case 'before-after':
-          return [heroSection, beforeAfterSection, portfolioSection, aboutSection, quizSection, widgetSection];
-        case 'process-steps':
-          return [heroSection, processSection, aboutSection, portfolioSection, quizSection, widgetSection];
-        case 'seasonal-cta':
-          return [heroSection, widgetSection, portfolioSection, aboutSection, processSection];
-        case 'trust-report':
-          return [heroSection, aboutSection, processSection, portfolioSection, beforeAfterSection, quizSection, widgetSection];
-        case 'service-zones':
-          return [heroSection, aboutSection, portfolioSection, quizSection, widgetSection];
-        case 'event-booking':
-          return [heroSection, portfolioSection, aboutSection, quizSection, widgetSection];
-        case 'standard':
-        default:
-          return [heroSection, aboutSection, processSection, beforeAfterSection, portfolioSection, quizSection, widgetSection];
-      }
-    })();
+    const byKey: Record<SectionKey, React.ReactNode> = {
+      hero: heroSection,
+      about: aboutSection,
+      process: processSection,
+      beforeAfter: beforeAfterSection,
+      portfolio: portfolioSection,
+      quiz: quizSection,
+      widget: widgetSection,
+    };
 
-    // Skip the before/after slider entirely for businesses with no physical
-    // "before" state (order/direct-purchase, pure professional services,
-    // ticketed/booking, person-body-sensitive) — config.beforeAfter is
-    // absent/null when the industry's BeforeAfterCategory is
-    // 'not-applicable' (see closet-dashboard's openai-images.ts docstring).
-    let filteredSections = config.beforeAfter ? sections : sections.filter((s) => s !== beforeAfterSection);
-    
-    // Order businesses (like restaurants/food trucks) do not follow a project
-    // "Process" (Consultation -> Design -> Install) or have "Before/After"
-    // states, and don't need a lead-qualification Quiz. Strip those sections
-    // out even if the layout/db included them.
-    if (isOrderBusiness) {
-      filteredSections = filteredSections.filter((s) => s !== processSection && s !== beforeAfterSection && s !== quizSection);
+    const order = mergeLayoutWithArchitecture(architecture, layoutStyleSectionOrder(style));
+    let sections = order.map((k) => byKey[k]);
+
+    // Skip before/after when not configured (not-applicable industries).
+    if (!config.beforeAfter) {
+      sections = sections.filter((s) => s !== beforeAfterSection);
     }
-    
-    return filteredSections;
+
+    // Order businesses: never show process / quiz / before-after.
+    if (isOrderBusiness) {
+      sections = sections.filter(
+        (s) => s !== processSection && s !== beforeAfterSection && s !== quizSection
+      );
+    }
+
+    return sections;
   };
 
   // Multi-page sites render the full <Navbar> in the layout. Rendering this

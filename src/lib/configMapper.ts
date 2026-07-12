@@ -58,6 +58,19 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
 
   if (!configRow) return null;
 
+  const processRow = configRow.process_config as ProcessConfig & {
+    signatureMotif?: NonNullable<BrandConfig['signature']>['motif'];
+    signatureEyebrow?: string;
+  };
+  const signature =
+    processRow?.signatureMotif || processRow?.signatureEyebrow
+      ? {
+          processName: processRow.title,
+          motif: processRow.signatureMotif,
+          eyebrow: processRow.signatureEyebrow,
+        }
+      : undefined;
+
   return {
     brandName: configRow.brand_name,
     theme: configRow.theme as ThemeType,
@@ -81,5 +94,6 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     quiz: configRow.quiz_config ?? undefined,
     engagementModel: (configRow.engagement_model as 'quote' | 'order' | 'booking' | 'ticket') || 'quote',
     themeTokens: configRow.theme_tokens ?? undefined,
+    signature,
   };
 }
