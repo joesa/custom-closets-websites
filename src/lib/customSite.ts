@@ -131,32 +131,19 @@ function findMatchingBrace(s: string, openIdx: number): number {
   return s.length - 1
 }
 
-/** Strip scripts / event handlers / javascript: URLs. Used at render + save. */
+/**
+ * Pure-JS HTML sanitizer (no jsdom/DOMPurify). Keeps the widget HTML comment
+ * placeholder intact while stripping scripts / event handlers / javascript: URLs.
+ */
 export function sanitizeCustomHtml(html: string): string {
-  // Lazy require so unit tests / edge without DOM still load the module.
-  // isomorphic-dompurify works in Node and the browser.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const DOMPurify = require('isomorphic-dompurify') as typeof import('isomorphic-dompurify')
-  return DOMPurify.sanitize(html || '', {
-    USE_PROFILES: { html: true },
-    ADD_TAGS: ['closet-quote-widget', 'closet-order-widget'],
-    ADD_ATTR: [
-      'data-contractor-id',
-      'data-api-url',
-      'data-preview-color',
-      'data-radius',
-      'data-font-heading',
-      'data-widget-title',
-      'data-quiz-frustration',
-      'data-quiz-style',
-      'data-quiz-timeline',
-      'class',
-      'style',
-      'id',
-    ],
-    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
-    FORBID_ATTR: ['srcdoc'],
-  })
+  if (!html) return ''
+  let out = html
+  out = out.replace(/<\s*(script|iframe|object|embed|form)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, '')
+  out = out.replace(/<\s*(script|iframe|object|embed|form)\b[^>]*\/?\s*>/gi, '')
+  out = out.replace(/\s+on\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+  out = out.replace(/\s(href|src|action)\s*=\s*(['"])\s*javascript:[^'"]*\2/gi, ' $1="#"')
+  out = out.replace(/\ssrcdoc\s*=\s*("[^"]*"|'[^']*')/gi, '')
+  return out
 }
 
 /** Strip `@import` and `expression()` / `url(javascript:)` from CSS. */
