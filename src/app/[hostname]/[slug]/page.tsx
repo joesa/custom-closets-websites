@@ -3,25 +3,30 @@ import { notFound } from "next/navigation";
 import LocalSEO from "@/components/LocalSEO";
 import PendingApproval from "@/components/PendingApproval";
 import LaunchPaywall from "@/components/LaunchPaywall";
+import CustomSiteRenderer from "@/components/CustomSiteRenderer";
 import GalleryLightbox from "@/components/GalleryLightbox";
 import HeroSection from "@/components/HeroSection";
 import { getThemeStyles, getGridClasses, applyVoice, getSectionTokens } from "@/lib/theme";
 import { siteSeed, getDesignVariant, heroHeadlineClasses } from "@/lib/designVariants";
 import { resolveSiteSignature } from "@/lib/siteSignature";
 import { resolvePageComposition } from "@/lib/pageCompositions";
+import { getCustomPage, isCustomSiteConfig } from "@/lib/customSite";
 import { getSiteGate } from "@/lib/siteGate";
 import { cookies } from "next/headers";
 import Image from "next/image";
 
 export default async function SubPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ hostname: string; slug: string }>;
+  searchParams?: Promise<{ draft?: string }>;
 }) {
   const resolvedParams = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
   const config = await getActiveConfig(resolvedParams.hostname);
 
-  if (!config || !config.pagesConfig) {
+  if (!config) {
     notFound();
   }
 
@@ -70,6 +75,44 @@ export default async function SubPage({
         <LaunchPaywall brandName={config.brandName} launchPayUrl={payUrl} />
       </>
     );
+  }
+
+  // Per-page custom render: if this path exists in the custom artifact, paint
+  // it outside the template engine. Otherwise fall through to pagesConfig.
+  const wantDraft = resolvedSearch.draft === "1" && isAdminBypass;
+  const draftConfig =
+    wantDraft && isCustomSiteConfig(config.customConfigDraft)
+      ? config.customConfigDraft
+      : null;
+  const liveCustom =
+    config.renderMode === "custom" && isCustomSiteConfig(config.customConfig)
+      ? config.customConfig
+      : null;
+  const activeCustom = draftConfig || liveCustom;
+  const customPage = activeCustom
+    ? getCustomPage(activeCustom, `/${resolvedParams.slug}`)
+    : null;
+
+  if (activeCustom && customPage) {
+    return (
+      <>
+        <LocalSEO
+          seo={config.seo}
+          brandName={config.brandName}
+          url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
+        />
+        <CustomSiteRenderer
+          custom={activeCustom}
+          page={customPage}
+          widgetId={config.widgetId}
+          isDraftPreview={!!draftConfig}
+        />
+      </>
+    );
+  }
+
+  if (!config.pagesConfig) {
+    notFound();
   }
 
   const pageData = config.pagesConfig.find(

@@ -28,6 +28,17 @@ export function proxy(req: NextRequest) {
       httpOnly: true,
       sameSite: 'lax',
     });
+    // Draft custom-site preview (?draft=1) — layout skips the engine Navbar
+    // so the custom HTML owns the chrome. Cookie is scoped to this session.
+    if (url.searchParams.get('draft') === '1') {
+      response.cookies.set('custom_draft_preview', 'true', {
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 60 * 60, // 1 hour
+      });
+    }
   }
 
   return response;

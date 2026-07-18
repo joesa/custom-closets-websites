@@ -8,6 +8,7 @@ import {
   SEOConfig,
   ThemeType,
 } from '@/types/config';
+import { isCustomSiteConfig, type CustomSiteConfig } from '@/lib/customSite';
 
 // Shape of the nested row returned by the domains->tenants->site_configs join.
 // Relations may come back as a single object or a one-element array.
@@ -31,6 +32,9 @@ type SiteConfigRow = {
   theme_tokens?: BrandConfig['themeTokens'] | null;
   quiz_config?: BrandConfig['quiz'] | null;
   engagement_model?: string | null;
+  render_mode?: string | null;
+  custom_config?: CustomSiteConfig | null;
+  custom_config_draft?: CustomSiteConfig | null;
 };
 type TenantRow = {
   widget_id?: string;
@@ -95,5 +99,10 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     engagementModel: (configRow.engagement_model as 'quote' | 'order' | 'booking' | 'ticket') || 'quote',
     themeTokens: configRow.theme_tokens ?? undefined,
     signature,
+    renderMode: configRow.render_mode === 'custom' ? 'custom' : 'engine',
+    customConfig: isCustomSiteConfig(configRow.custom_config) ? configRow.custom_config : null,
+    customConfigDraft: isCustomSiteConfig(configRow.custom_config_draft)
+      ? configRow.custom_config_draft
+      : null,
   };
 }

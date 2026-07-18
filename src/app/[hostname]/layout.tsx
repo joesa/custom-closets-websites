@@ -1,6 +1,7 @@
 import { getActiveConfig } from "@/lib/getConfig";
 import Navbar from "@/components/Navbar";
 import { getDesignVariant, siteSeed } from "@/lib/designVariants";
+import { cookies } from "next/headers";
 
 export default async function HostnameLayout({
   children,
@@ -13,6 +14,15 @@ export default async function HostnameLayout({
   const config = await getActiveConfig(resolvedParams.hostname);
 
   if (!config) {
+    return <>{children}</>;
+  }
+
+  const cookieStore = await cookies();
+  const draftPreview = cookieStore.get('custom_draft_preview')?.value === 'true';
+
+  // Custom-mode sites (and draft custom previews) own their own chrome.
+  // Skip the engine Navbar so it doesn't double-render over the custom build.
+  if (config.renderMode === 'custom' || draftPreview) {
     return <>{children}</>;
   }
 

@@ -56,7 +56,10 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
           design_variant,
           theme_tokens,
           quiz_config,
-          engagement_model
+          engagement_model,
+          render_mode,
+          custom_config,
+          custom_config_draft
         )
       )
     `)

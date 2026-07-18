@@ -211,4 +211,14 @@ export interface BrandConfig {
       | 'ribbon';
     eyebrow?: string;
   } | null;
+  /**
+   * When 'custom', the public renderer bypasses the shared template engine and
+   * paints `customConfig` (raw HTML/CSS) for this tenant only. Default/absent
+   * = 'engine' — every other site is unaffected.
+   */
+  renderMode?: 'engine' | 'custom';
+  /** Published custom-site artifact (live when renderMode = 'custom'). */
+  customConfig?: import('@/lib/customSite').CustomSiteConfig | null;
+  /** Draft artifact for admin preview (?draft=1 + admin_bypass). */
+  customConfigDraft?: import('@/lib/customSite').CustomSiteConfig | null;
 }
