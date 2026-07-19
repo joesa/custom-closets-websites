@@ -85,6 +85,7 @@ export default async function Page({
           custom={activeCustom}
           page={customPage}
           widgetId={config.widgetId}
+          engagementModel={config.engagementModel || 'quote'}
           isDraftPreview={!!draftConfig}
         />
       </>

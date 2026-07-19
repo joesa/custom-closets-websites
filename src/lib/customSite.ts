@@ -167,9 +167,9 @@ export function injectWidgetPlaceholder(
   if (out.includes(WIDGET_PLACEHOLDER_ALT)) {
     out = out.split(WIDGET_PLACEHOLDER_ALT).join(widgetHtml)
   }
-  // Also accept a bare custom element the AI may have emitted without attrs.
+  // Replace any engagement web component the AI may have emitted (quote/order/booking/ticket).
   out = out.replace(
-    /<closet-quote-widget\b[^>]*>\s*<\/closet-quote-widget>/gi,
+    /<closet-(?:quote|order|booking|ticket)-widget\b[^>]*>\s*<\/closet-(?:quote|order|booking|ticket)-widget>/gi,
     widgetHtml
   )
   return out
@@ -202,7 +202,7 @@ export function validateCustomConfig(config: CustomSiteConfig): CustomPublishChe
     if (
       html.includes(WIDGET_PLACEHOLDER) ||
       html.includes(WIDGET_PLACEHOLDER_ALT) ||
-      /<closet-quote-widget\b/i.test(html)
+      /<closet-(?:quote|order|booking|ticket)-widget\b/i.test(html)
     ) {
       hasWidget = true
     }
@@ -218,7 +218,7 @@ export function validateCustomConfig(config: CustomSiteConfig): CustomPublishChe
   }
   if (!hasWidget) {
     warnings.push(
-      `No quote widget placeholder found. Embed ${WIDGET_PLACEHOLDER} (or <closet-quote-widget></closet-quote-widget>) so leads still convert.`
+      `No engagement widget placeholder found. Embed ${WIDGET_PLACEHOLDER} (or a closet-*-widget tag) so leads still convert.`
     )
   }
   return { ok: errors.length === 0, warnings, errors }

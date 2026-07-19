@@ -105,6 +105,7 @@ export default async function SubPage({
           custom={activeCustom}
           page={customPage}
           widgetId={config.widgetId}
+          engagementModel={config.engagementModel || 'quote'}
           isDraftPreview={!!draftConfig}
         />
       </>

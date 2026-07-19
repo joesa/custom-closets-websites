@@ -13,17 +13,28 @@ import {
 
 const SCOPE = '[data-custom-site]';
 
-function buildWidgetElement(widgetId: string): string {
-  // Matches the attrs ClientPage passes to <closet-quote-widget>.
-  return `<closet-quote-widget data-contractor-id="${widgetId}" data-api-url="${PUBLIC_API_URL}"></closet-quote-widget>`;
+export type EngagementModel = 'quote' | 'order' | 'booking' | 'ticket';
+
+function buildWidgetElement(widgetId: string, engagementModel: EngagementModel = 'quote'): string {
+  // Web components from closet-widget/dist/widget.js — same attrs ClientPage uses.
+  const tag =
+    engagementModel === 'order'
+      ? 'closet-order-widget'
+      : engagementModel === 'booking'
+        ? 'closet-booking-widget'
+        : engagementModel === 'ticket'
+          ? 'closet-ticket-widget'
+          : 'closet-quote-widget';
+  return `<${tag} data-contractor-id="${widgetId}" data-api-url="${PUBLIC_API_URL}"></${tag}>`;
 }
 
 function prepareInlineHtml(
   page: CustomPageArtifact,
   custom: CustomSiteConfig,
-  widgetId: string
+  widgetId: string,
+  engagementModel: EngagementModel
 ): { html: string; css: string } {
-  const widgetEl = buildWidgetElement(widgetId);
+  const widgetEl = buildWidgetElement(widgetId, engagementModel);
   const rawHtml = injectWidgetPlaceholder(page.html || '', widgetEl);
   const html = sanitizeCustomHtml(rawHtml);
   const combinedCss = [custom.globalCss || '', page.css || ''].filter(Boolean).join('\n');
@@ -34,9 +45,10 @@ function prepareInlineHtml(
 function buildSrcDoc(
   page: CustomPageArtifact,
   custom: CustomSiteConfig,
-  widgetId: string
+  widgetId: string,
+  engagementModel: EngagementModel
 ): string {
-  const widgetEl = buildWidgetElement(widgetId);
+  const widgetEl = buildWidgetElement(widgetId, engagementModel);
   const bodyHtml = injectWidgetPlaceholder(page.html || '', widgetEl);
   // Iframe mode allows scripts (true "anything"); still strip javascript: URLs
   // from CSS and keep a basic document shell.
@@ -62,17 +74,26 @@ export default function CustomSiteRenderer({
   custom,
   page,
   widgetId,
+  engagementModel = 'quote',
   isDraftPreview = false,
 }: {
   custom: CustomSiteConfig;
   page: CustomPageArtifact;
   widgetId: string;
+  /** Which engagement web component to mount at the widget placeholder. */
+  engagementModel?: EngagementModel;
   isDraftPreview?: boolean;
 }) {
   const mode = custom.mode === 'iframe' ? 'iframe' : 'inline';
+  const model: EngagementModel =
+    engagementModel === 'order' ||
+    engagementModel === 'booking' ||
+    engagementModel === 'ticket'
+      ? engagementModel
+      : 'quote';
 
   if (mode === 'iframe') {
-    const srcDoc = buildSrcDoc(page, custom, widgetId);
+    const srcDoc = buildSrcDoc(page, custom, widgetId, model);
     return (
       <div className="relative min-h-screen w-full">
         {isDraftPreview ? <DraftBanner /> : null}
@@ -87,7 +108,7 @@ export default function CustomSiteRenderer({
     );
   }
 
-  const { html, css } = prepareInlineHtml(page, custom, widgetId);
+  const { html, css } = prepareInlineHtml(page, custom, widgetId, model);
 
   return (
     <div className="relative min-h-screen w-full">
