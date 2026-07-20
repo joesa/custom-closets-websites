@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# CI sibling checkouts (customSite sync)
+.ci-siblings/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

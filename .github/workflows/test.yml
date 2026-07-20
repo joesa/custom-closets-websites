@@ -10,6 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout dashboard sibling (customSite sync script)
+        uses: actions/checkout@v4
+        with:
+          repository: joesa/closet-dashboard
+          ref: main
+          path: .ci-siblings/closet-dashboard
+          sparse-checkout: |
+            src/lib/customSite.ts
+            scripts/check-custom-site-core-sync.mjs
+          sparse-checkout-cone-mode: false
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -18,5 +28,3 @@ jobs:
       - run: npm test
       - name: customSite shared-core sync
         run: npm run test:custom-site-sync
-        env:
-          CUSTOM_SITE_SYNC_SKIP: '1'
