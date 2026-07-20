@@ -93,6 +93,15 @@ describe('validateCustomConfig', () => {
     expect(injected).not.toMatch(/theme="dark"/)
   })
 
+  it('unwraps decorative widget-container shells after inject', async () => {
+    const { injectWidgetPlaceholder } = await import('./customSite')
+    const raw = `<div class="widget-container">${WIDGET_PLACEHOLDER}</div>`
+    const injected = injectWidgetPlaceholder(raw, '<closet-quote-widget data-x="1"></closet-quote-widget>')
+    expect(injected).toContain('closet-widget-mount')
+    expect(injected).not.toMatch(/widget-container/)
+    expect(injected).toContain('<closet-quote-widget data-x="1"></closet-quote-widget>')
+  })
+
   it('errors on script in inline mode', () => {
     const r = validateCustomConfig({
       mode: 'inline',

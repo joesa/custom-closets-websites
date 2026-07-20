@@ -5,6 +5,7 @@ import { PUBLIC_API_URL, WIDGET_CDN_URL } from '@/lib/urls';
 import {
   type CustomPageArtifact,
   type CustomSiteConfig,
+  WIDGET_MOUNT_RESET_CSS,
   injectWidgetPlaceholder,
   sanitizeCustomCss,
   sanitizeCustomHtml,
@@ -38,7 +39,13 @@ function prepareInlineHtml(
   const rawHtml = injectWidgetPlaceholder(page.html || '', widgetEl);
   const html = sanitizeCustomHtml(rawHtml);
   const combinedCss = [custom.globalCss || '', page.css || ''].filter(Boolean).join('\n');
-  const css = scopeCss(sanitizeCustomCss(combinedCss), SCOPE);
+  // Site CSS first, then mount reset so AI grey "outer boxes" cannot win.
+  const css = [
+    scopeCss(sanitizeCustomCss(combinedCss), SCOPE),
+    scopeCss(WIDGET_MOUNT_RESET_CSS, SCOPE),
+  ]
+    .filter(Boolean)
+    .join('\n');
   return { html, css };
 }
 
@@ -52,7 +59,12 @@ function buildSrcDoc(
   const bodyHtml = injectWidgetPlaceholder(page.html || '', widgetEl);
   // Iframe mode allows scripts (true "anything"); still strip javascript: URLs
   // from CSS and keep a basic document shell.
-  const css = sanitizeCustomCss([custom.globalCss || '', page.css || ''].filter(Boolean).join('\n'));
+  const css = [
+    sanitizeCustomCss([custom.globalCss || '', page.css || ''].filter(Boolean).join('\n')),
+    WIDGET_MOUNT_RESET_CSS,
+  ]
+    .filter(Boolean)
+    .join('\n');
   const title = page.title ? `<title>${escapeHtml(page.title)}</title>` : '';
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${title}<style>${css}</style></head><body>${bodyHtml}<script src="${WIDGET_CDN_URL}" defer></script></body></html>`;
 }
