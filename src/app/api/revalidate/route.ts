@@ -5,21 +5,14 @@ import { revalidateTag } from 'next/cache';
  * On-demand cache invalidation for `getActiveConfig`'s per-hostname
  * `unstable_cache` (tagged `site-config`, revalidate: 60s in `getConfig.ts`).
  *
- * Auth: prefer `REVALIDATE_SECRET`. Temporarily also accepts
- * `ADMIN_BYPASS_SECRET` so older dashboard deploys keep working during cutover.
- * Preview cookies continue to use ADMIN_BYPASS_SECRET only (see proxy.ts).
+ * Auth: `REVALIDATE_SECRET` via `x-revalidate-secret` header only.
+ * Preview cookies continue to use ADMIN_BYPASS_SECRET (see proxy.ts).
  */
 export async function POST(req: NextRequest) {
   const revalidateSecret = process.env.REVALIDATE_SECRET?.trim();
-  const legacySecret = process.env.ADMIN_BYPASS_SECRET?.trim();
   const provided = req.headers.get('x-revalidate-secret')?.trim();
 
-  const accepted =
-    !!provided &&
-    ((!!revalidateSecret && provided === revalidateSecret) ||
-      (!!legacySecret && provided === legacySecret));
-
-  if (!accepted) {
+  if (!revalidateSecret || !provided || provided !== revalidateSecret) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

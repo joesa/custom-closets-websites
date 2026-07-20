@@ -1,5 +1,6 @@
 /**
- * Thin wrapper — dashboard script is the source of truth for the check.
+ * Thin wrapper — dashboard script is the source of truth for the check
+ * (customSite.ts + widgetCdn.ts).
  *
  * Local: uses ../closet-dashboard when present.
  * CI: uses .ci-siblings/closet-dashboard (checked out by the workflow).
