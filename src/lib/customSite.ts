@@ -3,7 +3,8 @@
  * When site_configs.render_mode = 'custom', the public renderer bypasses
  * the shared template engine and paints this artifact for that tenant only.
  *
- * Keep widget-placeholder helpers in sync with closet-dashboard/src/lib/customSite.ts.
+ * Shared sanitize/validate/placeholder core is checked by
+ * scripts/check-custom-site-core-sync.mjs (dashboard script is source of truth).
  */
 
 export type CustomRenderMode = 'inline' | 'iframe'

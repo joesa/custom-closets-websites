@@ -5,20 +5,21 @@ import { revalidateTag } from 'next/cache';
  * On-demand cache invalidation for `getActiveConfig`'s per-hostname
  * `unstable_cache` (tagged `site-config`, revalidate: 60s in `getConfig.ts`).
  *
- * Without this, a freshly (re)provisioned tenant can keep serving its
- * previous nav/theme/copy for up to 60s — restarting a server or hard-
- * refreshing the browser does nothing, since the stale value lives in this
- * app's own server-side data cache, not the browser or the caller's process.
- *
- * Called by `closet-dashboard`'s provisioning flow right after a tenant's
- * site config is written. Shares `ADMIN_BYPASS_SECRET` with `proxy.ts` rather
- * than introducing a second cross-app secret.
+ * Auth: prefer `REVALIDATE_SECRET`. Temporarily also accepts
+ * `ADMIN_BYPASS_SECRET` so older dashboard deploys keep working during cutover.
+ * Preview cookies continue to use ADMIN_BYPASS_SECRET only (see proxy.ts).
  */
 export async function POST(req: NextRequest) {
-  const secret = process.env.ADMIN_BYPASS_SECRET?.trim();
+  const revalidateSecret = process.env.REVALIDATE_SECRET?.trim();
+  const legacySecret = process.env.ADMIN_BYPASS_SECRET?.trim();
   const provided = req.headers.get('x-revalidate-secret')?.trim();
 
-  if (!secret || !provided || provided !== secret) {
+  const accepted =
+    !!provided &&
+    ((!!revalidateSecret && provided === revalidateSecret) ||
+      (!!legacySecret && provided === legacySecret));
+
+  if (!accepted) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

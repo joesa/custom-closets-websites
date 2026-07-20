@@ -56,9 +56,9 @@ function buildSrcDoc(
   engagementModel: EngagementModel
 ): string {
   const widgetEl = buildWidgetElement(widgetId, engagementModel);
-  const bodyHtml = injectWidgetPlaceholder(page.html || '', widgetEl);
-  // Iframe mode allows scripts (true "anything"); still strip javascript: URLs
-  // from CSS and keep a basic document shell.
+  // Still sanitize HTML even in iframe mode — sandbox is not a substitute
+  // for stripping script/event-handler payloads from AI/admin content.
+  const bodyHtml = sanitizeCustomHtml(injectWidgetPlaceholder(page.html || '', widgetEl));
   const css = [
     sanitizeCustomCss([custom.globalCss || '', page.css || ''].filter(Boolean).join('\n')),
     WIDGET_MOUNT_RESET_CSS,
@@ -66,6 +66,7 @@ function buildSrcDoc(
     .filter(Boolean)
     .join('\n');
   const title = page.title ? `<title>${escapeHtml(page.title)}</title>` : '';
+  // Widget script is the only intentional script; body HTML is sanitized.
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${title}<style>${css}</style></head><body>${bodyHtml}<script src="${WIDGET_CDN_URL}" defer></script></body></html>`;
 }
 
@@ -79,8 +80,9 @@ function escapeHtml(s: string): string {
 
 /**
  * Renders one page of a per-tenant custom site outside the shared template
- * engine. Default mode is inline (sanitized HTML + scoped CSS). Opt into
- * iframe mode when the build needs arbitrary JS.
+ * engine. Default / preferred mode is `inline` (sanitized HTML + scoped CSS).
+ * `iframe` is elevated-trust only — body HTML is still sanitized; sandbox
+ * does NOT combine allow-scripts with allow-same-origin.
  */
 export default function CustomSiteRenderer({
   custom,
@@ -112,7 +114,7 @@ export default function CustomSiteRenderer({
         <iframe
           title={page.title || 'Custom site'}
           srcDoc={srcDoc}
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          sandbox="allow-scripts allow-forms allow-popups"
           className="block w-full border-0"
           style={{ minHeight: '100vh', height: '100vh' }}
         />

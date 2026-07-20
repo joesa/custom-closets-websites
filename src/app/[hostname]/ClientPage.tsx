@@ -437,7 +437,6 @@ function ClientPageContent({ config }: ClientPageProps) {
               <closet-order-widget
                 data-contractor-id={config.widgetId}
                 data-api-url={PUBLIC_API_URL}
-                data-preview-color={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
                 data-radius={widgetRadius}
                 data-font-heading={theme.headingFont}
                 data-widget-title={widgetTitle}
@@ -459,7 +458,6 @@ function ClientPageContent({ config }: ClientPageProps) {
               <closet-quote-widget 
                 data-contractor-id={config.widgetId} 
                 data-api-url={PUBLIC_API_URL}
-                data-preview-color={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
                 data-radius={widgetRadius}
                 data-font-heading={theme.headingFont}
                 data-widget-title={widgetTitle}
