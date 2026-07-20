@@ -62,7 +62,7 @@ describe('sanitizeCustomCss', () => {
 })
 
 describe('validateCustomConfig', () => {
-  it('requires pages and warns without widget', () => {
+  it('requires pages and hard-fails without widget on home', () => {
     const empty = validateCustomConfig({ mode: 'inline', pages: {} })
     expect(empty.ok).toBe(false)
 
@@ -70,15 +70,27 @@ describe('validateCustomConfig', () => {
       mode: 'inline',
       pages: { '/': { html: '<h1>Hi</h1>' } },
     })
-    expect(noWidget.ok).toBe(true)
-    expect(noWidget.warnings.some((w) => /widget/i.test(w))).toBe(true)
+    expect(noWidget.ok).toBe(false)
+    expect(noWidget.errors.some((e) => /widget/i.test(e))).toBe(true)
 
     const withWidget = validateCustomConfig({
       mode: 'inline',
       pages: { '/': { html: `<div>${WIDGET_PLACEHOLDER}</div>` } },
     })
     expect(withWidget.ok).toBe(true)
-    expect(withWidget.warnings.filter((w) => /widget/i.test(w))).toHaveLength(0)
+    expect(withWidget.errors).toHaveLength(0)
+  })
+
+  it('normalizes mutated CLOSET_WIDGET comments for inject', async () => {
+    const { injectWidgetPlaceholder, normalizeWidgetPlaceholders } = await import(
+      './customSite'
+    )
+    const raw = `<div class="widget-container"><!-- CLOSET_WIDGET theme="dark" --></div>`
+    const normalized = normalizeWidgetPlaceholders(raw)
+    expect(normalized).toContain(WIDGET_PLACEHOLDER)
+    const injected = injectWidgetPlaceholder(raw, '<closet-quote-widget></closet-quote-widget>')
+    expect(injected).toContain('closet-quote-widget')
+    expect(injected).not.toMatch(/theme="dark"/)
   })
 
   it('errors on script in inline mode', () => {

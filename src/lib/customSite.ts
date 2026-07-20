@@ -2,6 +2,8 @@
  * Per-site custom render mode — types + sanitize/scope helpers.
  * When site_configs.render_mode = 'custom', the public renderer bypasses
  * the shared template engine and paints this artifact for that tenant only.
+ *
+ * Keep widget-placeholder helpers in sync with closet-dashboard/src/lib/customSite.ts.
  */
 
 export type CustomRenderMode = 'inline' | 'iframe'
@@ -22,6 +24,9 @@ export type CustomSiteConfig = {
 /** Marker the AI embeds so we can inject the live quote/booking widget. */
 export const WIDGET_PLACEHOLDER = '<!-- CLOSET_WIDGET -->'
 export const WIDGET_PLACEHOLDER_ALT = '{{CLOSET_WIDGET}}'
+
+const WIDGET_COMMENT_RE = /<!--\s*CLOSET_WIDGET\b[\s\S]*?-->/gi
+const WIDGET_MUSTACHE_RE = /\{\{\s*CLOSET_WIDGET\s*\}\}/gi
 
 export function isCustomSiteConfig(v: unknown): v is CustomSiteConfig {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return false
@@ -49,6 +54,75 @@ export function getCustomPage(
 }
 
 /**
+ * Canonicalize AI-mutated widget markers (`<!-- CLOSET_WIDGET theme="dark" -->`)
+ * and keep a single mount point.
+ */
+export function normalizeWidgetPlaceholders(html: string): string {
+  if (!html) return ''
+  let out = html
+  out = out.replace(WIDGET_COMMENT_RE, WIDGET_PLACEHOLDER)
+  out = out.replace(WIDGET_MUSTACHE_RE, WIDGET_PLACEHOLDER)
+
+  const first = out.indexOf(WIDGET_PLACEHOLDER)
+  if (first >= 0) {
+    const before = out.slice(0, first + WIDGET_PLACEHOLDER.length)
+    const after = out
+      .slice(first + WIDGET_PLACEHOLDER.length)
+      .split(WIDGET_PLACEHOLDER)
+      .join('')
+    out = before + after
+  }
+
+  out = out.replace(
+    /<(div|section)([^>]*\b(?:widget-container|closet-widget-slot)\b[^>]*)>\s*<\/\1>/gi,
+    ''
+  )
+  return out
+}
+
+export function htmlHasInjectableWidget(html: string): boolean {
+  const n = normalizeWidgetPlaceholders(html)
+  return (
+    n.includes(WIDGET_PLACEHOLDER) ||
+    /<closet-(?:quote|order|booking|ticket)-widget\b/i.test(n)
+  )
+}
+
+export function findEmptyWidgetShells(html: string): string[] {
+  const shells: string[] = []
+  const re =
+    /<(div|section)([^>]*\b(?:widget-container|closet-widget-slot|quote-embed|quote-slot)\b[^>]*)>([\s\S]*?)<\/\1>/gi
+  let m: RegExpExecArray | null
+  while ((m = re.exec(html))) {
+    const inner = m[3] || ''
+    const hasMount =
+      /<!--\s*CLOSET_WIDGET\b/i.test(inner) ||
+      /\{\{\s*CLOSET_WIDGET\s*\}\}/i.test(inner) ||
+      /<closet-(?:quote|order|booking|ticket)-widget\b/i.test(inner)
+    const withoutComments = inner.replace(/<!--[\s\S]*?-->/g, '').trim()
+    if (!hasMount && withoutComments === '') {
+      shells.push((m[2] || '').trim().slice(0, 120) || 'widget shell')
+    }
+  }
+  return shells
+}
+
+/** Live HTML: shells that never received a real <closet-*-widget>. */
+export function findUnmountedWidgetShells(html: string): string[] {
+  const shells: string[] = []
+  const re =
+    /<(div|section)([^>]*\b(?:widget-container|closet-widget-slot|quote-embed|quote-slot)\b[^>]*)>([\s\S]*?)<\/\1>/gi
+  let m: RegExpExecArray | null
+  while ((m = re.exec(html))) {
+    const inner = m[3] || ''
+    if (!/<closet-(?:quote|order|booking|ticket)-widget\b/i.test(inner)) {
+      shells.push((m[2] || '').trim().slice(0, 120) || 'widget shell')
+    }
+  }
+  return shells
+}
+
+/**
  * Scope CSS rules to a wrapper so custom styles can't leak into the
  * platform chrome (navbar, etc.). Prefixes each selector with the scope.
  * @-rules (media/keyframes/font-face) are preserved with inner selectors scoped.
@@ -57,12 +131,9 @@ export function scopeCss(css: string, scope: string): string {
   if (!css?.trim()) return ''
   // Strip HTML comments that models sometimes leave in CSS blobs.
   let input = css.replace(/\/\*[\s\S]*?\*\//g, '')
-  // Very light pass: wrap bare rule blocks. Nested @media handled by
-  // rewriting the selector list before each `{` that isn't an @-rule.
   const parts: string[] = []
   let i = 0
   while (i < input.length) {
-    // Skip whitespace
     while (i < input.length && /\s/.test(input[i])) {
       parts.push(input[i])
       i++
@@ -70,15 +141,11 @@ export function scopeCss(css: string, scope: string): string {
     if (i >= input.length) break
 
     if (input[i] === '@') {
-      // Find the end of the @-rule header (either `;` for @import/@charset
-      // or `{` for @media/@keyframes/@font-face).
       const headerEnd = findHeaderEnd(input, i)
       const header = input.slice(i, headerEnd)
       parts.push(header)
       i = headerEnd
       if (input[i] === '{') {
-        // Find matching close brace and recursively scope the body for
-        // @media/@supports; leave @keyframes/@font-face bodies untouched.
         const bodyEnd = findMatchingBrace(input, i)
         const body = input.slice(i + 1, bodyEnd)
         const isKeyframes = /@(?:-?\w+-)?keyframes/i.test(header)
@@ -91,7 +158,6 @@ export function scopeCss(css: string, scope: string): string {
       continue
     }
 
-    // Normal rule: selectors { body }
     const brace = input.indexOf('{', i)
     if (brace < 0) {
       parts.push(input.slice(i))
@@ -132,8 +198,8 @@ function findMatchingBrace(s: string, openIdx: number): number {
 }
 
 /**
- * Pure-JS HTML sanitizer (no jsdom/DOMPurify). Keeps the widget HTML comment
- * placeholder intact while stripping scripts / event handlers / javascript: URLs.
+ * Pure-JS HTML sanitizer. Keeps the widget HTML comment placeholder intact
+ * while stripping scripts / event handlers / javascript: URLs.
  */
 export function sanitizeCustomHtml(html: string): string {
   if (!html) return ''
@@ -143,7 +209,7 @@ export function sanitizeCustomHtml(html: string): string {
   out = out.replace(/\s+on\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
   out = out.replace(/\s(href|src|action)\s*=\s*(['"])\s*javascript:[^'"]*\2/gi, ' $1="#"')
   out = out.replace(/\ssrcdoc\s*=\s*("[^"]*"|'[^']*')/gi, '')
-  return out
+  return normalizeWidgetPlaceholders(out)
 }
 
 /** Strip `@import` and `expression()` / `url(javascript:)` from CSS. */
@@ -160,14 +226,18 @@ export function injectWidgetPlaceholder(
   html: string,
   widgetHtml: string
 ): string {
-  let out = html
+  let out = normalizeWidgetPlaceholders(html)
   if (out.includes(WIDGET_PLACEHOLDER)) {
     out = out.split(WIDGET_PLACEHOLDER).join(widgetHtml)
   }
   if (out.includes(WIDGET_PLACEHOLDER_ALT)) {
     out = out.split(WIDGET_PLACEHOLDER_ALT).join(widgetHtml)
   }
-  // Replace any engagement web component the AI may have emitted (quote/order/booking/ticket).
+  // Paired or self-closing engagement web components.
+  out = out.replace(
+    /<closet-(?:quote|order|booking|ticket)-widget\b[^>]*\/>/gi,
+    widgetHtml
+  )
   out = out.replace(
     /<closet-(?:quote|order|booking|ticket)-widget\b[^>]*>\s*<\/closet-(?:quote|order|booking|ticket)-widget>/gi,
     widgetHtml
@@ -182,8 +252,7 @@ export type CustomPublishCheck = {
 }
 
 /**
- * Lightweight pre-publish validation. Soft-warns on missing widget; hard-fails
- * on scripts / javascript: URLs that would survive an inline render.
+ * Pre-publish validation. Missing / empty home widget mounts are hard errors.
  */
 export function validateCustomConfig(config: CustomSiteConfig): CustomPublishCheck {
   const warnings: string[] = []
@@ -192,20 +261,27 @@ export function validateCustomConfig(config: CustomSiteConfig): CustomPublishChe
   if (pageKeys.length === 0) {
     errors.push('No pages in custom config — at least "/" is required.')
   }
-  if (!config.pages['/'] && !config.pages['']) {
-    warnings.push('No home page ("/") — visitors hitting / will 404 or fall back.')
+
+  const home = config.pages['/'] || config.pages['']
+  if (!home) {
+    errors.push('No home page ("/") — visitors hitting / will 404 or fall back.')
+  } else {
+    const homeHtml = home.html || ''
+    if (!htmlHasInjectableWidget(homeHtml)) {
+      errors.push(
+        `Home page is missing a live engagement widget mount. Embed exactly ${WIDGET_PLACEHOLDER} (no attributes) inside the quote/CTA section.`
+      )
+    }
+    const emptyShells = findEmptyWidgetShells(homeHtml)
+    if (emptyShells.length > 0) {
+      errors.push(
+        `Home page has an empty widget container (${emptyShells[0]}) with no ${WIDGET_PLACEHOLDER} inside — visitors see a blank box instead of the calculator.`
+      )
+    }
   }
 
-  let hasWidget = false
   for (const [path, page] of Object.entries(config.pages || {})) {
     const html = page?.html || ''
-    if (
-      html.includes(WIDGET_PLACEHOLDER) ||
-      html.includes(WIDGET_PLACEHOLDER_ALT) ||
-      /<closet-(?:quote|order|booking|ticket)-widget\b/i.test(html)
-    ) {
-      hasWidget = true
-    }
     if (/<script\b/i.test(html) && config.mode === 'inline') {
       errors.push(`Page ${path}: <script> tags are not allowed in inline mode (use iframe mode).`)
     }
@@ -215,11 +291,6 @@ export function validateCustomConfig(config: CustomSiteConfig): CustomPublishChe
     if (/on\w+\s*=/i.test(html) && config.mode === 'inline') {
       warnings.push(`Page ${path}: inline event handlers will be stripped on render.`)
     }
-  }
-  if (!hasWidget) {
-    warnings.push(
-      `No engagement widget placeholder found. Embed ${WIDGET_PLACEHOLDER} (or a closet-*-widget tag) so leads still convert.`
-    )
   }
   return { ok: errors.length === 0, warnings, errors }
 }
