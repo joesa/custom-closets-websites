@@ -4,7 +4,8 @@ import * as motion from 'framer-motion/client';
 import { useMotionHydrated } from '@/components/MotionHydrationProvider';
 import { motionInitial } from '@/lib/motionInitial';
 
-const PLATFORM_URL = 'https://www.closetquotes.com/get-started';
+// Opens the homepage "Which one are you?" chooser (widget trial vs site build).
+const PLATFORM_URL = 'https://www.closetquotes.com/?start=free';
 
 /**
  * Sticky conversion bar shown only on shared-demo aesthetic sites
