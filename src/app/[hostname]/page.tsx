@@ -96,7 +96,7 @@ export default async function Page({
   return (
     <>
       <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}`} />
-      <ClientPage config={config} />
+      <ClientPage config={config} hostname={resolvedParams.hostname} />
     </>
   );
 }

@@ -33,13 +33,27 @@ import { motionInitial } from "@/lib/motionInitial";
 
 const PLATFORM_DEMO_WIDGET_ID = 'ec376123-f499-4ad4-88c9-2b63ad6f90ab';
 
+/** Hostnames for the Loom / outreach aesthetic demos (always show platform CTA). */
+const PLATFORM_DEMO_HOSTS = new Set([
+  'lumina.closetquotes.com',
+  'ironclad.closetquotes.com',
+  'hearth.closetquotes.com',
+]);
+
+function isPlatformDemoSite(config: BrandConfig, hostname?: string): boolean {
+  if (config.widgetId === PLATFORM_DEMO_WIDGET_ID) return true;
+  const host = (hostname || '').toLowerCase();
+  return PLATFORM_DEMO_HOSTS.has(host);
+}
+
 interface ClientPageProps {
   config: BrandConfig;
+  hostname?: string;
 }
 
 const HERO_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c';
 
-function ClientPageContent({ config }: ClientPageProps) {
+function ClientPageContent({ config, hostname }: ClientPageProps) {
   const motionReady = useMotionHydrated();
   // Single canonical seed for the whole site: a resolved (collision-free) design
   // seed if one was assigned at provision time, else the stable site identity.
@@ -91,7 +105,7 @@ function ClientPageContent({ config }: ClientPageProps) {
   
   const ctaLabels = isOrderBusiness ? ORDER_CTA_LABELS : isBookingBusiness ? BOOKING_CTA_LABELS : isTicketBusiness ? TICKET_CTA_LABELS : QUOTE_CTA_LABELS;
   const ctaLabel = ctaLabels[hashSeed(`${fontSeed}:cta`) % ctaLabels.length];
-  const isPlatformDemo = config.widgetId === PLATFORM_DEMO_WIDGET_ID;
+  const isPlatformDemo = isPlatformDemoSite(config, hostname);
   const ctaButton = (
     <div className={`flex flex-col items-stretch gap-3 sm:flex-row sm:items-center ${variant.heroAlign === 'left' ? 'sm:justify-start' : 'sm:justify-center'}`}>
       <a href="#quote" className={`inline-block cursor-pointer text-center ${theme.button}`}>
