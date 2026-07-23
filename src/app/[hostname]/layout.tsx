@@ -2,6 +2,27 @@ import { getActiveConfig } from "@/lib/getConfig";
 import Navbar from "@/components/Navbar";
 import { getDesignVariant, siteSeed } from "@/lib/designVariants";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ hostname: string }>;
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  const config = await getActiveConfig(resolvedParams.hostname);
+  if (!config) {
+    return { title: "DitchTheForm" };
+  }
+  const description =
+    config.hero.subheadline?.trim() ||
+    config.about.description?.trim() ||
+    `${config.brandName} — custom storage and instant quotes.`;
+  return {
+    title: config.brandName,
+    description: description.slice(0, 160),
+  };
+}
 
 export default async function HostnameLayout({
   children,

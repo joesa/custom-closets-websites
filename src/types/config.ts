@@ -95,6 +95,24 @@ export interface QuizConfig {
   questions: QuizQuestionConfig[];
 }
 
+export interface SocialProofTestimonial {
+  quote: string;
+  name: string;
+  role?: string;
+}
+
+export interface SocialProofStat {
+  value: string;
+  label: string;
+}
+
+export interface SocialProofConfig {
+  eyebrow?: string;
+  headline?: string;
+  testimonials?: SocialProofTestimonial[];
+  stats?: SocialProofStat[];
+}
+
 export interface SEOConfig {
   legalName: string;
   email?: string;
@@ -107,6 +125,8 @@ export interface SEOConfig {
     latitude: string;
     longitude: string;
   };
+  /** Optional homepage social proof (stored in seo_config JSONB). */
+  socialProof?: SocialProofConfig;
 }
 
 export interface BeforeAfterConfig {
@@ -197,6 +217,8 @@ export interface BrandConfig {
   // business's actual industry/services. Falls back to QuizSection's own
   // built-in generic questions when absent (e.g. not yet regenerated).
   quiz?: QuizConfig;
+  /** Optional social proof (testimonials + stats) for homepage conviction. */
+  socialProof?: SocialProofConfig;
   /** Per-site designer signature (process name, motif, eyebrow). */
   signature?: {
     processName?: string;

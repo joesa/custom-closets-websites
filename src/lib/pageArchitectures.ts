@@ -13,14 +13,15 @@ export type SectionKey =
   | 'process'
   | 'beforeAfter'
   | 'portfolio'
+  | 'socialProof'
   | 'quiz'
   | 'widget'
 
 const ARCHITECTURE_SPINES: Record<PageArchitecture, SectionKey[]> = {
-  quote_trust: ['hero', 'about', 'process', 'beforeAfter', 'portfolio', 'quiz', 'widget'],
+  quote_trust: ['hero', 'about', 'process', 'beforeAfter', 'portfolio', 'socialProof', 'quiz', 'widget'],
   order_menu: ['hero', 'portfolio', 'widget', 'about'],
   booking_schedule: ['hero', 'process', 'widget', 'portfolio', 'about'],
-  portfolio_first: ['hero', 'portfolio', 'beforeAfter', 'about', 'widget'],
+  portfolio_first: ['hero', 'portfolio', 'beforeAfter', 'socialProof', 'about', 'widget'],
   ticket_event: ['hero', 'portfolio', 'about', 'widget'],
 }
 
@@ -80,38 +81,38 @@ export function mergeLayoutWithArchitecture(
 export function layoutStyleSectionOrder(style: string | null | undefined): SectionKey[] {
   switch (style) {
     case 'portfolio-first':
-      return ['hero', 'portfolio', 'beforeAfter', 'about', 'process', 'quiz', 'widget']
+      return ['hero', 'portfolio', 'beforeAfter', 'socialProof', 'about', 'process', 'quiz', 'widget']
     case 'conversion-focus':
-      return ['hero', 'widget', 'beforeAfter', 'portfolio', 'about']
+      return ['hero', 'widget', 'socialProof', 'beforeAfter', 'portfolio', 'about']
     case 'storyteller':
-      return ['hero', 'about', 'quiz', 'portfolio', 'process', 'widget', 'beforeAfter']
+      return ['hero', 'about', 'quiz', 'portfolio', 'process', 'socialProof', 'widget', 'beforeAfter']
     case 'minimalist-lead':
     case 'compact-quote':
-      return ['hero', 'quiz', 'widget']
+      return ['hero', 'quiz', 'widget', 'socialProof']
     case 'visual-impact':
-      return ['hero', 'beforeAfter', 'portfolio', 'widget']
+      return ['hero', 'beforeAfter', 'portfolio', 'socialProof', 'widget']
     case 'trust-builder':
-      return ['hero', 'about', 'process', 'beforeAfter', 'portfolio', 'quiz', 'widget']
+      return ['hero', 'about', 'socialProof', 'process', 'beforeAfter', 'portfolio', 'quiz', 'widget']
     case 'gallery-showcase':
-      return ['hero', 'portfolio', 'beforeAfter', 'about', 'quiz', 'widget']
+      return ['hero', 'portfolio', 'beforeAfter', 'socialProof', 'about', 'quiz', 'widget']
     case 'local-expert':
-      return ['hero', 'about', 'process', 'portfolio', 'beforeAfter', 'quiz', 'widget']
+      return ['hero', 'about', 'socialProof', 'process', 'portfolio', 'beforeAfter', 'quiz', 'widget']
     case 'emergency-first':
       return ['hero', 'widget', 'about', 'beforeAfter', 'portfolio']
     case 'before-after':
-      return ['hero', 'beforeAfter', 'portfolio', 'about', 'quiz', 'widget']
+      return ['hero', 'beforeAfter', 'portfolio', 'socialProof', 'about', 'quiz', 'widget']
     case 'process-steps':
       return ['hero', 'process', 'about', 'portfolio', 'quiz', 'widget']
     case 'seasonal-cta':
       return ['hero', 'widget', 'portfolio', 'about', 'process']
     case 'trust-report':
-      return ['hero', 'about', 'process', 'portfolio', 'beforeAfter', 'quiz', 'widget']
+      return ['hero', 'about', 'socialProof', 'process', 'portfolio', 'beforeAfter', 'quiz', 'widget']
     case 'service-zones':
       return ['hero', 'about', 'portfolio', 'quiz', 'widget']
     case 'event-booking':
       return ['hero', 'portfolio', 'about', 'quiz', 'widget']
     case 'standard':
     default:
-      return ['hero', 'about', 'process', 'beforeAfter', 'portfolio', 'quiz', 'widget']
+      return ['hero', 'about', 'process', 'beforeAfter', 'portfolio', 'socialProof', 'quiz', 'widget']
   }
 }

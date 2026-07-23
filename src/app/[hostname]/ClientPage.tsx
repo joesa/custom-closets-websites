@@ -19,6 +19,8 @@ import ProcessSection from "@/components/ProcessSection";
 import ProductDetailSheet from "@/components/ProductDetailSheet";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import QuizSection from "@/components/QuizSection";
+import SocialProofSection from "@/components/SocialProofSection";
+import DemoPlatformCta from "@/components/DemoPlatformCta";
 import { BrandConfig, Product } from "@/types/config";
 import BookingEngine from "@/components/engines/BookingEngine";
 import TicketEngine from "@/components/engines/TicketEngine";
@@ -28,6 +30,8 @@ import {
   useMotionHydrated,
 } from "@/components/MotionHydrationProvider";
 import { motionInitial } from "@/lib/motionInitial";
+
+const PLATFORM_DEMO_WIDGET_ID = 'ec376123-f499-4ad4-88c9-2b63ad6f90ab';
 
 interface ClientPageProps {
   config: BrandConfig;
@@ -87,10 +91,21 @@ function ClientPageContent({ config }: ClientPageProps) {
   
   const ctaLabels = isOrderBusiness ? ORDER_CTA_LABELS : isBookingBusiness ? BOOKING_CTA_LABELS : isTicketBusiness ? TICKET_CTA_LABELS : QUOTE_CTA_LABELS;
   const ctaLabel = ctaLabels[hashSeed(`${fontSeed}:cta`) % ctaLabels.length];
+  const isPlatformDemo = config.widgetId === PLATFORM_DEMO_WIDGET_ID;
   const ctaButton = (
-    <a href="#quote" className={`inline-block cursor-pointer ${theme.button}`}>
-      {ctaLabel}
-    </a>
+    <div className={`flex flex-col items-stretch gap-3 sm:flex-row sm:items-center ${variant.heroAlign === 'left' ? 'sm:justify-start' : 'sm:justify-center'}`}>
+      <a href="#quote" className={`inline-block cursor-pointer text-center ${theme.button}`}>
+        {ctaLabel}
+      </a>
+      {isPlatformDemo ? (
+        <a
+          href="#portfolio"
+          className="inline-block cursor-pointer rounded-full border border-white/40 bg-white/10 px-6 py-3 text-center text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+        >
+          See the transformation
+        </a>
+      ) : null}
+    </div>
   );
 
   const PORTFOLIO_TITLES_QUOTE = ['Our Work', 'Recent Projects', 'Featured Jobs', 'What we build', 'Selected projects'];
@@ -319,6 +334,16 @@ function ClientPageContent({ config }: ClientPageProps) {
 
   const beforeAfterSection = <BeforeAfterSlider key="ba" theme={config.theme} themeTokens={config.themeTokens} fontSeed={fontSeed} config={config.beforeAfter} />;
 
+  const socialProofSection = config.socialProof ? (
+    <SocialProofSection
+      key="social-proof"
+      config={config.socialProof}
+      theme={config.theme}
+      themeTokens={config.themeTokens}
+      fontSeed={fontSeed}
+    />
+  ) : null;
+
   // Portfolio composition varies by design variant: a clean grid, a wider
   // showcase of larger cards, an editorial layout with taller imagery, a
   // staggered masonry, or framed cards with a bordered mat.
@@ -458,6 +483,8 @@ function ClientPageContent({ config }: ClientPageProps) {
               <closet-quote-widget 
                 data-contractor-id={config.widgetId} 
                 data-api-url={PUBLIC_API_URL}
+                data-contractor-name={config.brandName}
+                data-default-room={config.defaultRoom || ''}
                 data-radius={widgetRadius}
                 data-font-heading={theme.headingFont}
                 data-widget-title={widgetTitle}
@@ -488,12 +515,13 @@ function ClientPageContent({ config }: ClientPageProps) {
       process: processSection,
       beforeAfter: beforeAfterSection,
       portfolio: portfolioSection,
+      socialProof: socialProofSection,
       quiz: quizSection,
       widget: widgetSection,
     };
 
     const order = mergeLayoutWithArchitecture(architecture, layoutStyleSectionOrder(style));
-    let sections = order.map((k) => byKey[k]);
+    let sections = order.map((k) => byKey[k]).filter(Boolean);
 
     // Skip before/after when not configured (not-applicable industries).
     if (!config.beforeAfter) {
@@ -546,6 +574,13 @@ function ClientPageContent({ config }: ClientPageProps) {
 
       {/* Render selected structural layout */}
       {renderLayout()}
+
+      {isPlatformDemo ? (
+        <>
+          <div className="h-24" aria-hidden />
+          <DemoPlatformCta brandName={config.brandName} />
+        </>
+      ) : null}
 
       {/* ─── Interactive Product Detail Sheet (Global) ─── */}
       <ProductDetailSheet 

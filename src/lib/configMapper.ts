@@ -96,6 +96,7 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     launchPayUrl: configRow.launch_pay_url ?? undefined,
     designVariant: configRow.design_variant ?? undefined,
     quiz: configRow.quiz_config ?? undefined,
+    socialProof: configRow.seo_config?.socialProof ?? undefined,
     engagementModel: (configRow.engagement_model as 'quote' | 'order' | 'booking' | 'ticket') || 'quote',
     themeTokens: configRow.theme_tokens ?? undefined,
     signature,
