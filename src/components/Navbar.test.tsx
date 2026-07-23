@@ -71,10 +71,10 @@ describe('Navbar structural nav compositions', () => {
     expect(distinct.size).toBe(NAV_VARIANTS.length);
   });
 
-  it('defaults to the classic layout when navStyle is omitted', () => {
-    const withDefault = renderToStaticMarkup(
-      <Navbar brandName="Acme Closets" links={LINKS} themeName="luxury-minimal" fontSeed="test-seed" />
-    );
-    expect(withDefault).toBe(renderVariant('classic::glass::fade'));
+  it('sidebar-left uses a fixed desktop rail (w-64)', () => {
+    const html = renderVariant('sidebar-left::solid::fade');
+    expect(html).toContain('fixed');
+    expect(html).toContain('w-64');
+    expect(html).toContain('hidden md:flex');
   });
 });

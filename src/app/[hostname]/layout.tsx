@@ -52,6 +52,7 @@ export default async function HostnameLayout({
   const hasNav = config.navLinks && config.navLinks.length > 0;
   const fontSeed = siteSeed(config);
   const navStyle = getDesignVariant(fontSeed, config.theme).nav;
+  const isSidebarNav = hasNav && navStyle.startsWith('sidebar-left');
 
   return (
     <>
@@ -68,7 +69,8 @@ export default async function HostnameLayout({
           engagementModel={config.engagementModel}
         />
       )}
-      {children}
+      {/* Fixed sidebar-left nav is w-64; offset main content so pages aren't cramped. */}
+      <div className={isSidebarNav ? 'md:pl-64' : undefined}>{children}</div>
     </>
   );
 }
