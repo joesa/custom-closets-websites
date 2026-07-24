@@ -6,6 +6,7 @@ import PendingApproval from "@/components/PendingApproval";
 import LaunchPaywall from "@/components/LaunchPaywall";
 import CustomSiteRenderer from "@/components/CustomSiteRenderer";
 import { getCustomPage, isCustomSiteConfig } from "@/lib/customSite";
+import { cloakCustomSiteConfig } from "@/lib/mediaProxy";
 import { getSiteGate } from "@/lib/siteGate";
 import {
   buildCustomDraftPreviewQuery,
@@ -78,7 +79,12 @@ export default async function Page({
     config.renderMode === 'custom' && isCustomSiteConfig(config.customConfig)
       ? config.customConfig
       : null;
-  const activeCustom = draftConfig || liveCustom;
+  const activeCustomRaw = draftConfig || liveCustom;
+  // Cloak Supabase storage URLs at render time so page HTML never exposes
+  // the raw bucket path (served via encrypted /api/a/<token> proxy).
+  const activeCustom = activeCustomRaw
+    ? cloakCustomSiteConfig(activeCustomRaw)
+    : null;
   const customPage = activeCustom ? getCustomPage(activeCustom, '/') : null;
   const previewQuery = draftConfig
     ? buildCustomDraftPreviewQuery({

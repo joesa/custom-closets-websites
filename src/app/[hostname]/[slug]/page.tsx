@@ -11,6 +11,7 @@ import { siteSeed, getDesignVariant, heroHeadlineClasses } from "@/lib/designVar
 import { resolveSiteSignature } from "@/lib/siteSignature";
 import { resolvePageComposition } from "@/lib/pageCompositions";
 import { getCustomPage, isCustomSiteConfig } from "@/lib/customSite";
+import { cloakCustomSiteConfig } from "@/lib/mediaProxy";
 import { getSiteGate } from "@/lib/siteGate";
 import {
   buildCustomDraftPreviewQuery,
@@ -96,7 +97,10 @@ export default async function SubPage({
     config.renderMode === "custom" && isCustomSiteConfig(config.customConfig)
       ? config.customConfig
       : null;
-  const activeCustom = draftConfig || liveCustom;
+  const activeCustomRaw = draftConfig || liveCustom;
+  const activeCustom = activeCustomRaw
+    ? cloakCustomSiteConfig(activeCustomRaw)
+    : null;
   const customPage = activeCustom
     ? getCustomPage(activeCustom, `/${resolvedParams.slug}`)
     : null;
