@@ -38,6 +38,13 @@ export function proxy(req: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60, // 1 hour
       });
+    } else {
+      // Explicit admin visit without draft=1 → leave draft preview mode so
+      // "Open live site" does not keep painting custom_config_draft.
+      response.cookies.set('custom_draft_preview', '', {
+        path: '/',
+        maxAge: 0,
+      });
     }
   }
 

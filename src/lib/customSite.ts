@@ -249,6 +249,41 @@ export function sanitizeCustomHtml(html: string): string {
   return normalizeWidgetPlaceholders(out)
 }
 
+/**
+ * Append preview query params (e.g. draft=1, admin_bypass=…) to root-relative
+ * internal links so Custom Build draft navigation keeps the preview session.
+ * Leaves mailto/tel/#/external/protocol-relative hrefs untouched.
+ */
+export function appendPreviewQueryToInternalLinks(
+  html: string,
+  previewQuery: string
+): string {
+  const raw = (previewQuery || '').trim()
+  if (!html || !raw) return html
+  const qs = raw.startsWith('?') ? raw.slice(1) : raw
+  if (!qs) return html
+
+  return html.replace(
+    /\bhref\s*=\s*(['"])(\/[^'"]*)\1/gi,
+    (full, quote: string, path: string) => {
+      if (path.startsWith('//')) return full
+      const hashIdx = path.indexOf('#')
+      const hash = hashIdx >= 0 ? path.slice(hashIdx) : ''
+      const withoutHash = hashIdx >= 0 ? path.slice(0, hashIdx) : path
+      const qIdx = withoutHash.indexOf('?')
+      const pathname = qIdx >= 0 ? withoutHash.slice(0, qIdx) : withoutHash
+      const existing = qIdx >= 0 ? withoutHash.slice(qIdx + 1) : ''
+      const merged = new URLSearchParams(existing)
+      const incoming = new URLSearchParams(qs)
+      for (const [k, v] of incoming.entries()) {
+        if (!merged.has(k)) merged.set(k, v)
+      }
+      const nextQs = merged.toString()
+      return `href=${quote}${pathname}${nextQs ? `?${nextQs}` : ''}${hash}${quote}`
+    }
+  )
+}
+
 /** Strip `@import` and `expression()` / `url(javascript:)` from CSS. */
 export function sanitizeCustomCss(css: string): string {
   if (!css) return ''

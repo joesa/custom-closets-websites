@@ -7,6 +7,10 @@ import LaunchPaywall from "@/components/LaunchPaywall";
 import CustomSiteRenderer from "@/components/CustomSiteRenderer";
 import { getCustomPage, isCustomSiteConfig } from "@/lib/customSite";
 import { getSiteGate } from "@/lib/siteGate";
+import {
+  buildCustomDraftPreviewQuery,
+  shouldPaintCustomDraft,
+} from "@/lib/customDraftPreview";
 import { cookies } from "next/headers";
 
 export default async function Page({
@@ -14,7 +18,7 @@ export default async function Page({
   searchParams,
 }: {
   params: Promise<{ hostname: string }>;
-  searchParams?: Promise<{ draft?: string }>;
+  searchParams?: Promise<{ draft?: string; admin_bypass?: string }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearch = searchParams ? await searchParams : {};
@@ -60,9 +64,13 @@ export default async function Page({
     );
   }
 
-  // Draft preview: admin_bypass + ?draft=1 paints custom_config_draft without
-  // publishing. Live visitors never see the draft.
-  const wantDraft = resolvedSearch.draft === '1' && isAdminBypass;
+  // Draft preview: admin_bypass + (?draft=1 or draft-preview cookie) paints
+  // custom_config_draft without publishing. Live visitors never see the draft.
+  const wantDraft = shouldPaintCustomDraft({
+    isAdminBypass,
+    draftParam: resolvedSearch.draft,
+    draftPreviewCookie: cookieStore.get('custom_draft_preview')?.value,
+  });
   const draftConfig = wantDraft && isCustomSiteConfig(config.customConfigDraft)
     ? config.customConfigDraft
     : null;
@@ -72,6 +80,11 @@ export default async function Page({
       : null;
   const activeCustom = draftConfig || liveCustom;
   const customPage = activeCustom ? getCustomPage(activeCustom, '/') : null;
+  const previewQuery = draftConfig
+    ? buildCustomDraftPreviewQuery({
+        adminBypassParam: resolvedSearch.admin_bypass,
+      })
+    : null;
 
   if (activeCustom && customPage) {
     return (
@@ -87,6 +100,7 @@ export default async function Page({
           widgetId={config.widgetId}
           engagementModel={config.engagementModel || 'quote'}
           isDraftPreview={!!draftConfig}
+          previewQuery={previewQuery}
         />
       </>
     );

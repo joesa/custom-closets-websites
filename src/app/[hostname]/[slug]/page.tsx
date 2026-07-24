@@ -12,6 +12,10 @@ import { resolveSiteSignature } from "@/lib/siteSignature";
 import { resolvePageComposition } from "@/lib/pageCompositions";
 import { getCustomPage, isCustomSiteConfig } from "@/lib/customSite";
 import { getSiteGate } from "@/lib/siteGate";
+import {
+  buildCustomDraftPreviewQuery,
+  shouldPaintCustomDraft,
+} from "@/lib/customDraftPreview";
 import { cookies } from "next/headers";
 import Image from "next/image";
 
@@ -20,7 +24,7 @@ export default async function SubPage({
   searchParams,
 }: {
   params: Promise<{ hostname: string; slug: string }>;
-  searchParams?: Promise<{ draft?: string }>;
+  searchParams?: Promise<{ draft?: string; admin_bypass?: string }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearch = searchParams ? await searchParams : {};
@@ -79,7 +83,11 @@ export default async function SubPage({
 
   // Per-page custom render: if this path exists in the custom artifact, paint
   // it outside the template engine. Otherwise fall through to pagesConfig.
-  const wantDraft = resolvedSearch.draft === "1" && isAdminBypass;
+  const wantDraft = shouldPaintCustomDraft({
+    isAdminBypass,
+    draftParam: resolvedSearch.draft,
+    draftPreviewCookie: cookieStore.get("custom_draft_preview")?.value,
+  });
   const draftConfig =
     wantDraft && isCustomSiteConfig(config.customConfigDraft)
       ? config.customConfigDraft
@@ -91,6 +99,11 @@ export default async function SubPage({
   const activeCustom = draftConfig || liveCustom;
   const customPage = activeCustom
     ? getCustomPage(activeCustom, `/${resolvedParams.slug}`)
+    : null;
+  const previewQuery = draftConfig
+    ? buildCustomDraftPreviewQuery({
+        adminBypassParam: resolvedSearch.admin_bypass,
+      })
     : null;
 
   if (activeCustom && customPage) {
@@ -107,6 +120,7 @@ export default async function SubPage({
           widgetId={config.widgetId}
           engagementModel={config.engagementModel || 'quote'}
           isDraftPreview={!!draftConfig}
+          previewQuery={previewQuery}
         />
       </>
     );

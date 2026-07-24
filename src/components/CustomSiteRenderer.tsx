@@ -1,11 +1,13 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { PUBLIC_API_URL, WIDGET_CDN_URL } from '@/lib/urls';
 import {
   type CustomPageArtifact,
   type CustomSiteConfig,
   WIDGET_MOUNT_RESET_CSS,
+  appendPreviewQueryToInternalLinks,
   injectWidgetPlaceholder,
   sanitizeCustomCss,
   sanitizeCustomHtml,
@@ -33,11 +35,15 @@ function prepareInlineHtml(
   page: CustomPageArtifact,
   custom: CustomSiteConfig,
   widgetId: string,
-  engagementModel: EngagementModel
+  engagementModel: EngagementModel,
+  previewQuery?: string | null
 ): { html: string; css: string } {
   const widgetEl = buildWidgetElement(widgetId, engagementModel);
   const rawHtml = injectWidgetPlaceholder(page.html || '', widgetEl);
-  const html = sanitizeCustomHtml(rawHtml);
+  let html = sanitizeCustomHtml(rawHtml);
+  if (previewQuery) {
+    html = appendPreviewQueryToInternalLinks(html, previewQuery);
+  }
   const combinedCss = [custom.globalCss || '', page.css || ''].filter(Boolean).join('\n');
   // Site CSS first, then mount reset so AI grey "outer boxes" cannot win.
   const css = [
@@ -53,12 +59,16 @@ function buildSrcDoc(
   page: CustomPageArtifact,
   custom: CustomSiteConfig,
   widgetId: string,
-  engagementModel: EngagementModel
+  engagementModel: EngagementModel,
+  previewQuery?: string | null
 ): string {
   const widgetEl = buildWidgetElement(widgetId, engagementModel);
   // Still sanitize HTML even in iframe mode — sandbox is not a substitute
   // for stripping script/event-handler payloads from AI/admin content.
-  const bodyHtml = sanitizeCustomHtml(injectWidgetPlaceholder(page.html || '', widgetEl));
+  let bodyHtml = sanitizeCustomHtml(injectWidgetPlaceholder(page.html || '', widgetEl));
+  if (previewQuery) {
+    bodyHtml = appendPreviewQueryToInternalLinks(bodyHtml, previewQuery);
+  }
   const css = [
     sanitizeCustomCss([custom.globalCss || '', page.css || ''].filter(Boolean).join('\n')),
     WIDGET_MOUNT_RESET_CSS,
@@ -78,6 +88,38 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
+/** Keep draft/admin preview params on in-site navigations (click safety net). */
+function withCurrentPreviewParams(href: string, search: string): string | null {
+  if (!href || !search) return null;
+  if (
+    href.startsWith('#') ||
+    href.startsWith('mailto:') ||
+    href.startsWith('tel:') ||
+    href.startsWith('javascript:')
+  ) {
+    return null;
+  }
+
+  let url: URL;
+  try {
+    url = new URL(href, window.location.origin);
+  } catch {
+    return null;
+  }
+  if (url.origin !== window.location.origin) return null;
+
+  const keep = new URLSearchParams(search);
+  const draft = keep.get('draft');
+  const bypass = keep.get('admin_bypass');
+  if (!draft && !bypass) return null;
+
+  if (draft && !url.searchParams.has('draft')) url.searchParams.set('draft', draft);
+  if (bypass && !url.searchParams.has('admin_bypass')) {
+    url.searchParams.set('admin_bypass', bypass);
+  }
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
 /**
  * Renders one page of a per-tenant custom site outside the shared template
  * engine. Default / preferred mode is `inline` (sanitized HTML + scoped CSS).
@@ -90,6 +132,7 @@ export default function CustomSiteRenderer({
   widgetId,
   engagementModel = 'quote',
   isDraftPreview = false,
+  previewQuery = null,
 }: {
   custom: CustomSiteConfig;
   page: CustomPageArtifact;
@@ -97,6 +140,8 @@ export default function CustomSiteRenderer({
   /** Which engagement web component to mount at the widget placeholder. */
   engagementModel?: EngagementModel;
   isDraftPreview?: boolean;
+  /** Query string (e.g. "draft=1&admin_bypass=…") appended to internal links. */
+  previewQuery?: string | null;
 }) {
   const mode = custom.mode === 'iframe' ? 'iframe' : 'inline';
   const model: EngagementModel =
@@ -105,11 +150,34 @@ export default function CustomSiteRenderer({
     engagementModel === 'ticket'
       ? engagementModel
       : 'quote';
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isDraftPreview) return;
+    const root = rootRef.current;
+    if (!root) return;
+
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as Element | null)?.closest?.('a');
+      if (!anchor || !root.contains(anchor)) return;
+      const href = anchor.getAttribute('href');
+      if (!href) return;
+      const next = withCurrentPreviewParams(href, window.location.search);
+      if (!next || next === href) return;
+      event.preventDefault();
+      window.location.assign(next);
+    };
+
+    root.addEventListener('click', onClick);
+    return () => root.removeEventListener('click', onClick);
+  }, [isDraftPreview, page.html]);
 
   if (mode === 'iframe') {
-    const srcDoc = buildSrcDoc(page, custom, widgetId, model);
+    const srcDoc = buildSrcDoc(page, custom, widgetId, model, previewQuery);
     return (
-      <div className="relative min-h-screen w-full">
+      <div className="relative min-h-screen w-full" ref={rootRef}>
         {isDraftPreview ? <DraftBanner /> : null}
         <iframe
           title={page.title || 'Custom site'}
@@ -122,10 +190,10 @@ export default function CustomSiteRenderer({
     );
   }
 
-  const { html, css } = prepareInlineHtml(page, custom, widgetId, model);
+  const { html, css } = prepareInlineHtml(page, custom, widgetId, model, previewQuery);
 
   return (
-    <div className="relative min-h-screen w-full">
+    <div className="relative min-h-screen w-full" ref={rootRef}>
       {isDraftPreview ? <DraftBanner /> : null}
       {css ? <style dangerouslySetInnerHTML={{ __html: css }} /> : null}
       <div data-custom-site dangerouslySetInnerHTML={{ __html: html }} />
