@@ -20,32 +20,36 @@ export function proxy(req: NextRequest) {
   const adminBypass = url.searchParams.get('admin_bypass');
   const bypassSecret = process.env.ADMIN_BYPASS_SECRET;
   const response = NextResponse.rewrite(url);
+  const wantDraft = url.searchParams.get('draft') === '1';
 
-  if (bypassSecret && adminBypass === bypassSecret) {
+  const bypassFromQuery = Boolean(bypassSecret && adminBypass === bypassSecret);
+  if (bypassFromQuery) {
     response.cookies.set('admin_bypass', 'true', {
       path: '/',
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       sameSite: 'lax',
     });
-    // Draft custom-site preview (?draft=1) — layout skips the engine Navbar
-    // so the custom HTML owns the chrome. Cookie is scoped to this session.
-    if (url.searchParams.get('draft') === '1') {
-      response.cookies.set('custom_draft_preview', 'true', {
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: 'lax',
-        maxAge: 60 * 60, // 1 hour
-      });
-    } else {
-      // Explicit admin visit without draft=1 → leave draft preview mode so
-      // "Open live site" does not keep painting custom_config_draft.
-      response.cookies.set('custom_draft_preview', '', {
-        path: '/',
-        maxAge: 0,
-      });
-    }
+  }
+
+  // Draft preview cookie is only for layout chrome (skip engine Navbar).
+  // Always clear it unless this request explicitly asks for ?draft=1 — otherwise
+  // "Visit live site" after Preview kept showing the yellow DRAFT PREVIEW banner.
+  const isAdmin =
+    bypassFromQuery || req.cookies.get('admin_bypass')?.value === 'true';
+  if (wantDraft && isAdmin) {
+    response.cookies.set('custom_draft_preview', 'true', {
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60, // 1 hour
+    });
+  } else if (!wantDraft) {
+    response.cookies.set('custom_draft_preview', '', {
+      path: '/',
+      maxAge: 0,
+    });
   }
 
   return response;

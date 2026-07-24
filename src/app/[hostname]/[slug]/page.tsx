@@ -84,10 +84,10 @@ export default async function SubPage({
 
   // Per-page custom render: if this path exists in the custom artifact, paint
   // it outside the template engine. Otherwise fall through to pagesConfig.
+  // Draft preview requires explicit ?draft=1 (cookie alone must not stick).
   const wantDraft = shouldPaintCustomDraft({
     isAdminBypass,
     draftParam: resolvedSearch.draft,
-    draftPreviewCookie: cookieStore.get("custom_draft_preview")?.value,
   });
   const draftConfig =
     wantDraft && isCustomSiteConfig(config.customConfigDraft)

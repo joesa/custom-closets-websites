@@ -1,19 +1,19 @@
 /**
  * Admin Custom Build draft preview helpers.
- * Draft HTML is only painted when the admin bypass cookie is present AND
- * either ?draft=1 is on the URL or the custom_draft_preview session cookie
- * was set by a prior ?draft=1 visit.
+ *
+ * Draft HTML is only painted when the admin is bypassing gates AND the URL
+ * explicitly has ?draft=1. A leftover draft-preview cookie must NOT keep the
+ * live site in draft mode after Publish (that caused the sticky yellow banner).
  */
 
 export function shouldPaintCustomDraft(opts: {
   isAdminBypass: boolean
   draftParam?: string | null
+  /** @deprecated ignored — draft requires ?draft=1 on the URL */
   draftPreviewCookie?: string | null
 }): boolean {
   if (!opts.isAdminBypass) return false
-  return (
-    opts.draftParam === '1' || opts.draftPreviewCookie === 'true'
-  )
+  return opts.draftParam === '1'
 }
 
 /**

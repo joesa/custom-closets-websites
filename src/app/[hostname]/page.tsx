@@ -65,12 +65,11 @@ export default async function Page({
     );
   }
 
-  // Draft preview: admin_bypass + (?draft=1 or draft-preview cookie) paints
-  // custom_config_draft without publishing. Live visitors never see the draft.
+  // Draft preview: admin_bypass + ?draft=1 paints custom_config_draft.
+  // Live / Visit-site URLs without draft=1 always show published HTML.
   const wantDraft = shouldPaintCustomDraft({
     isAdminBypass,
     draftParam: resolvedSearch.draft,
-    draftPreviewCookie: cookieStore.get('custom_draft_preview')?.value,
   });
   const draftConfig = wantDraft && isCustomSiteConfig(config.customConfigDraft)
     ? config.customConfigDraft

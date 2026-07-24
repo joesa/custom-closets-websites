@@ -15,7 +15,7 @@ describe('shouldPaintCustomDraft', () => {
     ).toBe(false)
   })
 
-  it('accepts ?draft=1 with bypass', () => {
+  it('requires explicit ?draft=1 (cookie alone is not enough)', () => {
     expect(
       shouldPaintCustomDraft({
         isAdminBypass: true,
@@ -23,16 +23,13 @@ describe('shouldPaintCustomDraft', () => {
         draftPreviewCookie: null,
       })
     ).toBe(true)
-  })
-
-  it('accepts draft-preview cookie with bypass', () => {
     expect(
       shouldPaintCustomDraft({
         isAdminBypass: true,
         draftParam: undefined,
         draftPreviewCookie: 'true',
       })
-    ).toBe(true)
+    ).toBe(false)
   })
 })
 
