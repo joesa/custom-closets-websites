@@ -104,13 +104,20 @@ export function cloakStorageUrlsInText(text: string): string {
   )
 }
 
+type CloakablePage = {
+  html: string
+  css?: string
+  title?: string
+  description?: string
+}
+
 /** Cloak storage URLs in a custom site config for public/draft render (server-only). */
 export function cloakCustomSiteConfig<T extends {
   globalCss?: string
-  pages: Record<string, { html: string; css?: string; title?: string; description?: string }>
+  pages: Record<string, CloakablePage>
 }>(config: T): T {
   if (!mediaSecret()) return config
-  const pages: T['pages'] = {} as T['pages']
+  const pages: Record<string, CloakablePage> = {}
   for (const [path, page] of Object.entries(config.pages || {})) {
     pages[path] = {
       ...page,
@@ -123,6 +130,6 @@ export function cloakCustomSiteConfig<T extends {
     globalCss: config.globalCss
       ? cloakStorageUrlsInText(config.globalCss)
       : config.globalCss,
-    pages,
+    pages: pages as T['pages'],
   }
 }
