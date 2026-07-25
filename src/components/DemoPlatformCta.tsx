@@ -5,7 +5,7 @@ import { useMotionHydrated } from '@/components/MotionHydrationProvider';
 import { motionInitial } from '@/lib/motionInitial';
 
 // Opens the homepage "Which one are you?" chooser (widget trial vs site build).
-const PLATFORM_URL = 'https://www.closetquotes.com/?start=free';
+const PLATFORM_URL = 'https://www.ditchtheform.com/?start=free';
 
 /**
  * Sticky conversion bar shown only on shared-demo aesthetic sites

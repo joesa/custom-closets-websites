@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 export function proxy(req: NextRequest) {
   const url = req.nextUrl;
 
-  // Get the hostname (e.g., 'lumina.closetquotes.com' or 'localhost:3000')
+  // Get the hostname (e.g., 'lumina.ditchtheform.com' or 'localhost:3000')
   let hostname = req.headers.get('host') || '';
 
   // Remove the port if running locally

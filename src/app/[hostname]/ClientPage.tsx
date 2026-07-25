@@ -35,9 +35,9 @@ const PLATFORM_DEMO_WIDGET_ID = 'ec376123-f499-4ad4-88c9-2b63ad6f90ab';
 
 /** Hostnames for the Loom / outreach aesthetic demos (always show platform CTA). */
 const PLATFORM_DEMO_HOSTS = new Set([
-  'lumina.closetquotes.com',
-  'ironclad.closetquotes.com',
-  'hearth.closetquotes.com',
+  'lumina.ditchtheform.com',
+  'ironclad.ditchtheform.com',
+  'hearth.ditchtheform.com',
 ]);
 
 function isPlatformDemoSite(config: BrandConfig, hostname?: string): boolean {
