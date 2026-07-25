@@ -17,6 +17,7 @@ import {
   buildCustomDraftPreviewQuery,
   shouldPaintCustomDraft,
 } from "@/lib/customDraftPreview";
+import { isAdminBypassRequest } from "@/lib/adminBypass";
 import { cookies } from "next/headers";
 import Image from "next/image";
 
@@ -36,7 +37,11 @@ export default async function SubPage({
   }
 
   const cookieStore = await cookies();
-  const isAdminBypass = cookieStore.get("admin_bypass")?.value === "true";
+  const isAdminBypass = isAdminBypassRequest({
+    cookieValue: cookieStore.get("admin_bypass")?.value,
+    queryValue: resolvedSearch.admin_bypass,
+    secret: process.env.ADMIN_BYPASS_SECRET,
+  });
   const gate = getSiteGate(config, isAdminBypass);
 
   if (gate === "blocked") {

@@ -12,6 +12,7 @@ import {
   buildCustomDraftPreviewQuery,
   shouldPaintCustomDraft,
 } from "@/lib/customDraftPreview";
+import { isAdminBypassRequest } from "@/lib/adminBypass";
 import { cookies } from "next/headers";
 
 export default async function Page({
@@ -30,7 +31,11 @@ export default async function Page({
   }
 
   const cookieStore = await cookies();
-  const isAdminBypass = cookieStore.get('admin_bypass')?.value === 'true';
+  const isAdminBypass = isAdminBypassRequest({
+    cookieValue: cookieStore.get('admin_bypass')?.value,
+    queryValue: resolvedSearch.admin_bypass,
+    secret: process.env.ADMIN_BYPASS_SECRET,
+  });
   const gate = getSiteGate(config, isAdminBypass);
 
   // Suspended sites are taken offline entirely.
