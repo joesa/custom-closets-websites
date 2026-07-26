@@ -7,7 +7,7 @@ import CustomSiteRenderer from "@/components/CustomSiteRenderer";
 import GalleryLightbox from "@/components/GalleryLightbox";
 import HeroSection from "@/components/HeroSection";
 import { getThemeStyles, getGridClasses, applyVoice, getSectionTokens } from "@/lib/theme";
-import { siteSeed, getDesignVariant, heroHeadlineClasses } from "@/lib/designVariants";
+import { siteSeed, getDesignVariant, pageHeroHeadlineClasses } from "@/lib/designVariants";
 import { resolveSiteSignature } from "@/lib/siteSignature";
 import { resolvePageComposition } from "@/lib/pageCompositions";
 import { getCustomPage, isCustomSiteConfig } from "@/lib/customSite";
@@ -219,7 +219,7 @@ export default async function SubPage({
           headline={pageData.hero.headline}
           heroImage={heroImage}
           brandName={config.brandName}
-          heroHeadlineClasses={heroHeadlineClasses(variant.typeScale)}
+          heroHeadlineClasses={pageHeroHeadlineClasses(variant.typeScale)}
           ornament={signature.motif}
         />
 
@@ -227,14 +227,14 @@ export default async function SubPage({
           {composition.family === "services" && composition.servicesIntroSticky ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
               <aside className="lg:col-span-4 lg:sticky lg:top-28 self-start space-y-4">
-                <p className={`text-sm uppercase tracking-[0.2em] ${theme.accentColor}`}>
+                <p className={`text-sm uppercase tracking-[0.2em] ${theme.bodyFont} ${theme.accentColor}`}>
                   {signature.eyebrow}
                 </p>
-                <h2 className={`text-3xl md:text-4xl ${theme.headingFont} ${theme.accentColor}`}>
+                <h2 className={`text-2xl md:text-3xl ${theme.headingFont} ${theme.accentColor}`}>
                   {pageData.title}
                 </h2>
                 {textBlocks[0]?.body ? (
-                  <p className={`text-base leading-relaxed ${mutedText} whitespace-pre-line`}>
+                  <p className={`text-base leading-relaxed ${theme.bodyFont} ${mutedText} whitespace-pre-line`}>
                     {textBlocks[0].body}
                   </p>
                 ) : null}
@@ -252,38 +252,48 @@ export default async function SubPage({
               </div>
             </div>
           ) : composition.family === "about" && composition.aboutSplit ? (
-            <div
-              className={
-                credentialBullets.length > 0
-                  ? "grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 items-start"
-                  : "flex flex-col gap-12 max-w-3xl"
-              }
-            >
-              <div className={credentialBullets.length > 0 ? "md:col-span-7 space-y-8" : "space-y-8"}>
-                <p className={`text-sm ${theme.accentColor}`}>{signature.eyebrow}</p>
-                {textBlocks.map((block, idx) => (
-                  <div key={`about-text-${idx}`}>
-                    {block.heading ? (
-                      <h2
-                        className={`text-3xl md:text-5xl ${theme.headingFont} mb-6 ${theme.accentColor}`}
+            <div className="flex flex-col gap-16 md:gap-20">
+              <div
+                className={
+                  credentialBullets.length > 0
+                    ? "grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 items-start"
+                    : "flex flex-col gap-12 max-w-3xl"
+                }
+              >
+                <div className={credentialBullets.length > 0 ? "md:col-span-7 space-y-10" : "space-y-10"}>
+                  <p className={`text-sm ${theme.bodyFont} ${theme.accentColor}`}>{signature.eyebrow}</p>
+                  {textBlocks.map((block, idx) => (
+                    <div key={`about-text-${idx}`}>
+                      {block.heading ? (
+                        <h2
+                          className={`text-2xl md:text-4xl leading-tight text-balance ${theme.headingFont} mb-5 ${theme.accentColor}`}
+                        >
+                          {block.heading}
+                        </h2>
+                      ) : null}
+                      <p
+                        className={`text-base md:text-lg leading-relaxed ${theme.bodyFont} ${mutedText} whitespace-pre-line`}
                       >
-                        {block.heading}
-                      </h2>
-                    ) : null}
-                    <p className={`text-lg md:text-xl leading-relaxed ${mutedText} whitespace-pre-line`}>
-                      {block.body}
-                    </p>
-                  </div>
-                ))}
+                        {block.body}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {credentialBullets.length > 0 ? (
+                  <aside className={`md:col-span-5 space-y-5 p-8 border ${cardSurface}`}>
+                    <h3 className={`text-lg md:text-xl ${theme.headingFont} ${theme.accentColor}`}>
+                      At a glance
+                    </h3>
+                    <ul className={`space-y-3 text-base leading-relaxed ${theme.bodyFont} ${mutedText}`}>
+                      {credentialBullets.map((b) => (
+                        <li key={b}>{b}</li>
+                      ))}
+                    </ul>
+                  </aside>
+                ) : null}
               </div>
-              {credentialBullets.length > 0 ? (
-                <div className={`md:col-span-5 space-y-6 p-8 border ${cardSurface}`}>
-                  <h3 className={`text-xl ${theme.headingFont} ${theme.accentColor}`}>At a glance</h3>
-                  <ul className={`space-y-3 text-sm ${mutedText}`}>
-                    {credentialBullets.map((b) => (
-                      <li key={b}>{b}</li>
-                    ))}
-                  </ul>
+              {otherBlocks.length > 0 ? (
+                <div className="flex flex-col gap-16 w-full">
                   {otherBlocks.map((block, idx) =>
                     renderBlock(block, idx, {
                       theme,
@@ -294,17 +304,7 @@ export default async function SubPage({
                     })
                   )}
                 </div>
-              ) : (
-                otherBlocks.map((block, idx) =>
-                  renderBlock(block, idx, {
-                    theme,
-                    mutedText,
-                    cardSurface,
-                    pageDataTitle: pageData.title,
-                    composition,
-                  })
-                )
-              )}
+              ) : null}
             </div>
           ) : (
             pageData.content_blocks.map((block, idx) =>
@@ -402,6 +402,7 @@ export default async function SubPage({
 
 type ThemeLike = {
   headingFont: string;
+  bodyFont: string;
   accentColor: string;
 };
 
@@ -431,16 +432,20 @@ function renderBlock(
         key={idx}
         className={
           composition.family === "about"
-            ? "max-w-3xl"
-            : "max-w-4xl mx-auto text-center"
+            ? "max-w-3xl w-full"
+            : "max-w-4xl mx-auto text-center w-full"
         }
       >
         {block.heading ? (
-          <h2 className={`text-3xl md:text-4xl ${theme.headingFont} mb-8 ${theme.accentColor}`}>
+          <h2
+            className={`text-2xl md:text-3xl leading-tight text-balance ${theme.headingFont} mb-6 ${theme.accentColor}`}
+          >
             {block.heading}
           </h2>
         ) : null}
-        <p className={`text-lg md:text-xl leading-relaxed ${mutedText} whitespace-pre-line`}>
+        <p
+          className={`text-base md:text-lg leading-relaxed ${theme.bodyFont} ${mutedText} whitespace-pre-line`}
+        >
           {block.body}
         </p>
       </div>
@@ -452,12 +457,14 @@ function renderBlock(
     return (
       <div
         key={idx}
-        className={`flex flex-col md:flex-row gap-12 items-center ${
-          isLeft ? "" : "md:flex-row-reverse"
-        }`}
+        className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center w-full"
       >
-        {block.image && (
-          <div className="w-full md:w-1/2 aspect-square md:aspect-[4/3] relative overflow-hidden border border-black/10">
+        {block.image ? (
+          <div
+            className={`relative w-full aspect-[4/3] overflow-hidden border border-white/10 ${
+              isLeft ? "md:order-1" : "md:order-2"
+            }`}
+          >
             <Image
               src={block.image}
               alt={block.heading || "Section image"}
@@ -466,14 +473,20 @@ function renderBlock(
               className="object-cover"
             />
           </div>
-        )}
-        <div className={`w-full ${block.image ? "md:w-1/2" : ""}`}>
+        ) : null}
+        <div className={`w-full min-w-0 ${isLeft ? "md:order-2" : "md:order-1"}`}>
           {block.heading ? (
-            <h2 className={`text-3xl md:text-4xl ${theme.headingFont} mb-6 ${theme.accentColor}`}>
+            <h2
+              className={`text-2xl md:text-3xl leading-tight text-balance ${theme.headingFont} mb-5 ${theme.accentColor}`}
+            >
               {block.heading}
             </h2>
           ) : null}
-          <p className={`text-lg leading-relaxed ${mutedText} whitespace-pre-line`}>{block.body}</p>
+          <p
+            className={`text-base md:text-lg leading-relaxed ${theme.bodyFont} ${mutedText} whitespace-pre-line`}
+          >
+            {block.body}
+          </p>
         </div>
       </div>
     );
@@ -483,7 +496,7 @@ function renderBlock(
     return (
       <div key={idx} className={`w-full ${composition.galleryBleed ? "-mx-2 md:mx-0" : ""}`}>
         <h2
-          className={`text-3xl md:text-4xl ${theme.headingFont} mb-6 ${
+          className={`text-2xl md:text-3xl leading-tight text-balance ${theme.headingFont} mb-6 ${
             composition.galleryBleed ? "text-left px-2" : "text-center"
           } ${theme.accentColor}`}
         >
@@ -493,7 +506,7 @@ function renderBlock(
           <p
             className={`${
               composition.galleryBleed ? "text-left px-2 max-w-2xl" : "text-center max-w-3xl mx-auto"
-            } ${mutedText} mb-12`}
+            } text-base md:text-lg ${theme.bodyFont} ${mutedText} mb-12`}
           >
             {block.body}
           </p>
@@ -507,7 +520,7 @@ function renderBlock(
     return (
       <div key={idx} className="w-full">
         <h2
-          className={`text-3xl md:text-4xl ${theme.headingFont} mb-12 ${
+          className={`text-2xl md:text-3xl leading-tight text-balance ${theme.headingFont} mb-6 ${
             composition.servicesIntroSticky ? "text-left" : "text-center"
           } ${theme.accentColor}`}
         >
@@ -517,7 +530,7 @@ function renderBlock(
           <p
             className={`${
               composition.servicesIntroSticky ? "text-left" : "text-center mx-auto"
-            } ${mutedText} mb-12 max-w-3xl`}
+            } text-base md:text-lg ${theme.bodyFont} ${mutedText} mb-10 max-w-3xl`}
           >
             {block.body}
           </p>
@@ -526,7 +539,7 @@ function renderBlock(
           {block.items.map((item, i) => (
             <div
               key={i}
-              className={`border overflow-hidden transition-colors ${cardSurface}`}
+              className={`border overflow-hidden transition-colors min-w-0 ${cardSurface}`}
             >
               {item.image ? (
                 <div className="relative aspect-[4/3] w-full">
@@ -539,9 +552,13 @@ function renderBlock(
                   />
                 </div>
               ) : null}
-              <div className="p-8">
-                <h3 className={`text-xl font-bold mb-4`}>{item.title}</h3>
-                <p className={`${mutedText} leading-relaxed`}>{item.description}</p>
+              <div className="p-6 md:p-8">
+                <h3 className={`text-lg md:text-xl font-bold mb-3 break-words ${theme.headingFont}`}>
+                  {item.title}
+                </h3>
+                <p className={`text-base leading-relaxed break-words ${theme.bodyFont} ${mutedText}`}>
+                  {item.description}
+                </p>
               </div>
             </div>
           ))}

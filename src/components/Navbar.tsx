@@ -112,7 +112,7 @@ export default function Navbar({
   const Brand = () => (
     <Link
       href="/"
-      className={`text-xl font-bold tracking-wider ${chrome.brand} ${chrome.linkShadow} ${theme.headingFont}`}
+      className={`text-lg md:text-xl font-bold tracking-wide shrink-0 ${chrome.brand} ${chrome.linkShadow} ${theme.bodyFont}`}
     >
       {logoUrl ? (
         <Image
@@ -120,7 +120,7 @@ export default function Navbar({
           alt={brandName}
           width={280}
           height={90}
-          className="h-16 w-auto object-contain sm:h-20"
+          className="h-12 w-auto object-contain sm:h-14"
           priority
         />
       ) : (
@@ -151,7 +151,7 @@ export default function Navbar({
           <Link
             key={i}
             href={link.slug}
-            className={`group relative text-sm tracking-widest transition-colors font-medium ${chrome.link} ${chrome.linkShadow} ${hoverClasses}`}
+            className={`group relative text-sm tracking-wide whitespace-nowrap transition-colors font-medium ${theme.bodyFont} ${chrome.link} ${chrome.linkShadow} ${hoverClasses}`}
           >
             {link.label}
             {innerExtra}
@@ -164,7 +164,7 @@ export default function Navbar({
   const CtaButton = ({ filled = false }: { filled?: boolean }) => (
     <Link
       href="/#quote"
-      className={`px-6 py-2 text-xs uppercase tracking-widest font-bold border transition-all ${rounded} ${
+      className={`shrink-0 px-5 py-2 text-xs uppercase tracking-widest font-bold border transition-all ${theme.bodyFont} ${rounded} ${
         filled ? chrome.ctaFilled + ' border-transparent' : chrome.cta
       }`}
     >
@@ -207,7 +207,7 @@ export default function Navbar({
             key={i}
             href={link.slug}
             onClick={() => setMobileOpen(false)}
-            className={`text-base tracking-widest font-medium ${chrome.link}`}
+            className={`text-base tracking-wide font-medium ${theme.bodyFont} ${chrome.link}`}
           >
             {link.label}
           </Link>
@@ -303,9 +303,9 @@ export default function Navbar({
   if (layout === 'classic-reversed') {
     return (
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${chrome.bar}`}>
-        <div className="relative max-w-7xl mx-auto px-6 flex items-center justify-between flex-row-reverse">
+        <div className="relative max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between flex-row-reverse gap-4">
           <Brand />
-          <div className="hidden md:flex items-center gap-8 flex-row-reverse">
+          <div className="hidden md:flex items-center gap-4 lg:gap-6 flex-row-reverse min-w-0">
             <NavItems />
             <CtaButton />
           </div>

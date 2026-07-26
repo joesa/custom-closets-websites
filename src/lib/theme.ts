@@ -172,7 +172,7 @@ const SHAPE_POOL: Record<
     buttonShape: 'rounded-none px-8 py-4 uppercase font-bold text-base',
     productCard: 'group overflow-hidden rounded-none',
     productImageHover: 'transition-transform duration-500 group-hover:scale-105',
-    headingModifier: 'font-black tracking-tighter uppercase',
+    headingModifier: 'font-black tracking-tight',
     bodyModifier: '',
   },
   'quiet-minimal': {
@@ -209,7 +209,9 @@ function coreThemeStyles(theme: ThemeType): ThemeStyles {
         pageBackground: 'bg-[#050505]',
         textPrimary: 'text-white',
         textSecondary: 'text-slate-400',
-        headingFont: 'font-archivo font-black tracking-tighter uppercase',
+        // No forced uppercase — all-caps + display scale was clipping heroes
+        // and making nav/section headings look inconsistently oversized.
+        headingFont: 'font-archivo font-black tracking-tight',
         bodyFont: 'font-space-grotesk',
         containerClasses: 'max-w-7xl mx-auto px-6 py-24',
         button: 'bg-yellow-400 text-black hover:bg-yellow-300 transition-colors rounded-none px-8 py-4 uppercase font-bold text-base border-2 border-yellow-400',

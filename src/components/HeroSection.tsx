@@ -546,14 +546,14 @@ export default function HeroSection({
               initial={motionInitial(motionReady, { opacity: 0, y: 20 })}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className={`flex items-center justify-between border-y-2 ${tokens.surfaceBorder} py-3`}
+              className={`flex items-center justify-between gap-4 border-y-2 ${tokens.surfaceBorder} py-3`}
             >
               {brandName && (
-                <span className={`text-xs font-bold ${theme.accentColor}`}>
+                <span className={`text-xs font-bold ${theme.bodyFont} ${theme.accentColor}`}>
                   {brandName}
                 </span>
               )}
-              <span className={`text-xs ${theme.textSecondary}`}>
+              <span className={`text-xs ${theme.bodyFont} ${theme.textSecondary}`}>
                 {brandName ? 'Locally owned' : ''}
               </span>
             </motion.div>
@@ -561,7 +561,7 @@ export default function HeroSection({
               initial={motionRise(siteMotion, motionReady)}
               animate={{ opacity: 1, y: 0 }}
               transition={siteMotion.hero}
-              className={`mx-auto my-10 max-w-4xl text-center ${heroHeadlineClasses} ${theme.headingFont} ${theme.textPrimary}`}
+              className={`mx-auto my-8 md:my-12 max-w-5xl px-1 text-center ${heroHeadlineClasses} ${theme.headingFont} ${theme.textPrimary}`}
             >
               {headline}
             </motion.h1>

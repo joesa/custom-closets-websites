@@ -490,17 +490,32 @@ export function structuralFingerprint(seed: string, theme?: string | null): stri
   ].join('.');
 }
 
-/** Headline size classes per type scale, used by the hero compositions. */
+/**
+ * Headline size classes per type scale, used by the hero compositions.
+ * Scales are capped so long all-caps display faces stay on-screen and wrap
+ * cleanly (monumental/oversized used to hit md:text-9xl and clip).
+ */
 export function heroHeadlineClasses(scale: TypeScale): string {
+  const wrap = 'text-balance break-words';
   switch (scale) {
     case 'monumental':
-      return 'text-6xl md:text-9xl leading-[0.9] tracking-[-0.04em]';
+      return `text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight ${wrap}`;
     case 'oversized':
-      return 'text-5xl md:text-8xl leading-[0.98] tracking-[-0.03em]';
+      return `text-4xl sm:text-5xl md:text-6xl leading-[1.08] tracking-tight ${wrap}`;
     case 'compact':
-      return 'text-4xl md:text-5xl leading-snug tracking-[0.01em]';
+      return `text-3xl sm:text-4xl md:text-5xl leading-snug tracking-[0.01em] ${wrap}`;
     case 'standard':
     default:
-      return 'text-5xl md:text-7xl leading-tight tracking-[-0.02em]';
+      return `text-4xl sm:text-5xl md:text-6xl leading-tight tracking-[-0.01em] ${wrap}`;
   }
+}
+
+/**
+ * Subpage heroes (About, Services, …) sit under a denser nav and often carry
+ * longer titles — keep them one step below the homepage type scale.
+ */
+export function pageHeroHeadlineClasses(scale: TypeScale): string {
+  const capped: TypeScale =
+    scale === 'monumental' ? 'oversized' : scale === 'oversized' ? 'standard' : scale;
+  return heroHeadlineClasses(capped);
 }

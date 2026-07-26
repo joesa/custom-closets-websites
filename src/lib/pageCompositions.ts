@@ -55,7 +55,7 @@ export function resolvePageComposition(slug: string, seed?: string | null): Page
       ? 'py-20 px-6 mx-auto max-w-screen-xl'
       : 'py-24 px-6 mx-auto max-w-screen-xl flex flex-col gap-24',
     gallery: 'py-16 md:py-20 px-4 md:px-6 mx-auto max-w-[1400px] flex flex-col gap-16',
-    about: 'py-24 px-6 mx-auto max-w-screen-lg flex flex-col gap-20',
+    about: 'py-20 md:py-24 px-6 mx-auto max-w-screen-xl flex flex-col gap-16 md:gap-20',
     contact: 'py-20 px-6 mx-auto max-w-screen-xl flex flex-col gap-16',
     default: 'py-24 px-6 mx-auto max-w-screen-xl flex flex-col gap-24',
   }

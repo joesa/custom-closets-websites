@@ -300,10 +300,10 @@ function ClientPageContent({ config, hostname }: ClientPageProps) {
             className="mx-auto max-w-5xl"
           >
             {renderOrnament(false)}
-            <h2 className={`mb-10 max-w-3xl text-3xl md:text-5xl leading-tight ${theme.headingFont} ${theme.textPrimary}`}>
+            <h2 className={`mb-10 max-w-3xl text-2xl md:text-4xl leading-tight text-balance ${theme.headingFont} ${theme.textPrimary}`}>
               {aboutEyebrow}
             </h2>
-            <p className={`columns-1 gap-12 text-lg md:columns-2 md:text-xl leading-relaxed ${theme.textSecondary}`}>
+            <p className={`columns-1 gap-12 text-base md:columns-2 md:text-lg leading-relaxed ${theme.bodyFont} ${theme.textSecondary}`}>
               {config.about.description}
             </p>
           </motion.div>
