@@ -20,6 +20,7 @@ import {
 import { isAdminBypassRequest } from "@/lib/adminBypass";
 import { cookies } from "next/headers";
 import Image from "next/image";
+import ServicesProductGrid from "@/components/ServicesProductGrid";
 
 export default async function SubPage({
   params,
@@ -224,7 +225,66 @@ export default async function SubPage({
         />
 
         <section className={composition.shellClass}>
-          {composition.family === "services" && composition.servicesIntroSticky ? (
+          {composition.family === "services" && (config.products?.length ?? 0) > 0 ? (
+            composition.servicesIntroSticky ? (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+                <aside className="lg:col-span-4 lg:sticky lg:top-28 self-start space-y-4">
+                  <p className={`text-sm uppercase tracking-[0.2em] ${theme.bodyFont} ${theme.accentColor}`}>
+                    {signature.eyebrow}
+                  </p>
+                  <h2 className={`text-2xl md:text-3xl ${theme.headingFont} ${theme.accentColor}`}>
+                    {pageData.title}
+                  </h2>
+                  {textBlocks[0]?.body ? (
+                    <p className={`text-base leading-relaxed ${theme.bodyFont} ${mutedText} whitespace-pre-line`}>
+                      {textBlocks[0].body}
+                    </p>
+                  ) : null}
+                </aside>
+                <div className="lg:col-span-8">
+                  <ServicesProductGrid
+                    products={config.products}
+                    theme={theme}
+                    themeType={config.theme}
+                    themeTokens={config.themeTokens}
+                    fontSeed={fontSeed}
+                    heading="What we offer"
+                    mutedText={mutedText}
+                    cardSurface={cardSurface}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-12">
+                {textBlocks[0] ? (
+                  <div className="max-w-3xl">
+                    {textBlocks[0].heading ? (
+                      <h2
+                        className={`text-2xl md:text-3xl leading-tight text-balance ${theme.headingFont} mb-5 ${theme.accentColor}`}
+                      >
+                        {textBlocks[0].heading}
+                      </h2>
+                    ) : null}
+                    <p
+                      className={`text-base md:text-lg leading-relaxed ${theme.bodyFont} ${mutedText} whitespace-pre-line`}
+                    >
+                      {textBlocks[0].body}
+                    </p>
+                  </div>
+                ) : null}
+                <ServicesProductGrid
+                  products={config.products}
+                  theme={theme}
+                  themeType={config.theme}
+                  themeTokens={config.themeTokens}
+                  fontSeed={fontSeed}
+                  heading="What we offer"
+                  mutedText={mutedText}
+                  cardSurface={cardSurface}
+                />
+              </div>
+            )
+          ) : composition.family === "services" && composition.servicesIntroSticky ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
               <aside className="lg:col-span-4 lg:sticky lg:top-28 self-start space-y-4">
                 <p className={`text-sm uppercase tracking-[0.2em] ${theme.bodyFont} ${theme.accentColor}`}>
