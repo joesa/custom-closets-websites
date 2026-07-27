@@ -5,6 +5,7 @@ import PendingApproval from "@/components/PendingApproval";
 import LaunchPaywall from "@/components/LaunchPaywall";
 import CustomSiteRenderer from "@/components/CustomSiteRenderer";
 import DraftEmptyNotice from "@/components/DraftEmptyNotice";
+import DraftMissingPageNotice from "@/components/DraftMissingPageNotice";
 import GalleryLightbox from "@/components/GalleryLightbox";
 import HeroSection from "@/components/HeroSection";
 import { getThemeStyles, getGridClasses, applyVoice, getSectionTokens } from "@/lib/theme";
@@ -116,6 +117,49 @@ export default async function SubPage({
         adminBypassParam: resolvedSearch.admin_bypass,
       })
     : null;
+
+  if (
+    draftConfig &&
+    !getCustomPage(draftConfig, `/${resolvedParams.slug}`) &&
+    !getCustomPage(draftConfig, '/')
+  ) {
+    return (
+      <>
+        <LocalSEO
+          seo={config.seo}
+          brandName={config.brandName}
+          url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
+        />
+        <DraftEmptyNotice brandName={config.brandName} />
+      </>
+    );
+  }
+
+  // Draft has home but this path is missing/empty — do not fall through to the
+  // old engine (looks like "half redesigned").
+  if (draftConfig) {
+    const draftPage = getCustomPage(draftConfig, `/${resolvedParams.slug}`);
+    const html = (draftPage?.html || "").trim();
+    if (!draftPage || html.length < 40) {
+      const availablePaths = Object.keys(draftConfig.pages || {})
+        .filter((k) => (draftConfig.pages[k]?.html || "").trim().length >= 40)
+        .sort();
+      return (
+        <>
+          <LocalSEO
+            seo={config.seo}
+            brandName={config.brandName}
+            url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
+          />
+          <DraftMissingPageNotice
+            brandName={config.brandName}
+            path={`/${resolvedParams.slug}`}
+            availablePaths={availablePaths}
+          />
+        </>
+      );
+    }
+  }
 
   if (activeCustom && customPage) {
     return (
