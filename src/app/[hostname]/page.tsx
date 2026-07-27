@@ -5,6 +5,7 @@ import LocalSEO from "@/components/LocalSEO";
 import PendingApproval from "@/components/PendingApproval";
 import LaunchPaywall from "@/components/LaunchPaywall";
 import CustomSiteRenderer from "@/components/CustomSiteRenderer";
+import DraftEmptyNotice from "@/components/DraftEmptyNotice";
 import { getCustomPage, isCustomSiteConfig } from "@/lib/customSite";
 import { cloakCustomSiteConfig } from "@/lib/mediaProxy";
 import { getSiteGate } from "@/lib/siteGate";
@@ -95,6 +96,17 @@ export default async function Page({
         adminBypassParam: resolvedSearch.admin_bypass,
       })
     : null;
+
+  // Empty Full redesign draft (`pages: {}`) used to fall through to the old
+  // live/engine site — Preview looked unchanged while admin showed a "success" reply.
+  if (draftConfig && !getCustomPage(draftConfig, '/')) {
+    return (
+      <>
+        <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}`} />
+        <DraftEmptyNotice brandName={config.brandName} />
+      </>
+    );
+  }
 
   if (activeCustom && customPage) {
     return (
