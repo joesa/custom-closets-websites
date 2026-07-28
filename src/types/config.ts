@@ -169,6 +169,8 @@ export interface BrandConfig {
     headline: string;
     subheadline?: string;
     backgroundImage: string;
+    /** Optional override for the hero primary CTA (defaults to seeded #quote label). */
+    primaryCta?: { label: string; href: string };
   };
   about: {
     description: string;
