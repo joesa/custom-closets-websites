@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   appendPreviewQueryToInternalLinks,
+  decorateCustomSiteImages,
   getCustomPage,
   normalizeCustomPath,
   scopeCss,
@@ -9,6 +10,18 @@ import {
   WIDGET_PLACEHOLDER,
   type CustomSiteConfig,
 } from './customSite'
+
+describe('decorateCustomSiteImages', () => {
+  it('eager-loads the first two images and lazy-loads the rest', () => {
+    const html =
+      '<img src="/a.jpg"><img src="/b.jpg"><img src="/c.jpg"><img src="/d.jpg" loading="lazy">'
+    const out = decorateCustomSiteImages(html)
+    expect(out).toContain('src="/a.jpg" decoding="async" loading="eager" fetchpriority="high"')
+    expect(out).toContain('src="/b.jpg" decoding="async" loading="eager" fetchpriority="high"')
+    expect(out).toContain('src="/c.jpg" decoding="async" loading="lazy"')
+    expect(out).toContain('src="/d.jpg" loading="lazy" decoding="async"')
+  })
+})
 
 describe('normalizeCustomPath', () => {
   it('normalizes variants to /slug', () => {

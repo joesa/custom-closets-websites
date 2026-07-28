@@ -6,8 +6,10 @@ import { PUBLIC_API_URL, WIDGET_CDN_URL } from '@/lib/urls';
 import {
   type CustomPageArtifact,
   type CustomSiteConfig,
+  CUSTOM_SITE_IMG_PERF_CSS,
   WIDGET_MOUNT_RESET_CSS,
   appendPreviewQueryToInternalLinks,
+  decorateCustomSiteImages,
   injectWidgetPlaceholder,
   sanitizeCustomCss,
   sanitizeCustomHtml,
@@ -41,7 +43,7 @@ function prepareInlineHtml(
 ): { html: string; css: string } {
   const widgetEl = buildWidgetElement(widgetId, engagementModel);
   const rawHtml = injectWidgetPlaceholder(page.html || '', widgetEl);
-  let html = sanitizeCustomHtml(rawHtml);
+  let html = decorateCustomSiteImages(sanitizeCustomHtml(rawHtml));
   if (previewQuery) {
     html = appendPreviewQueryToInternalLinks(html, previewQuery);
   }
@@ -50,6 +52,7 @@ function prepareInlineHtml(
   const css = [
     scopeCss(sanitizeCustomCss(combinedCss), SCOPE),
     scopeCss(WIDGET_MOUNT_RESET_CSS, SCOPE),
+    scopeCss(CUSTOM_SITE_IMG_PERF_CSS, SCOPE),
   ]
     .filter(Boolean)
     .join('\n');
@@ -66,13 +69,16 @@ function buildSrcDoc(
   const widgetEl = buildWidgetElement(widgetId, engagementModel);
   // Still sanitize HTML even in iframe mode — sandbox is not a substitute
   // for stripping script/event-handler payloads from AI/admin content.
-  let bodyHtml = sanitizeCustomHtml(injectWidgetPlaceholder(page.html || '', widgetEl));
+  let bodyHtml = decorateCustomSiteImages(
+    sanitizeCustomHtml(injectWidgetPlaceholder(page.html || '', widgetEl))
+  );
   if (previewQuery) {
     bodyHtml = appendPreviewQueryToInternalLinks(bodyHtml, previewQuery);
   }
   const css = [
     sanitizeCustomCss([custom.globalCss || '', page.css || ''].filter(Boolean).join('\n')),
     WIDGET_MOUNT_RESET_CSS,
+    CUSTOM_SITE_IMG_PERF_CSS,
   ]
     .filter(Boolean)
     .join('\n');
@@ -247,7 +253,10 @@ export default function CustomSiteRenderer({
       ) : (
         <div data-custom-site dangerouslySetInnerHTML={{ __html: html }} />
       )}
-      <Script src={WIDGET_CDN_URL} strategy="lazyOnload" />
+      {/* afterInteractive: do not wait for window.load (blocked by many large
+          gallery images). lazyOnload deferred the 450KB widget until every
+          eager img finished — extending the main-thread hitch. */}
+      <Script src={WIDGET_CDN_URL} strategy="afterInteractive" />
     </div>
   );
 }

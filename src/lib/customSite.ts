@@ -250,6 +250,38 @@ export function sanitizeCustomHtml(html: string): string {
 }
 
 /**
+ * Keep first-paint cheap: decode off the critical path and lazy-load images
+ * below the fold. Eager full-page image decode (~many MP JPEGs) was freezing
+ * Chromium (including unrelated tabs) on custom sites like Baffour.
+ */
+export function decorateCustomSiteImages(html: string): string {
+  if (!html) return ''
+  let index = 0
+  return html.replace(/<img\b([^>]*)>/gi, (_full, attrs: string) => {
+    let a = String(attrs || '')
+    const i = index++
+    if (!/\bdecoding\s*=/i.test(a)) a += ' decoding="async"'
+    if (!/\bloading\s*=/i.test(a)) {
+      if (i < 2) {
+        a += ' loading="eager"'
+        if (!/\bfetchpriority\s*=/i.test(a)) a += ' fetchpriority="high"'
+      } else {
+        a += ' loading="lazy"'
+      }
+    }
+    return `<img${a}>`
+  })
+}
+
+/** Cheap paint containment for off-screen custom-site images. */
+export const CUSTOM_SITE_IMG_PERF_CSS = `
+img {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px 600px;
+}
+`.trim()
+
+/**
  * Append preview query params (e.g. draft=1, admin_bypass=…) to root-relative
  * internal links so Custom Build draft navigation keeps the preview session.
  * Leaves mailto/tel/#/external/protocol-relative hrefs untouched.
