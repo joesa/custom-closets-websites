@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Props = {
-  rootRef: React.RefObject<HTMLDivElement | null>;
+  siteRef: React.RefObject<HTMLDivElement | null>;
   tenantId: string;
   pagePath: string;
   apiBaseUrl: string;
@@ -12,7 +12,11 @@ type Props = {
 
 function isEditableTarget(el: Element | null): el is HTMLElement {
   if (!el || !(el instanceof HTMLElement)) return false;
-  if (el.closest('closet-quote-widget, closet-order-widget, closet-booking-widget, closet-ticket-widget')) {
+  if (
+    el.closest(
+      'closet-quote-widget, closet-order-widget, closet-booking-widget, closet-ticket-widget'
+    )
+  ) {
     return false;
   }
   if (el.closest('script, style, noscript')) return false;
@@ -25,12 +29,19 @@ function wrapImgForLightbox(imgHtml: string, useLightbox: boolean): string {
   return `<label class="img-lightbox"><input type="checkbox" class="lightbox-toggle" aria-label="Enlarge image">${imgHtml}</label>`;
 }
 
+function tokenStorageKey(tenantId: string) {
+  return `eip-token:${tenantId}`;
+}
+
 /**
  * Admin-only overlay: click text to edit, click images to replace/remove,
  * Save posts serialized HTML to the dashboard edit-in-place save API.
+ *
+ * Keeps a dirtyHtml buffer so Save never depends on React re-seeding
+ * dangerouslySetInnerHTML (which would wipe contenteditable changes).
  */
 export default function EditInPlaceLayer({
-  rootRef,
+  siteRef,
   tenantId,
   pagePath,
   apiBaseUrl,
@@ -38,24 +49,42 @@ export default function EditInPlaceLayer({
 }: Props) {
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [resolvedToken, setResolvedToken] = useState<string | null>(editToken);
+  const dirtyHtmlRef = useRef<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const replaceImgRef = useRef<HTMLImageElement | null>(null);
   const addModeRef = useRef(false);
 
+  useEffect(() => {
+    if (editToken) {
+      try {
+        sessionStorage.setItem(tokenStorageKey(tenantId), editToken);
+      } catch {
+        /* ignore */
+      }
+      setResolvedToken(editToken);
+      return;
+    }
+    try {
+      setResolvedToken(sessionStorage.getItem(tokenStorageKey(tenantId)));
+    } catch {
+      setResolvedToken(null);
+    }
+  }, [editToken, tenantId]);
+
   const authHeaders = useCallback((): HeadersInit => {
     const h: Record<string, string> = {};
-    if (editToken) h.Authorization = `Bearer ${editToken}`;
+    if (resolvedToken) h.Authorization = `Bearer ${resolvedToken}`;
     return h;
-  }, [editToken]);
+  }, [resolvedToken]);
 
-  const siteRoot = useCallback(() => {
-    return rootRef.current?.querySelector('[data-custom-site]') as HTMLElement | null;
-  }, [rootRef]);
-
-  const serializeHtml = useCallback(() => {
-    const el = siteRoot();
-    return el ? el.innerHTML : '';
-  }, [siteRoot]);
+  const captureHtml = useCallback(() => {
+    const el = siteRef.current;
+    if (!el) return dirtyHtmlRef.current || '';
+    const html = el.innerHTML;
+    dirtyHtmlRef.current = html;
+    return html;
+  }, [siteRef]);
 
   const save = useCallback(async () => {
     if (!tenantId || !apiBaseUrl) {
@@ -63,9 +92,15 @@ export default function EditInPlaceLayer({
       setMessage('Missing tenant or API URL');
       return;
     }
-    if (!editToken) {
+    if (!resolvedToken) {
       setStatus('error');
       setMessage('Missing edit token — reopen from admin Custom build.');
+      return;
+    }
+    const html = captureHtml();
+    if (!html.trim()) {
+      setStatus('error');
+      setMessage('Nothing to save — page HTML was empty.');
       return;
     }
     setStatus('saving');
@@ -79,18 +114,27 @@ export default function EditInPlaceLayer({
             'Content-Type': 'application/json',
             ...authHeaders(),
           },
-          body: JSON.stringify({ path: pagePath, html: serializeHtml() }),
+          body: JSON.stringify({ path: pagePath, html }),
         }
       );
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error || `Save failed (${res.status})`);
       setStatus('saved');
-      setMessage('Saved. Turn OFF Edit in place in admin when finished.');
+      setMessage(
+        `Saved (${json.htmlLength ?? html.length} chars). Hard-refresh if needed — then turn OFF Edit in place in admin.`
+      );
     } catch (err) {
       setStatus('error');
       setMessage(err instanceof Error ? err.message : 'Save failed');
     }
-  }, [apiBaseUrl, authHeaders, editToken, pagePath, serializeHtml, tenantId]);
+  }, [
+    apiBaseUrl,
+    authHeaders,
+    captureHtml,
+    pagePath,
+    resolvedToken,
+    tenantId,
+  ]);
 
   const uploadImage = useCallback(
     async (file: File): Promise<string> => {
@@ -113,7 +157,7 @@ export default function EditInPlaceLayer({
   );
 
   useEffect(() => {
-    const root = rootRef.current;
+    const root = siteRef.current;
     if (!root) return;
 
     const onClick = (event: MouseEvent) => {
@@ -134,6 +178,7 @@ export default function EditInPlaceLayer({
         if (a === 'remove' || a === 'delete') {
           const wrap = img.closest('label.img-lightbox');
           ;(wrap || img).remove();
+          captureHtml();
           setStatus('idle');
           setMessage('Image removed — click Save.');
           return;
@@ -146,14 +191,13 @@ export default function EditInPlaceLayer({
         return;
       }
 
-      // Text editing: prefer a block-ish parent with text.
       let el: HTMLElement | null = target as HTMLElement;
       if (el.tagName === 'IMG') return;
       const block = el.closest(
         'p, h1, h2, h3, h4, h5, h6, li, span, a, figcaption, blockquote, td, th, label'
       ) as HTMLElement | null;
       el = block || el;
-      if (!el || el.closest('[data-custom-site]') == null) return;
+      if (!el || !root.contains(el)) return;
       if (el.isContentEditable) return;
       if (el.closest('.svc-drawer-wrap .side-drawer')) return;
 
@@ -168,6 +212,7 @@ export default function EditInPlaceLayer({
         el!.removeEventListener('keydown', onKey);
         el!.removeEventListener('blur', onBlur);
         if (commit) {
+          captureHtml();
           setStatus('idle');
           setMessage('Text updated — click Save.');
         }
@@ -177,7 +222,12 @@ export default function EditInPlaceLayer({
           e.preventDefault();
           finish(false);
         }
-        if (e.key === 'Enter' && !e.shiftKey && el!.tagName !== 'P' && el!.tagName !== 'LI') {
+        if (
+          e.key === 'Enter' &&
+          !e.shiftKey &&
+          el!.tagName !== 'P' &&
+          el!.tagName !== 'LI'
+        ) {
           e.preventDefault();
           finish(true);
         }
@@ -189,7 +239,7 @@ export default function EditInPlaceLayer({
 
     root.addEventListener('click', onClick, true);
     return () => root.removeEventListener('click', onClick, true);
-  }, [rootRef]);
+  }, [captureHtml, siteRef]);
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -199,7 +249,7 @@ export default function EditInPlaceLayer({
       setStatus('saving');
       setMessage('Uploading image…');
       const url = await uploadImage(file);
-      const site = siteRoot();
+      const site = siteRef.current;
       const useLightbox = Boolean(site?.querySelector('.img-lightbox'));
       if (addModeRef.current && site) {
         const tmp = document.createElement('div');
@@ -215,6 +265,7 @@ export default function EditInPlaceLayer({
         replaceImgRef.current.removeAttribute('srcset');
         setMessage('Image replaced — click Save.');
       }
+      captureHtml();
       setStatus('idle');
     } catch (err) {
       setStatus('error');
@@ -234,7 +285,7 @@ export default function EditInPlaceLayer({
         <button
           type="button"
           onClick={() => void save()}
-          disabled={status === 'saving' || !editToken}
+          disabled={status === 'saving' || !resolvedToken}
           className="px-3 py-1 rounded bg-black text-amber-300 text-xs font-semibold disabled:opacity-50"
         >
           {status === 'saving' ? 'Saving…' : 'Save'}

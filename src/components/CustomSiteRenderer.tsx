@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import Script from 'next/script';
 import { PUBLIC_API_URL, WIDGET_CDN_URL } from '@/lib/urls';
 import {
@@ -167,7 +167,19 @@ export default function CustomSiteRenderer({
       ? engagementModel
       : 'quote';
   const rootRef = useRef<HTMLDivElement>(null);
+  const siteRef = useRef<HTMLDivElement>(null);
   const showEditor = editInPlace && mode === 'inline' && Boolean(tenantId);
+  const { html, css } = prepareInlineHtml(page, custom, widgetId, model, previewQuery);
+
+  // In edit mode, seed the DOM once and never let React rewrite it via
+  // dangerouslySetInnerHTML (that wiped contenteditable changes before Save).
+  useLayoutEffect(() => {
+    if (!showEditor) return;
+    const el = siteRef.current;
+    if (!el || el.dataset.eipSeeded === '1') return;
+    el.innerHTML = html;
+    el.dataset.eipSeeded = '1';
+  }, [showEditor, html]);
 
   useEffect(() => {
     if (!isDraftPreview && !editInPlace) return;
@@ -179,7 +191,6 @@ export default function CustomSiteRenderer({
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const anchor = (event.target as Element | null)?.closest?.('a');
       if (!anchor || !root.contains(anchor)) return;
-      // While editing text, don't navigate.
       if (editInPlace && (event.target as HTMLElement | null)?.isContentEditable) {
         return;
       }
@@ -216,13 +227,11 @@ export default function CustomSiteRenderer({
     );
   }
 
-  const { html, css } = prepareInlineHtml(page, custom, widgetId, model, previewQuery);
-
   return (
     <div className="relative min-h-screen w-full" ref={rootRef}>
       {showEditor ? (
         <EditInPlaceLayer
-          rootRef={rootRef}
+          siteRef={siteRef}
           tenantId={tenantId}
           pagePath={pagePath}
           apiBaseUrl={apiBaseUrl}
@@ -232,7 +241,11 @@ export default function CustomSiteRenderer({
         <DraftBanner />
       ) : null}
       {css ? <style dangerouslySetInnerHTML={{ __html: css }} /> : null}
-      <div data-custom-site dangerouslySetInnerHTML={{ __html: html }} />
+      {showEditor ? (
+        <div data-custom-site ref={siteRef} />
+      ) : (
+        <div data-custom-site dangerouslySetInnerHTML={{ __html: html }} />
+      )}
       <Script src={WIDGET_CDN_URL} strategy="lazyOnload" />
     </div>
   );
