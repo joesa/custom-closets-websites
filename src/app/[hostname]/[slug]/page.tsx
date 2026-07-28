@@ -23,13 +23,14 @@ import { isAdminBypassRequest } from "@/lib/adminBypass";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import ServicesProductGrid from "@/components/ServicesProductGrid";
+import { PUBLIC_API_URL } from "@/lib/urls";
 
 export default async function SubPage({
   params,
   searchParams,
 }: {
   params: Promise<{ hostname: string; slug: string }>;
-  searchParams?: Promise<{ draft?: string; admin_bypass?: string }>;
+  searchParams?: Promise<{ draft?: string; admin_bypass?: string; edit_token?: string }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearch = searchParams ? await searchParams : {};
@@ -51,7 +52,7 @@ export default async function SubPage({
     notFound();
   }
 
-  if (gate === "pending") {
+  if (gate === "pending" || gate === "edit_locked") {
     return (
       <>
         <LocalSEO
@@ -59,7 +60,7 @@ export default async function SubPage({
           brandName={config.brandName}
           url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
         />
-        <PendingApproval />
+        <PendingApproval reason={gate === "edit_locked" ? "edit_locked" : "pending"} />
       </>
     );
   }
@@ -176,6 +177,15 @@ export default async function SubPage({
           engagementModel={config.engagementModel || 'quote'}
           isDraftPreview={!!draftConfig}
           previewQuery={previewQuery}
+          editInPlace={Boolean(config.editInPlace) && isAdminBypass}
+          tenantId={config.tenantId || config.widgetId}
+          pagePath={`/${resolvedParams.slug}`}
+          apiBaseUrl={PUBLIC_API_URL}
+          editToken={
+            typeof resolvedSearch.edit_token === 'string'
+              ? resolvedSearch.edit_token
+              : null
+          }
         />
       </>
     );

@@ -34,6 +34,7 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
     .select(`
       hostname,
       tenants (
+        id,
         widget_id,
         site_status,
         validation_status,
@@ -58,6 +59,7 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
           quiz_config,
           engagement_model,
           render_mode,
+          edit_in_place,
           custom_config,
           custom_config_draft
         )

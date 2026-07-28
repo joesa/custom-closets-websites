@@ -178,6 +178,8 @@ export interface BrandConfig {
   seo: SEOConfig;
   beforeAfter?: BeforeAfterConfig;
   widgetId: string;
+  /** Tenants.id — used by admin edit-in-place save APIs. */
+  tenantId?: string;
   defaultRoom?: string;
   siteStatus?: string;
   /** Agentic site-validation gate result (see siteGate.ts) — 'failed' forces
@@ -239,6 +241,11 @@ export interface BrandConfig {
    * = 'engine' — every other site is unaffected.
    */
   renderMode?: 'engine' | 'custom';
+  /**
+   * When true, public visitors see a holding page; admin_bypass still paints
+   * the site so operators can use edit-in-place.
+   */
+  editInPlace?: boolean;
   /** Published custom-site artifact (live when renderMode = 'custom'). */
   customConfig?: import('@/lib/customSite').CustomSiteConfig | null;
   /** Draft artifact for admin preview (?draft=1 + admin_bypass). */

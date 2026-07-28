@@ -33,10 +33,12 @@ type SiteConfigRow = {
   quiz_config?: BrandConfig['quiz'] | null;
   engagement_model?: string | null;
   render_mode?: string | null;
+  edit_in_place?: boolean | null;
   custom_config?: CustomSiteConfig | null;
   custom_config_draft?: CustomSiteConfig | null;
 };
 type TenantRow = {
+  id?: string;
   widget_id?: string;
   site_status?: string;
   validation_status?: string | null;
@@ -85,6 +87,7 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     seo: configRow.seo_config,
     beforeAfter: configRow.before_after_config ?? undefined,
     widgetId: tenant.widget_id ?? '',
+    tenantId: tenant.id ?? undefined,
     defaultRoom: configRow.default_room,
     layoutStyle: configRow.layout_style,
     siteStatus: tenant.site_status,
@@ -101,6 +104,7 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     themeTokens: configRow.theme_tokens ?? undefined,
     signature,
     renderMode: configRow.render_mode === 'custom' ? 'custom' : 'engine',
+    editInPlace: Boolean(configRow.edit_in_place),
     customConfig: isCustomSiteConfig(configRow.custom_config) ? configRow.custom_config : null,
     customConfigDraft: isCustomSiteConfig(configRow.custom_config_draft)
       ? configRow.custom_config_draft

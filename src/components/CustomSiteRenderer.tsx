@@ -13,6 +13,7 @@ import {
   sanitizeCustomHtml,
   scopeCss,
 } from '@/lib/customSite';
+import EditInPlaceLayer from '@/components/EditInPlaceLayer';
 
 const SCOPE = '[data-custom-site]';
 
@@ -111,11 +112,15 @@ function withCurrentPreviewParams(href: string, search: string): string | null {
   const keep = new URLSearchParams(search);
   const draft = keep.get('draft');
   const bypass = keep.get('admin_bypass');
-  if (!draft && !bypass) return null;
+  const editToken = keep.get('edit_token');
+  if (!draft && !bypass && !editToken) return null;
 
   if (draft && !url.searchParams.has('draft')) url.searchParams.set('draft', draft);
   if (bypass && !url.searchParams.has('admin_bypass')) {
     url.searchParams.set('admin_bypass', bypass);
+  }
+  if (editToken && !url.searchParams.has('edit_token')) {
+    url.searchParams.set('edit_token', editToken);
   }
   return `${url.pathname}${url.search}${url.hash}`;
 }
@@ -133,6 +138,11 @@ export default function CustomSiteRenderer({
   engagementModel = 'quote',
   isDraftPreview = false,
   previewQuery = null,
+  editInPlace = false,
+  tenantId = '',
+  pagePath = '/',
+  apiBaseUrl = PUBLIC_API_URL,
+  editToken = null,
 }: {
   custom: CustomSiteConfig;
   page: CustomPageArtifact;
@@ -142,6 +152,12 @@ export default function CustomSiteRenderer({
   isDraftPreview?: boolean;
   /** Query string (e.g. "draft=1&admin_bypass=…") appended to internal links. */
   previewQuery?: string | null;
+  /** Admin bypass + site_configs.edit_in_place — show WYSIWYG chrome. */
+  editInPlace?: boolean;
+  tenantId?: string;
+  pagePath?: string;
+  apiBaseUrl?: string;
+  editToken?: string | null;
 }) {
   const mode = custom.mode === 'iframe' ? 'iframe' : 'inline';
   const model: EngagementModel =
@@ -151,9 +167,10 @@ export default function CustomSiteRenderer({
       ? engagementModel
       : 'quote';
   const rootRef = useRef<HTMLDivElement>(null);
+  const showEditor = editInPlace && mode === 'inline' && Boolean(tenantId);
 
   useEffect(() => {
-    if (!isDraftPreview) return;
+    if (!isDraftPreview && !editInPlace) return;
     const root = rootRef.current;
     if (!root) return;
 
@@ -162,6 +179,10 @@ export default function CustomSiteRenderer({
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const anchor = (event.target as Element | null)?.closest?.('a');
       if (!anchor || !root.contains(anchor)) return;
+      // While editing text, don't navigate.
+      if (editInPlace && (event.target as HTMLElement | null)?.isContentEditable) {
+        return;
+      }
       const href = anchor.getAttribute('href');
       if (!href) return;
       const next = withCurrentPreviewParams(href, window.location.search);
@@ -172,13 +193,18 @@ export default function CustomSiteRenderer({
 
     root.addEventListener('click', onClick);
     return () => root.removeEventListener('click', onClick);
-  }, [isDraftPreview, page.html]);
+  }, [isDraftPreview, editInPlace, page.html]);
 
   if (mode === 'iframe') {
     const srcDoc = buildSrcDoc(page, custom, widgetId, model, previewQuery);
     return (
       <div className="relative min-h-screen w-full" ref={rootRef}>
         {isDraftPreview ? <DraftBanner /> : null}
+        {editInPlace ? (
+          <div className="sticky top-0 z-[10000] bg-amber-500 px-4 py-2 text-center text-sm font-semibold text-black">
+            Edit in place requires Inline mode (this site is iframe). Switch mode in Custom build.
+          </div>
+        ) : null}
         <iframe
           title={page.title || 'Custom site'}
           srcDoc={srcDoc}
@@ -194,7 +220,17 @@ export default function CustomSiteRenderer({
 
   return (
     <div className="relative min-h-screen w-full" ref={rootRef}>
-      {isDraftPreview ? <DraftBanner /> : null}
+      {showEditor ? (
+        <EditInPlaceLayer
+          rootRef={rootRef}
+          tenantId={tenantId}
+          pagePath={pagePath}
+          apiBaseUrl={apiBaseUrl}
+          editToken={editToken}
+        />
+      ) : isDraftPreview ? (
+        <DraftBanner />
+      ) : null}
       {css ? <style dangerouslySetInnerHTML={{ __html: css }} /> : null}
       <div data-custom-site dangerouslySetInnerHTML={{ __html: html }} />
       <Script src={WIDGET_CDN_URL} strategy="lazyOnload" />

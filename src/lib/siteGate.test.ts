@@ -42,4 +42,14 @@ describe('getSiteGate', () => {
     const cfg = { ...config('active'), validationStatus: 'failed' };
     expect(getSiteGate(cfg, true)).toBe('ok');
   });
+
+  it('holds the public site offline while editInPlace is on', () => {
+    const cfg = { ...config('active'), editInPlace: true };
+    expect(getSiteGate(cfg, false)).toBe('edit_locked');
+  });
+
+  it('admin bypass still opens the site during editInPlace', () => {
+    const cfg = { ...config('active'), editInPlace: true };
+    expect(getSiteGate(cfg, true)).toBe('ok');
+  });
 });
