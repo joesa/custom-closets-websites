@@ -33,9 +33,16 @@ function tokenStorageKey(tenantId: string) {
   return `eip-token:${tenantId}`;
 }
 
+function editModeStorageKey(tenantId: string) {
+  return `eip-edit-mode:${tenantId}`;
+}
+
 /**
  * Admin-only overlay: click text to edit, click images to replace/remove,
  * Save posts serialized HTML to the dashboard edit-in-place save API.
+ *
+ * Edit mode is a manual toggle (default Off) so admins can navigate links
+ * without accidentally entering contenteditable on every click.
  *
  * Keeps a dirtyHtml buffer so Save never depends on React re-seeding
  * dangerouslySetInnerHTML (which would wipe contenteditable changes).
@@ -50,10 +57,19 @@ export default function EditInPlaceLayer({
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [resolvedToken, setResolvedToken] = useState<string | null>(editToken);
+  const [editMode, setEditMode] = useState(false);
   const dirtyHtmlRef = useRef<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const replaceImgRef = useRef<HTMLImageElement | null>(null);
   const addModeRef = useRef(false);
+
+  useEffect(() => {
+    try {
+      setEditMode(sessionStorage.getItem(editModeStorageKey(tenantId)) === '1');
+    } catch {
+      setEditMode(false);
+    }
+  }, [tenantId]);
 
   useEffect(() => {
     if (editToken) {
@@ -86,6 +102,38 @@ export default function EditInPlaceLayer({
     return html;
   }, [siteRef]);
 
+  const clearActiveEditing = useCallback(() => {
+    const root = siteRef.current;
+    if (!root) return;
+    root.querySelectorAll('[contenteditable="true"]').forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      node.contentEditable = 'false';
+      node.classList.remove('eip-editing');
+    });
+  }, [siteRef]);
+
+  const setEditModePersist = useCallback(
+    (next: boolean) => {
+      if (!next) {
+        clearActiveEditing();
+        captureHtml();
+      }
+      setEditMode(next);
+      try {
+        sessionStorage.setItem(editModeStorageKey(tenantId), next ? '1' : '0');
+      } catch {
+        /* ignore */
+      }
+      setStatus('idle');
+      setMessage(
+        next
+          ? 'Edit mode ON — click text or images. Turn Off to navigate links.'
+          : 'Edit mode OFF — links navigate normally. Turn On to edit.'
+      );
+    },
+    [captureHtml, clearActiveEditing, tenantId]
+  );
+
   const save = useCallback(async () => {
     if (!tenantId || !apiBaseUrl) {
       setStatus('error');
@@ -97,6 +145,7 @@ export default function EditInPlaceLayer({
       setMessage('Missing edit token — reopen from admin Custom build.');
       return;
     }
+    clearActiveEditing();
     const html = captureHtml();
     if (!html.trim()) {
       setStatus('error');
@@ -131,6 +180,7 @@ export default function EditInPlaceLayer({
     apiBaseUrl,
     authHeaders,
     captureHtml,
+    clearActiveEditing,
     pagePath,
     resolvedToken,
     tenantId,
@@ -159,6 +209,12 @@ export default function EditInPlaceLayer({
   useEffect(() => {
     const root = siteRef.current;
     if (!root) return;
+    root.dataset.eipEdit = editMode ? '1' : '0';
+  }, [editMode, siteRef]);
+
+  useEffect(() => {
+    const root = siteRef.current;
+    if (!root || !editMode) return;
 
     const onClick = (event: MouseEvent) => {
       const target = event.target as Element | null;
@@ -202,6 +258,7 @@ export default function EditInPlaceLayer({
       if (el.closest('.svc-drawer-wrap .side-drawer')) return;
 
       event.preventDefault();
+      event.stopPropagation();
       el.contentEditable = 'true';
       el.classList.add('eip-editing');
       el.focus();
@@ -239,7 +296,7 @@ export default function EditInPlaceLayer({
 
     root.addEventListener('click', onClick, true);
     return () => root.removeEventListener('click', onClick, true);
-  }, [captureHtml, siteRef]);
+  }, [captureHtml, editMode, siteRef]);
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -284,6 +341,19 @@ export default function EditInPlaceLayer({
         </span>
         <button
           type="button"
+          role="switch"
+          aria-checked={editMode}
+          onClick={() => setEditModePersist(!editMode)}
+          className={`px-3 py-1 rounded text-xs font-bold ${
+            editMode
+              ? 'bg-black text-amber-300 ring-2 ring-black'
+              : 'bg-white/90 text-black border border-black/30'
+          }`}
+        >
+          Edit: {editMode ? 'ON' : 'OFF'}
+        </button>
+        <button
+          type="button"
           onClick={() => void save()}
           disabled={status === 'saving' || !resolvedToken}
           className="px-3 py-1 rounded bg-black text-amber-300 text-xs font-semibold disabled:opacity-50"
@@ -292,12 +362,13 @@ export default function EditInPlaceLayer({
         </button>
         <button
           type="button"
+          disabled={!editMode}
           onClick={() => {
             addModeRef.current = true;
             replaceImgRef.current = null;
             fileRef.current?.click();
           }}
-          className="px-3 py-1 rounded bg-black/80 text-white text-xs font-semibold"
+          className="px-3 py-1 rounded bg-black/80 text-white text-xs font-semibold disabled:opacity-40"
         >
           Add image
         </button>
@@ -309,7 +380,9 @@ export default function EditInPlaceLayer({
           Reload
         </button>
         <span className="text-xs opacity-90 flex-1 min-w-[12rem]">
-          Click text to edit · click image → replace/remove · Save when done · turn OFF in admin
+          {editMode
+            ? 'Edit ON — click text / images. Turn Off to use nav links.'
+            : 'Edit OFF — click links to change pages. Turn On to edit.'}
         </span>
         {message ? (
           <span
@@ -333,7 +406,8 @@ export default function EditInPlaceLayer({
           outline: 2px solid #f59e0b !important;
           outline-offset: 2px;
         }
-        [data-custom-site] img { cursor: pointer; }
+        [data-custom-site][data-eip-edit="1"] img { cursor: pointer; }
+        [data-custom-site][data-eip-edit="1"] a { cursor: text; }
       `}</style>
     </>
   );

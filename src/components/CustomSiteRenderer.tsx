@@ -191,7 +191,8 @@ export default function CustomSiteRenderer({
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const anchor = (event.target as Element | null)?.closest?.('a');
       if (!anchor || !root.contains(anchor)) return;
-      if (editInPlace && (event.target as HTMLElement | null)?.isContentEditable) {
+      // While a contenteditable field is active, don't hijack the click for nav.
+      if ((event.target as HTMLElement | null)?.isContentEditable) {
         return;
       }
       const href = anchor.getAttribute('href');
