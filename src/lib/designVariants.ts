@@ -240,6 +240,9 @@ const THEME_ARCHETYPE: Record<string, DesignArchetype> = {
   'fleet-logistics': 'modern',
   'media-creative': 'modern',
   'gourmet-warm': 'editorial',
+
+  // Bespoke demo themes
+  'garage-loadrated': 'bold',
 };
 
 /** Build a full weight vector of `len` with a floor of 1 plus per-index boosts. */

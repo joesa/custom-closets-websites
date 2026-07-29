@@ -614,6 +614,25 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
         accentColor: 'text-red-800',
       };
 
+    // ── Bespoke demo themes ──
+    case 'garage-loadrated':
+      // Ironclad demo: powder-coat gray ground, graphite ink, one tool-red
+      // accent. Light industrial — deliberately outside the dark
+      // black-plus-acid cluster the other garage themes share.
+      return {
+        pageBackground: 'bg-[#eceef0]',
+        textPrimary: 'text-zinc-900',
+        textSecondary: 'text-zinc-600',
+        headingFont: 'font-archivo font-bold tracking-tight',
+        bodyFont: 'font-space-grotesk',
+        containerClasses: 'max-w-7xl mx-auto px-6 py-24',
+        button: 'bg-red-700 text-white hover:bg-red-800 transition-colors rounded-sm px-8 py-4 font-semibold',
+        productCard: 'group overflow-hidden rounded-sm border border-zinc-300 bg-white hover:border-red-700 transition-colors',
+        productImageHover: 'transition-transform duration-500 group-hover:scale-[1.03]',
+        accentColor: 'text-red-700',
+        heroGradient: 'bg-gradient-to-t from-zinc-950/70 via-zinc-900/20 to-transparent',
+      };
+
     default:
       return coreThemeStyles(theme);
   }
@@ -691,6 +710,9 @@ const THEME_VOICE: Record<ThemeType, VoiceFamily> = {
   'fleet-logistics': 'modernSans',
   'media-creative': 'modernSans',
   'gourmet-warm': 'editorial',
+
+  // Bespoke demo themes
+  'garage-loadrated': 'boldDisplay',
 };
 
 // Interchangeable heading typefaces per voice family (all carry the same mood).
@@ -839,7 +861,11 @@ const THEME_ACCENTS: Record<ThemeType, string[]> = {
   'wellness-calm':       ['zen', 'teal', 'sky'],
   'fleet-logistics':     ['blue', 'indigo', 'slate'],
   'media-creative':      ['fuchsia', 'cyan', 'purple'],
-  'gourmet-warm':        ['amber', 'bronze', 'red'],};
+  'gourmet-warm':        ['amber', 'bronze', 'red'],
+
+  // Bespoke demo themes: a single-swatch pool so every seed resolves to the
+  // same accent — the one tool-red is the brand, not a rotation axis.
+  'garage-loadrated':    ['red'],};
 
 /** Seed-stable accent swatch for a theme (deterministic; null when no seed). */
 function resolveAccent(theme: ThemeType, seed: string): AccentSwatch | null {
@@ -995,6 +1021,9 @@ const SECTION_TOKENS: Record<ThemeType, SectionTokens> = {
   'fleet-logistics':     { isDark: true,  surface: 'bg-slate-800',        surfaceBorder: 'border-slate-700',       accent: 'text-amber-400',  accentBg: 'bg-amber-500',  accentText: 'text-slate-900' },
   'media-creative':      { isDark: true,  surface: 'bg-zinc-900',         surfaceBorder: 'border-zinc-800',        accent: 'text-fuchsia-400', accentBg: 'bg-fuchsia-500', accentText: 'text-black' },
   'gourmet-warm':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-amber-900/10',    accent: 'text-red-800',    accentBg: 'bg-red-800',    accentText: 'text-white' },
+
+  // Bespoke demo themes
+  'garage-loadrated':    { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-zinc-300',        accent: 'text-red-700',    accentBg: 'bg-red-700',    accentText: 'text-white' },
 };
 
 export function getSectionTokens(theme: ThemeType, seed = '', tokens?: ThemeTokenSelection | null): SectionTokens {
@@ -1085,6 +1114,8 @@ export function getThemePrimaryHex(theme: ThemeType, seed = '', tokens?: ThemeTo
       return '#0f766e';
     case 'office-executive':
       return '#fbbf24';
+    case 'garage-loadrated':
+      return '#b91c1c';
     default:
       return '#2d2d2d';
   }
