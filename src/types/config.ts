@@ -51,7 +51,10 @@ export type ThemeType =
   | 'wellness-calm'
   | 'fleet-logistics'
   | 'media-creative'
-  | 'gourmet-warm';
+  | 'gourmet-warm'
+  // Bespoke demo themes — hand-assigned to a single tenant, never offered by
+  // the provisioner's theme catalog (keep them out of sitePresentationCatalog).
+  | 'garage-loadrated';
 
 export interface ProductDetails {
   subtitle: string;
