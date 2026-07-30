@@ -734,20 +734,25 @@ const THEME_VOICE: Record<ThemeType, VoiceFamily> = {
 };
 
 // Interchangeable heading typefaces per voice family (all carry the same mood).
+// Syne and Inter are absent on purpose: FULL_REDESIGN_DESIGN_SYSTEM bans both as
+// by-habit defaults, and a hash-picked pool is by-habit selection by definition.
+// Their slots are overwritten in place rather than deleted — pickVoice() indexes
+// these arrays by a per-tenant hash, so changing a length reshuffles typography
+// on already-published sites.
 const HEADING_VOICE: Record<VoiceFamily, string[]> = {
   luxe: ['font-cormorant', 'font-playfair', 'font-fraunces', 'font-dm-serif'],
   editorial: ['font-dm-serif', 'font-fraunces', 'font-playfair', 'font-lora', 'font-libre-baskerville'],
-  modernSans: ['font-space-grotesk', 'font-archivo', 'font-manrope', 'font-syne'],
-  boldDisplay: ['font-archivo', 'font-syne', 'font-space-grotesk'],
-  playful: ['font-syne', 'font-fraunces', 'font-archivo', 'font-space-grotesk'],
+  modernSans: ['font-space-grotesk', 'font-archivo', 'font-manrope', 'font-space-grotesk'],
+  boldDisplay: ['font-archivo', 'font-archivo', 'font-space-grotesk'],
+  playful: ['font-fraunces', 'font-fraunces', 'font-archivo', 'font-space-grotesk'],
 };
 
 // Body typefaces per voice family — only text-readable faces (no display serifs).
 const BODY_VOICE: Record<VoiceFamily, string[]> = {
   luxe: ['font-manrope', 'font-lora', 'font-libre-baskerville'],
   editorial: ['font-lora', 'font-libre-baskerville'],
-  modernSans: ['font-manrope', 'font-inter'],
-  boldDisplay: ['font-space-grotesk', 'font-inter', 'font-manrope'],
+  modernSans: ['font-manrope', 'font-manrope'],
+  boldDisplay: ['font-space-grotesk', 'font-manrope', 'font-manrope'],
   playful: ['font-manrope', 'font-space-grotesk'],
 };
 
@@ -823,6 +828,14 @@ const SWATCH: Record<string, AccentSwatch> = {
   slate:   { textLight: 'text-slate-600',   textDark: 'text-slate-300',   bg: 'bg-slate-700',   on: 'text-white',      hex: '#475569' },
   zen:     { textLight: 'text-[#7d8276]',   textDark: 'text-[#aeb3a6]',   bg: 'bg-[#5b6157]',   on: 'text-white',      hex: '#7d8276' },
   brass:   { textLight: 'text-[#8a7256]',   textDark: 'text-[#c2ab8c]',   bg: 'bg-[#8a7256]',   on: 'text-white',      hex: '#8a7256' },
+  // Mixed rather than lifted from Tailwind's default ramp, so an accent reads as
+  // a chosen colour instead of a framework preset. Offered to new builds in place
+  // of indigo/violet/purple/fuchsia/cyan (see SWATCH_TOKENS in the dashboard).
+  oxblood: { textLight: 'text-[#6b2733]',   textDark: 'text-[#d99aa4]',   bg: 'bg-[#6b2733]',   on: 'text-white',      hex: '#6b2733' },
+  pine:    { textLight: 'text-[#2f4f43]',   textDark: 'text-[#9ec4b4]',   bg: 'bg-[#2f4f43]',   on: 'text-white',      hex: '#2f4f43' },
+  clay:    { textLight: 'text-[#96482f]',   textDark: 'text-[#e0a48c]',   bg: 'bg-[#96482f]',   on: 'text-white',      hex: '#96482f' },
+  denim:   { textLight: 'text-[#35506b]',   textDark: 'text-[#a8c0da]',   bg: 'bg-[#35506b]',   on: 'text-white',      hex: '#35506b' },
+  ochre:   { textLight: 'text-[#8a6a1f]',   textDark: 'text-[#d9be7a]',   bg: 'bg-[#8a6a1f]',   on: 'text-white',      hex: '#8a6a1f' },
 };
 
 const THEME_ACCENTS: Record<ThemeType, string[]> = {
