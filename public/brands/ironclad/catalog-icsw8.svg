@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <!-- Ironclad catalog plate — drawn in-repo, matches the shop-elevation style.
+       Safe zone keeps content visible under 1:1 and 3:4 masonry crops. -->
+  <rect width="1200" height="1500" fill="#eceef0"/>
+  <rect x="90" y="185" width="10" height="66" fill="#b91c1c"/>
+  <text x="126" y="216" font-family="Arial, Helvetica, sans-serif" font-size="30" letter-spacing="6" fill="#71717a">SLATWALL SYSTEM</text>
+  <text x="122" y="266" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="bold" letter-spacing="2" fill="#27272a">IC-SW8</text>
+
+  <g stroke="#27272a" stroke-width="4" fill="#f4f5f7">
+    <rect x="270" y="380" width="660" height="640"/>
+  </g>
+  <g stroke="#a1a1aa" stroke-width="3">
+    <line x1="270" y1="460" x2="930" y2="460"/><line x1="270" y1="476" x2="930" y2="476"/>
+    <line x1="270" y1="540" x2="930" y2="540"/><line x1="270" y1="556" x2="930" y2="556"/>
+    <line x1="270" y1="620" x2="930" y2="620"/><line x1="270" y1="636" x2="930" y2="636"/>
+    <line x1="270" y1="700" x2="930" y2="700"/><line x1="270" y1="716" x2="930" y2="716"/>
+    <line x1="270" y1="780" x2="930" y2="780"/><line x1="270" y1="796" x2="930" y2="796"/>
+    <line x1="270" y1="860" x2="930" y2="860"/><line x1="270" y1="876" x2="930" y2="876"/>
+    <line x1="270" y1="940" x2="930" y2="940"/><line x1="270" y1="956" x2="930" y2="956"/>
+  </g>
+  <g stroke="#27272a" stroke-width="5" fill="none">
+    <path d="M420 468 v90 a26 26 0 0 0 52 0"/>
+    <path d="M700 548 v70 h130 v40"/>
+    <path d="M560 708 v110 a30 30 0 0 0 60 0 a30 30 0 0 0 60 0 v-40"/>
+  </g>
+  <line x1="270" y1="1080" x2="930" y2="1080" stroke="#b91c1c" stroke-width="2.5"/>
+  <line x1="270" y1="1066" x2="270" y2="1094" stroke="#b91c1c" stroke-width="2"/>
+  <line x1="930" y1="1066" x2="930" y2="1094" stroke="#b91c1c" stroke-width="2"/>
+  <rect x="430" y="1058" width="340" height="44" fill="#eceef0"/>
+  <text x="600" y="1090" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="bold" letter-spacing="2" fill="#b91c1c">8&#8217;-0&#8221; SECTION</text>
+  <line x1="90" y1="1180" x2="1110" y2="1180" stroke="#27272a" stroke-width="3"/>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="27" letter-spacing="2" fill="#52525b">
+    <text x="90" y="1232">ANODIZED ALUMINUM RAIL</text>
+    <text x="90" y="1282">220 LB PER SQ FT</text>
+    <text x="90" y="1332">TOOLS REPOSITION WITHOUT TOOLS</text>
+  </g>
+</svg>
