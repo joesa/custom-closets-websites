@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1030" viewBox="0 0 2400 1030">
+  <!-- Lumina — the SAME 6'-6" reach-in niche as wall-before.svg, as installed.
+       Wall extents, floor line, ceiling line, corner returns and the overall
+       dimension lines share exact coordinates with the before drawing so the
+       compare slider reads as one room. Canvas is 2400x1030 (21:9) to match
+       the before/after slider's desktop crop; content is authored at 2400x1200
+       and uniformly scaled/centered via the outer <g> below. -->
+  <defs>
+    <marker id="arrowLa" markerWidth="12" markerHeight="10" refX="2" refY="5" orient="auto">
+      <path d="M12,0 L0,5 L12,10 z" fill="#8a7256"/>
+    </marker>
+    <marker id="arrowRa" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto">
+      <path d="M0,0 L12,5 L0,10 z" fill="#8a7256"/>
+    </marker>
+  </defs>
+
+  <rect width="2400" height="1030" fill="#f5efe4"/>
+  <g transform="translate(170.5 0) scale(0.858)">
+
+  <!-- floor line + ground hatch (identical to before) -->
+  <line x1="260" y1="980" x2="2140" y2="980" stroke="#241f1a" stroke-width="4"/>
+  <g stroke="#a89a86" stroke-width="2">
+    <line x1="300" y1="980" x2="280" y2="1006"/><line x1="400" y1="980" x2="380" y2="1006"/>
+    <line x1="500" y1="980" x2="480" y2="1006"/><line x1="600" y1="980" x2="580" y2="1006"/>
+    <line x1="700" y1="980" x2="680" y2="1006"/><line x1="800" y1="980" x2="780" y2="1006"/>
+    <line x1="900" y1="980" x2="880" y2="1006"/><line x1="1000" y1="980" x2="980" y2="1006"/>
+    <line x1="1100" y1="980" x2="1080" y2="1006"/><line x1="1200" y1="980" x2="1180" y2="1006"/>
+    <line x1="1300" y1="980" x2="1280" y2="1006"/><line x1="1400" y1="980" x2="1380" y2="1006"/>
+    <line x1="1500" y1="980" x2="1480" y2="1006"/><line x1="1600" y1="980" x2="1580" y2="1006"/>
+    <line x1="1700" y1="980" x2="1680" y2="1006"/><line x1="1800" y1="980" x2="1780" y2="1006"/>
+    <line x1="1900" y1="980" x2="1880" y2="1006"/><line x1="2000" y1="980" x2="1980" y2="1006"/>
+    <line x1="2100" y1="980" x2="2080" y2="1006"/>
+  </g>
+
+  <!-- wall extents + corner returns (identical) -->
+  <line x1="380" y1="190" x2="380" y2="980" stroke="#5a4f42" stroke-width="2"/>
+  <line x1="2020" y1="190" x2="2020" y2="980" stroke="#5a4f42" stroke-width="2"/>
+  <line x1="380" y1="190" x2="2020" y2="190" stroke="#5a4f42" stroke-width="2"/>
+  <path d="M380 230 h34 M380 230 v-34" stroke="#5a4f42" stroke-width="2" fill="none"/>
+  <path d="M2020 230 h-34 M2020 230 v-34" stroke="#5a4f42" stroke-width="2" fill="none"/>
+
+  <!-- overall width dimension (identical position to before) -->
+  <line x1="380" y1="140" x2="2020" y2="140" stroke="#8a7256" stroke-width="2.5" marker-start="url(#arrowLa)" marker-end="url(#arrowRa)"/>
+  <rect x="1040" y="112" width="320" height="52" fill="#f5efe4"/>
+  <text x="1200" y="149" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="bold" letter-spacing="3" fill="#8a7256">6&#8217;-6&#8221; NICHE WIDTH</text>
+
+  <!-- overall height dimension (identical position to before) -->
+  <line x1="300" y1="190" x2="300" y2="980" stroke="#8a7256" stroke-width="2.5" marker-start="url(#arrowLa)" marker-end="url(#arrowRa)"/>
+  <g transform="translate(228 585) rotate(-90)">
+    <rect x="-150" y="-26" width="300" height="50" fill="#f5efe4"/>
+    <text x="0" y="10" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" font-weight="bold" letter-spacing="3" fill="#8a7256">8&#8217;-0&#8221; CEILING HT.</text>
+  </g>
+
+  <!-- crown reveal + integrated LED strip (fixture position matches before) -->
+  <line x1="380" y1="230" x2="2020" y2="230" stroke="#5a4f42" stroke-width="2.5"/>
+  <line x1="420" y1="210" x2="1980" y2="210" stroke="#8a7256" stroke-width="3" stroke-dasharray="2 10"/>
+
+  <!-- bay dividers -->
+  <line x1="800" y1="230" x2="800" y2="980" stroke="#5a4f42" stroke-width="2"/>
+  <line x1="1400" y1="230" x2="1400" y2="980" stroke="#5a4f42" stroke-width="2"/>
+
+  <!-- ── Left bay: double-hang, adjustable ─────────────────────────── -->
+  <line x1="420" y1="340" x2="760" y2="340" stroke="#241f1a" stroke-width="4"/>
+  <line x1="420" y1="610" x2="760" y2="610" stroke="#241f1a" stroke-width="4"/>
+  <g stroke="#5a4f42" stroke-width="2" fill="#efe6d6">
+    <path d="M450 340 q10 -14 20 0 v78 h-20 z"/>
+    <path d="M510 340 q10 -14 20 0 v78 h-20 z"/>
+    <path d="M570 340 q10 -14 20 0 v78 h-20 z"/>
+    <path d="M630 340 q10 -14 20 0 v78 h-20 z"/>
+    <path d="M690 340 q10 -14 20 0 v78 h-20 z"/>
+  </g>
+  <g stroke="#5a4f42" stroke-width="2" fill="#efe6d6">
+    <path d="M450 610 q10 -14 20 0 v300 h-20 z"/>
+    <path d="M520 610 q10 -14 20 0 v300 h-20 z"/>
+    <path d="M590 610 q10 -14 20 0 v300 h-20 z"/>
+    <path d="M660 610 q10 -14 20 0 v300 h-20 z"/>
+  </g>
+
+  <!-- ── Center bay: open cubbies over a drawer stack ──────────────── -->
+  <g stroke="#5a4f42" stroke-width="2.5" fill="none">
+    <rect x="820" y="250" width="560" height="270"/>
+    <line x1="1006" y1="250" x2="1006" y2="520"/>
+    <line x1="1194" y1="250" x2="1194" y2="520"/>
+    <line x1="820" y1="385" x2="1380" y2="385"/>
+  </g>
+  <path d="M865 300 v55 M905 300 v55 M945 300 v55" stroke="#a89a86" stroke-width="2"/>
+  <path d="M1050 300 h95 M1050 330 h95" stroke="#a89a86" stroke-width="2"/>
+  <path d="M1240 420 v60 M1280 420 v60 M1320 420 v60" stroke="#a89a86" stroke-width="2"/>
+
+  <g stroke="#5a4f42" stroke-width="2.5" fill="none">
+    <rect x="820" y="520" width="560" height="115"/>
+    <rect x="820" y="635" width="560" height="115"/>
+    <rect x="820" y="750" width="560" height="115"/>
+    <rect x="820" y="865" width="560" height="115"/>
+  </g>
+  <g stroke="#8a7256" stroke-width="6" stroke-linecap="round">
+    <line x1="1080" y1="577" x2="1120" y2="577"/>
+    <line x1="1080" y1="692" x2="1120" y2="692"/>
+    <line x1="1080" y1="807" x2="1120" y2="807"/>
+    <line x1="1080" y1="922" x2="1120" y2="922"/>
+  </g>
+  <!-- jewelry drawer: compartment grid inset on the top drawer front -->
+  <g stroke="#8a7256" stroke-width="1.5" fill="none" opacity="0.85">
+    <rect x="855" y="545" width="490" height="65"/>
+    <line x1="925" y1="545" x2="925" y2="610"/><line x1="995" y1="545" x2="995" y2="610"/>
+    <line x1="1065" y1="545" x2="1065" y2="610"/><line x1="1135" y1="545" x2="1135" y2="610"/>
+    <line x1="1205" y1="545" x2="1205" y2="610"/><line x1="1275" y1="545" x2="1275" y2="610"/>
+  </g>
+
+  <!-- ── Right bay: open shelving ───────────────────────────────────── -->
+  <g stroke="#5a4f42" stroke-width="2.5">
+    <line x1="1400" y1="340" x2="2020" y2="340"/>
+    <line x1="1400" y1="480" x2="2020" y2="480"/>
+    <line x1="1400" y1="620" x2="2020" y2="620"/>
+    <line x1="1400" y1="760" x2="2020" y2="760"/>
+    <line x1="1400" y1="900" x2="2020" y2="900"/>
+  </g>
+  <g stroke="#5a4f42" stroke-width="2" fill="#efe6d6">
+    <path d="M1460 470 q40 -26 88 0 q8 18 -18 24 h-58 q-22 -6 -12 -24 z"/>
+    <path d="M1620 470 q40 -26 88 0 q8 18 -18 24 h-58 q-22 -6 -12 -24 z"/>
+    <rect x="1470" y="610" width="150" height="80" rx="4"/>
+    <rect x="1700" y="750" width="180" height="80" rx="4"/>
+  </g>
+
+  <!-- brass field notes -->
+  <g font-family="Georgia, 'Times New Roman', serif">
+    <line x1="1200" y1="212" x2="1650" y2="235" stroke="#8a7256" stroke-width="2"/>
+    <circle cx="1200" cy="212" r="5" fill="#8a7256"/>
+    <text x="1666" y="243" font-size="25" font-weight="bold" letter-spacing="1" fill="#241f1a">INTEGRATED LED <tspan fill="#5a4f42" font-weight="normal">&#8212; 2700K</tspan></text>
+
+    <line x1="1380" y1="577" x2="1650" y2="650" stroke="#8a7256" stroke-width="2"/>
+    <circle cx="1380" cy="577" r="5" fill="#8a7256"/>
+    <text x="1666" y="658" font-size="25" font-weight="bold" letter-spacing="1" fill="#241f1a">BRUSHED BRASS PULLS</text>
+
+    <line x1="1380" y1="865" x2="1650" y2="850" stroke="#8a7256" stroke-width="2"/>
+    <circle cx="1380" cy="865" r="5" fill="#8a7256"/>
+    <text x="1666" y="858" font-size="25" font-weight="bold" letter-spacing="1" fill="#241f1a">SOFT-CLOSE <tspan fill="#5a4f42" font-weight="normal">&#8212; full extension</tspan></text>
+
+    <path d="M420 340 L420 760 L150 760" stroke="#8a7256" stroke-width="2" fill="none"/>
+    <circle cx="420" cy="340" r="5" fill="#8a7256"/>
+    <text x="20" y="742" font-size="25" font-weight="bold" letter-spacing="1" fill="#241f1a">DOUBLE-HANG <tspan fill="#5a4f42" font-weight="normal">&#8212; adjustable</tspan></text>
+  </g>
+
+  <!-- title block, same position as before -->
+  <g font-family="Georgia, 'Times New Roman', serif">
+    <rect x="1640" y="1030" width="380" height="150" fill="#f5efe4" stroke="#241f1a" stroke-width="3"/>
+    <line x1="1640" y1="1078" x2="2020" y2="1078" stroke="#241f1a" stroke-width="2"/>
+    <line x1="1640" y1="1126" x2="2020" y2="1126" stroke="#241f1a" stroke-width="2"/>
+    <rect x="1640" y="1030" width="8" height="150" fill="#8a7256"/>
+    <text x="1664" y="1062" font-size="20" font-weight="bold" letter-spacing="1" fill="#241f1a">LUMINA CUSTOM CLOSETS</text>
+    <text x="1664" y="1108" font-size="17" letter-spacing="1" fill="#5a4f42">AS-BUILT ELEVATION</text>
+    <text x="1664" y="1156" font-size="17" letter-spacing="1" fill="#5a4f42">INSTALLED &#183; JOB NO. 24-0619</text>
+    <text x="1664" y="1178" font-size="15" letter-spacing="1" fill="#8a7256">SAME NICHE AS SHEET 1</text>
+  </g>
+  <text x="260" y="1140" font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="2" fill="#a89a86">NOT TO SCALE &#183; SHOP ELEVATION</text>
+  </g>
+</svg>

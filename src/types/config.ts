@@ -54,7 +54,8 @@ export type ThemeType =
   | 'gourmet-warm'
   // Bespoke demo themes — hand-assigned to a single tenant, never offered by
   // the provisioner's theme catalog (keep them out of sitePresentationCatalog).
-  | 'garage-loadrated';
+  | 'garage-loadrated'
+  | 'lumina-atelier';
 
 export interface ProductDetails {
   subtitle: string;
