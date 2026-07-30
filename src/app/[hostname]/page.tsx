@@ -16,6 +16,27 @@ import {
 import { isAdminBypassRequest } from "@/lib/adminBypass";
 import { cookies } from "next/headers";
 import { PUBLIC_API_URL } from "@/lib/urls";
+import type { Metadata } from "next";
+
+// Custom-mode sites carry per-page titles/descriptions in custom_config;
+// surface them instead of the engine's brandName-only metadata.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ hostname: string }>;
+}): Promise<Metadata> {
+  const { hostname } = await params;
+  const config = await getActiveConfig(hostname);
+  if (!config || config.renderMode !== "custom" || !isCustomSiteConfig(config.customConfig)) {
+    return {};
+  }
+  const page = getCustomPage(config.customConfig, "/");
+  if (!page) return {};
+  const meta: Metadata = {};
+  if (page.title?.trim()) meta.title = page.title.trim();
+  if (page.description?.trim()) meta.description = page.description.trim().slice(0, 160);
+  return meta;
+}
 
 export default async function Page({
   params,
