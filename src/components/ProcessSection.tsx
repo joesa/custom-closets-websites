@@ -15,10 +15,10 @@ interface ProcessSectionProps {
   fontSeed?: string;
 }
 
-type ProcessLayout = 'columns' | 'timeline' | 'stacked';
+type ProcessLayout = 'columns' | 'timeline' | 'stacked' | 'lumina-method';
 
 function resolveLayout(seed?: string): ProcessLayout {
-  const layouts: ProcessLayout[] = ['columns', 'timeline', 'stacked'];
+  const layouts: ProcessLayout[] = ['columns', 'timeline', 'stacked', 'lumina-method'];
   return layouts[hashSeed(`${seed || 'process'}::layout`) % layouts.length];
 }
 
@@ -29,18 +29,41 @@ export default function ProcessSection({ theme, themeTokens, process, fontSeed }
   const layout = resolveLayout(fontSeed);
 
   return (
-    <section className={`py-24 md:py-32 px-6 ${t.pageBackground}`}>
+    <section className={`py-24 md:py-32 px-6 ${t.pageBackground} ds-hairline-bottom`}>
       <div className="max-w-7xl mx-auto">
-        <div className={`${layout === 'stacked' ? 'text-left max-w-3xl' : 'text-center'} mb-16 md:mb-24`}>
+        <div className={`${layout === 'stacked' || layout === 'lumina-method' ? 'text-left max-w-3xl' : 'text-center'} mb-16 md:mb-24`}>
+          {layout === 'lumina-method' && (
+            <p className="ds-eyebrow mb-4">Method</p>
+          )}
           <h2 className={`text-3xl md:text-5xl ${t.headingFont} ${t.textPrimary}`}>
             {process.title}
           </h2>
           {process.subtitle ? (
-            <p className={`text-sm mt-4 ${t.textSecondary}`}>{process.subtitle}</p>
+            <p className={`text-base mt-4 ${t.textSecondary}`}>{process.subtitle}</p>
           ) : null}
         </div>
 
-        {layout === 'timeline' ? (
+        {layout === 'lumina-method' ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ds-step-counter">
+            {process.steps.map((step, idx) => (
+              <motion.article
+                key={`${idx}-${step.number}`}
+                initial={motionInitial(motionReady, { opacity: 0, y: 24 })}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.6, delay: idx * 0.15 }}
+                className="ds-hairline border p-8 md:p-10 relative bg-[var(--ds-surface-raised,#faf7f1)]"
+              >
+                <h3 className={`text-2xl mb-3 ${t.headingFont} ${t.textPrimary}`}>
+                  {step.title}
+                </h3>
+                <p className={`leading-relaxed ds-body text-base ${t.textSecondary}`}>
+                  {step.description}
+                </p>
+              </motion.article>
+            ))}
+          </div>
+        ) : layout === 'timeline' ? (
           <div className="max-w-3xl mx-auto space-y-0 border-l border-black/10 dark:border-white/10 pl-8">
             {process.steps.map((step, idx) => (
               <motion.div

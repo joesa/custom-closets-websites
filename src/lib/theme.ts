@@ -15,6 +15,30 @@ export type ThemeStyles = {
   heroGradient: string;
 };
 
+/** CSS custom property values for the elevated design system.
+ * Components inject these into a <style> tag; other CSS/components consume them as var(--xxx).
+ * All values are raw CSS (no `var()` wrapping) so they compose cleanly.
+ */
+export type ThemeCssVars = {
+  '--ds-surface': string;        // page background
+  '--ds-surface-raised': string; // elevated card/panel background  
+  '--ds-ink': string;            // primary text
+  '--ds-ink-soft': string;       // secondary text
+  '--ds-mute': string;           // captions, labels, tertiary text
+  '--ds-accent': string;         // accent color (CTAs, decorations)
+  '--ds-accent-deep': string;    // hover/emphasis accent
+  '--ds-hair': string;           // subtle borders (rgba)
+  '--ds-hair-soft': string;      // barely-there dividers (rgba)
+  '--ds-heading-family': string; // heading font-family stack
+  '--ds-body-family': string;    // body font-family stack
+  '--ds-heading-tracking': string; // heading letter-spacing
+  '--ds-eyebrow-size': string;   // eyebrow font-size
+  '--ds-eyebrow-tracking': string; // eyebrow letter-spacing
+  '--ds-eyebrow-weight': string; // eyebrow font-weight
+  '--ds-section-pad': string;    // section vertical padding
+  '--ds-transition': string;     // default transition duration
+};
+
 /**
  * A "synthesized" theme selection: instead of picking one of the ~47
  * hand-authored ThemeType palettes below, a site can be assembled on the fly
@@ -1156,4 +1180,281 @@ export function getThemePrimaryHex(theme: ThemeType, seed = '', tokens?: ThemeTo
     default:
       return '#2d2d2d';
   }
+}
+
+const EXTENDED_PALETTE: Record<string, {
+  surfaceRaised: string;
+  inkSoft: string;
+  mute: string;
+  accentDeep: string;
+  hair: string;
+  hairSoft: string;
+  headingTracking: string;
+  eyebrowSize: string;
+  eyebrowTracking: string;
+  eyebrowWeight: string;
+  sectionPad: string;
+}> = {
+  // Warm light themes (luxury-minimal, classic-warm, elegant-dressing, rustic-pantry, etc.)
+  'warm-light': {
+    surfaceRaised: '#faf7f1',
+    inkSoft: '#4d453c',
+    mute: '#7a7065',
+    accentDeep: '#6e5a42',
+    hair: 'rgba(36, 31, 26, 0.14)',
+    hairSoft: 'rgba(36, 31, 26, 0.08)',
+    headingTracking: '-0.01em',
+    eyebrowSize: '11px',
+    eyebrowTracking: '0.28em',
+    eyebrowWeight: '700',
+    sectionPad: '110px',
+  },
+  // Cool light themes (modern-office, functional-utility, laundry-clean, etc.)
+  'cool-light': {
+    surfaceRaised: '#ffffff',
+    inkSoft: '#475569',
+    mute: '#64748b',
+    accentDeep: '#1e40af',
+    hair: 'rgba(15, 23, 42, 0.12)',
+    hairSoft: 'rgba(15, 23, 42, 0.06)',
+    headingTracking: '-0.02em',
+    eyebrowSize: '11px',
+    eyebrowTracking: '0.22em',
+    eyebrowWeight: '600',
+    sectionPad: '96px',
+  },
+  // Dark themes (brutalist, sleek-entertainment, sophisticated-wine, cozy-library, office-executive, etc.)
+  'dark': {
+    surfaceRaised: 'rgba(255, 255, 255, 0.06)',
+    inkSoft: 'rgba(255, 255, 255, 0.7)',
+    mute: 'rgba(255, 255, 255, 0.45)',
+    accentDeep: 'rgba(255, 255, 255, 0.9)',
+    hair: 'rgba(255, 255, 255, 0.14)',
+    hairSoft: 'rgba(255, 255, 255, 0.07)',
+    headingTracking: '-0.01em',
+    eyebrowSize: '11px',
+    eyebrowTracking: '0.24em',
+    eyebrowWeight: '700',
+    sectionPad: '104px',
+  },
+  // Playful/vibrant themes (playful-kids, creative-craft, care-comfort, etc.)
+  'playful': {
+    surfaceRaised: '#ffffff',
+    inkSoft: 'rgba(30, 30, 30, 0.7)',
+    mute: 'rgba(30, 30, 30, 0.5)',
+    accentDeep: 'rgba(30, 30, 30, 0.8)',
+    hair: 'rgba(30, 30, 30, 0.12)',
+    hairSoft: 'rgba(30, 30, 30, 0.06)',
+    headingTracking: '-0.02em',
+    eyebrowSize: '12px',
+    eyebrowTracking: '0.18em',
+    eyebrowWeight: '800',
+    sectionPad: '96px',
+  },
+  // Zen/minimal themes (minimalist-zen, wellness-calm)
+  'zen': {
+    surfaceRaised: '#ffffff',
+    inkSoft: 'rgba(42, 43, 42, 0.6)',
+    mute: 'rgba(42, 43, 42, 0.4)',
+    accentDeep: 'rgba(42, 43, 42, 0.7)',
+    hair: 'rgba(42, 43, 42, 0.10)',
+    hairSoft: 'rgba(42, 43, 42, 0.05)',
+    headingTracking: '0.08em',
+    eyebrowSize: '10px',
+    eyebrowTracking: '0.32em',
+    eyebrowWeight: '500',
+    sectionPad: '120px',
+  },
+};
+
+const THEME_PALETTE_KEY: Record<string, string> = {
+  'luxury-minimal': 'warm-light',
+  'classic-warm': 'warm-light',
+  'elegant-dressing': 'warm-light',
+  'rustic-pantry': 'warm-light',
+  'coastal-climate': 'warm-light',
+  'historic-classic': 'warm-light',
+  'lumina-atelier': 'warm-light',
+  'warm-handyman': 'warm-light',
+  'rich-flooring': 'dark',
+  'artisan-wood': 'warm-light',
+  'gourmet-warm': 'warm-light',
+  'mudroom-family': 'warm-light',
+  'pantry-fresh': 'warm-light',
+  'cozy-library': 'dark',
+  'sophisticated-wine': 'dark',
+  'wine-cellar': 'dark',
+  'hearth-warm': 'dark',
+  'modern-office': 'cool-light',
+  'functional-utility': 'cool-light',
+  'laundry-clean': 'cool-light',
+  'commercial-pro': 'cool-light',
+  'fresh-clean': 'cool-light',
+  'clean-move': 'cool-light',
+  'appliance-pro': 'cool-light',
+  'eco-solar': 'cool-light',
+  'winter-ready': 'cool-light',
+  'fleet-logistics': 'cool-light',
+  'window-light': 'cool-light',
+  'pool-resort': 'cool-light',
+  'brutalist': 'dark',
+  'sleek-entertainment': 'dark',
+  'garage-industrial': 'dark',
+  'office-executive': 'dark',
+  'media-theater': 'dark',
+  'swift-mobile': 'dark',
+  'urban-reclaim': 'dark',
+  'garage-smart': 'dark',
+  'home-guardian': 'dark',
+  'bold-remodel': 'dark',
+  'media-creative': 'dark',
+  'garage-loadrated': 'cool-light',
+  'playful-kids': 'playful',
+  'creative-craft': 'playful',
+  'kids-playful': 'playful',
+  'care-comfort': 'playful',
+  'pastoral-pet': 'playful',
+  'event-festive': 'playful',
+  'minimalist-zen': 'zen',
+  'wellness-calm': 'zen',
+  'stone-masonry': 'cool-light',
+  'seasonal-outdoor': 'cool-light',
+  'luxury-gallery': 'warm-light',
+};
+
+/** Map a Tailwind bg-xxx class to a raw hex/rgba CSS value. */
+export function twBgToHex(twClass: string): string {
+  // Bracket values: bg-[#abc123] → #abc123
+  const bracket = twClass.match(/bg-\[([^\]]+)\]/);
+  if (bracket) return bracket[1];
+  // Named Tailwind colors — cover the ones actually used in this file
+  const MAP: Record<string, string> = {
+    'bg-white': '#ffffff',
+    'bg-black': '#000000',
+    'bg-slate-50': '#f8fafc',
+    'bg-slate-900': '#0f172a',
+    'bg-zinc-950': '#09090b',
+    'bg-sky-50': '#f0f9ff',
+    'bg-purple-50': '#faf5ff',
+    'bg-stone-200': '#e7e5e4',
+    'bg-rose-50': '#fff1f2',
+    'bg-emerald-50/40': '#ecfdf540',
+    'bg-cyan-50': '#ecfeff',
+    'bg-sky-50/40': '#f0f9ff66',
+    'bg-slate-100': '#f1f5f9',
+    'bg-neutral-50': '#fafafa',
+  };
+  // strip Tailwind modifier classes (keep only the bg- one)
+  const bgPart = twClass.split(/\s+/).find(c => c.startsWith('bg-')) || twClass;
+  return MAP[bgPart] || '#ffffff';
+}
+
+/** Map a Tailwind font-xxx utility to a CSS font-family reference. */
+export function twFontToFamily(twClass: string): string {
+  const SERIF_STACK = ', Georgia, "Times New Roman", serif';
+  const SANS_STACK = ', "Helvetica Neue", Arial, sans-serif';
+  const FAMILIES: Record<string, string> = {
+    'font-cormorant': `var(--font-cormorant)${SERIF_STACK}`,
+    'font-playfair': `var(--font-playfair)${SERIF_STACK}`,
+    'font-fraunces': `var(--font-fraunces)${SERIF_STACK}`,
+    'font-dm-serif': `var(--font-dm-serif)${SERIF_STACK}`,
+    'font-lora': `var(--font-lora)${SERIF_STACK}`,
+    'font-libre-baskerville': `var(--font-libre-baskerville)${SERIF_STACK}`,
+    'font-manrope': `var(--font-manrope)${SANS_STACK}`,
+    'font-space-grotesk': `var(--font-space-grotesk)${SANS_STACK}`,
+    'font-archivo': `var(--font-archivo)${SANS_STACK}`,
+    'font-syne': `var(--font-syne)${SANS_STACK}`,
+    'font-inter': `var(--font-inter)${SANS_STACK}`,
+  };
+  const fontPart = twClass.split(/\s+/).find(c => c.startsWith('font-') && !c.startsWith('font-light') && !c.startsWith('font-bold') && !c.startsWith('font-black') && !c.startsWith('font-medium') && !c.startsWith('font-semibold') && !c.startsWith('font-normal'));
+  return fontPart ? (FAMILIES[fontPart] || `${SANS_STACK}`) : `${SANS_STACK}`;
+}
+
+/** Map a Tailwind text-xxx class to a hex/rgba CSS value. */
+export function twTextToColor(twClass: string): string {
+  const bracket = twClass.match(/text-\[([^\]]+)\]/);
+  if (bracket) return bracket[1];
+  const MAP: Record<string, string> = {
+    'text-stone-900': '#1c1917',
+    'text-stone-500': '#78716c',
+    'text-slate-900': '#0f172a',
+    'text-slate-800': '#1e293b',
+    'text-slate-600': '#475569',
+    'text-slate-500': '#64748b',
+    'text-slate-400': '#94a3b8',
+    'text-slate-100': '#f1f5f9',
+    'text-amber-950': '#451a03',
+    'text-amber-700': '#b45309',
+    'text-zinc-900': '#18181b',
+    'text-zinc-100': '#f4f4f5',
+    'text-zinc-400': '#a1a1aa',
+    'text-zinc-600': '#52525b',
+    'text-white': '#ffffff',
+    'text-neutral-900': '#171717',
+    'text-neutral-500': '#737373',
+    'text-purple-950': '#3b0764',
+    'text-blue-600': '#2563eb',
+    'text-sky-600': '#0284c7',
+    'text-rose-500': '#f43f5e',
+    'text-cyan-400': '#22d3ee',
+    'text-emerald-700': '#047857',
+    'text-teal-700': '#0f766e',
+    'text-red-700': '#b91c1c',
+    'text-amber-800': '#92400e',
+    'text-yellow-400': '#facc15',
+    'text-amber-400': '#fbbf24',
+    'text-purple-600': '#9333ea',
+    'text-orange-400': '#fb923c',
+    'text-fuchsia-500': '#d946ef',
+    'text-fuchsia-400': '#e879f9',
+    'text-indigo-400': '#818cf8',
+    'text-emerald-400': '#34d399',
+    'text-blue-400': '#60a5fa',
+    'text-emerald-600': '#059669',
+  };
+  // handle opacity modifiers like text-amber-900/70
+  const withoutOpacity = twClass.replace(/\/\d+$/, '');
+  return MAP[withoutOpacity] || MAP[twClass] || '#1c1917';
+}
+
+/**
+ * Generate CSS custom properties for the elevated design system.
+ * Returns a ThemeCssVars object that can be serialized into a <style> tag.
+ */
+export function generateCssVars(
+  styles: ThemeStyles,
+  sectionTokens: SectionTokens,
+  theme: ThemeType,
+): ThemeCssVars {
+  const paletteKey = THEME_PALETTE_KEY[theme] || (sectionTokens.isDark ? 'dark' : 'warm-light');
+  const ext = EXTENDED_PALETTE[paletteKey] || EXTENDED_PALETTE['warm-light'];
+  const surfaceHex = twBgToHex(styles.pageBackground);
+  const accentHex = twTextToColor(styles.accentColor);
+  
+  return {
+    '--ds-surface': surfaceHex,
+    '--ds-surface-raised': ext.surfaceRaised,
+    '--ds-ink': twTextToColor(styles.textPrimary),
+    '--ds-ink-soft': ext.inkSoft,
+    '--ds-mute': ext.mute,
+    '--ds-accent': accentHex,
+    '--ds-accent-deep': ext.accentDeep,
+    '--ds-hair': ext.hair,
+    '--ds-hair-soft': ext.hairSoft,
+    '--ds-heading-family': twFontToFamily(styles.headingFont),
+    '--ds-body-family': twFontToFamily(styles.bodyFont),
+    '--ds-heading-tracking': ext.headingTracking,
+    '--ds-eyebrow-size': ext.eyebrowSize,
+    '--ds-eyebrow-tracking': ext.eyebrowTracking,
+    '--ds-eyebrow-weight': ext.eyebrowWeight,
+    '--ds-section-pad': ext.sectionPad,
+    '--ds-transition': '220ms',
+  };
+}
+
+/** Serialize ThemeCssVars to a CSS string for a <style> tag. */
+export function cssVarsToString(vars: ThemeCssVars): string {
+  return Object.entries(vars)
+    .map(([key, val]) => `  ${key}: ${val};`)
+    .join('\n');
 }

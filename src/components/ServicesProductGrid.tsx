@@ -7,6 +7,8 @@ import type { Product, ThemeType } from "@/types/config";
 import type { ThemeTokenSelection } from "@/lib/theme";
 import { getGridClasses } from "@/lib/theme";
 
+import { hashSeed } from "@/lib/designVariants";
+
 type ThemeLike = {
   headingFont: string;
   bodyFont: string;
@@ -49,23 +51,45 @@ export default function ServicesProductGrid({
 
   if (list.length === 0) return null;
 
+  const isStaggered = fontSeed && list.length >= 3 && hashSeed(`${fontSeed}::staggered-grid`) % 2 === 0;
+
+  const getStaggerClasses = (index: number) => {
+    if (!isStaggered) return "";
+    switch (index % 4) {
+      case 0:
+        return "md:col-span-7";
+      case 1:
+        return "md:col-span-5 md:mt-20";
+      case 2:
+        return "md:col-start-2 md:col-span-5 md:mt-12";
+      case 3:
+        return "md:col-span-6 md:mt-28";
+      default:
+        return "md:col-span-6";
+    }
+  };
+
   return (
     <>
       <div className="w-full">
         {heading ? (
-          <h2
-            className={`text-2xl md:text-3xl leading-tight text-balance text-center mb-10 ${theme.headingFont}`}
-          >
-            {heading}
-          </h2>
+          <div className="mb-12">
+            <p className="ds-eyebrow mb-3">Recent jobs</p>
+            <h2
+              className={`text-2xl md:text-4xl leading-tight text-balance ${theme.headingFont}`}
+            >
+              {heading}
+            </h2>
+          </div>
         ) : null}
-        <div className={getGridClasses(list.length)}>
+
+        <div className={isStaggered ? "grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 items-start" : getGridClasses(list.length)}>
           {list.map((product, i) => (
             <button
               key={`${product.title}-${i}`}
               type="button"
               onClick={() => setSelected(product)}
-              className={`border overflow-hidden transition-colors text-left min-w-0 cursor-pointer group ${theme.productCard} ${cardSurface}`}
+              className={`border overflow-hidden transition-colors text-left min-w-0 cursor-pointer group ds-framed-img ${theme.productCard} ${cardSurface} ${getStaggerClasses(i)}`}
             >
               <div className="relative aspect-[4/3] w-full">
                 {product.image ? (
@@ -73,7 +97,7 @@ export default function ServicesProductGrid({
                     src={product.image}
                     alt={product.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className={`object-cover ${theme.productImageHover}`}
                   />
                 ) : (
@@ -83,17 +107,17 @@ export default function ServicesProductGrid({
                 )}
               </div>
               <div className="p-6 md:p-8">
-                <h3 className={`text-lg md:text-xl mb-3 break-words ${theme.headingFont}`}>
-                  {product.title}
-                </h3>
-                <p className={`text-base leading-relaxed break-words ${theme.bodyFont} ${mutedText}`}>
+                <div className="flex items-baseline justify-between gap-4">
+                  <h3 className={`text-lg md:text-xl break-words ${theme.headingFont}`}>
+                    {product.title}
+                  </h3>
+                  <span className="text-[11px] tracking-[0.18em] uppercase ds-mute shrink-0">
+                    Job 25-0{i + 1}
+                  </span>
+                </div>
+                <p className={`mt-3 text-sm leading-relaxed break-words ${theme.bodyFont} ${mutedText}`}>
                   {productCardTeaser(product)}
                 </p>
-                <span
-                  className={`mt-4 inline-block text-xs uppercase tracking-widest opacity-70 group-hover:opacity-100 transition-opacity ${theme.bodyFont}`}
-                >
-                  View details
-                </span>
               </div>
             </button>
           ))}

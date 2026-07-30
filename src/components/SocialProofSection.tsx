@@ -6,6 +6,8 @@ import { applyVoice, getSectionTokens, getThemeStyles, type ThemeTokenSelection 
 import { getSiteMotion, motionRise } from '@/lib/siteMotion';
 import { useMotionHydrated } from '@/components/MotionHydrationProvider';
 
+import { hashSeed } from '@/lib/designVariants';
+
 interface SocialProofSectionProps {
   config: SocialProofConfig;
   theme: ThemeType;
@@ -28,21 +30,23 @@ export default function SocialProofSection({
 
   if (!testimonials.length && !stats.length) return null;
 
+  const isLuminaStyle = hashSeed(`${fontSeed}::quotes`) % 2 === 0;
+
   return (
-    <section className={`px-6 py-24 ${t.pageBackground}`}>
+    <section className={`px-6 py-24 ${t.pageBackground} ds-hairline-bottom`}>
       <div className="mx-auto max-w-6xl">
         <motion.div
           initial={motionRise(siteMotion, motionReady)}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={siteMotion.section}
-          className="mb-14 text-center"
+          className={`mb-14 ${isLuminaStyle ? 'text-left' : 'text-center'}`}
         >
-          <p className={`mb-3 text-sm uppercase tracking-[0.2em] ${section.accent}`}>
-            {config.eyebrow?.trim() || 'Trusted locally'}
+          <p className={`mb-3 ${isLuminaStyle ? 'ds-eyebrow' : 'text-sm uppercase tracking-[0.2em] ' + section.accent}`}>
+            {config.eyebrow?.trim() || 'Clients'}
           </p>
           <h2 className={`text-3xl md:text-5xl ${t.headingFont} ${t.textPrimary}`}>
-            {config.headline?.trim() || 'Homeowners who already made the switch'}
+            {config.headline?.trim() || 'In their words'}
           </h2>
         </motion.div>
 
@@ -67,24 +71,45 @@ export default function SocialProofSection({
         )}
 
         {testimonials.length > 0 && (
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((item, i) => (
-              <motion.blockquote
-                key={`${item.name}-${i}`}
-                initial={motionRise(siteMotion, motionReady)}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ ...siteMotion.section, delay: 0.08 * i }}
-                className={`rounded-2xl border p-6 ${section.surface} ${section.surfaceBorder}`}
-              >
-                <p className={`text-base leading-relaxed ${t.textPrimary}`}>“{item.quote}”</p>
-                <footer className={`mt-5 text-sm ${t.textSecondary}`}>
-                  <span className={`font-semibold ${t.textPrimary}`}>{item.name}</span>
-                  {item.role ? <span> · {item.role}</span> : null}
-                </footer>
-              </motion.blockquote>
-            ))}
-          </div>
+          isLuminaStyle ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 border ds-hairline bg-[var(--ds-surface-raised,#faf7f1)] overflow-hidden">
+              {testimonials.map((item, i) => (
+                <motion.blockquote
+                  key={`${item.name}-${i}`}
+                  initial={motionRise(siteMotion, motionReady)}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ ...siteMotion.section, delay: 0.08 * i }}
+                  className="p-8 md:p-10 border-b md:border-b-0 md:border-r last:border-r-0 last:border-b-0 ds-hairline flex flex-col justify-between"
+                >
+                  <p className={`text-lg leading-relaxed ${t.headingFont} ${t.textPrimary}`}>“{item.quote}”</p>
+                  <footer className="mt-6 text-xs uppercase tracking-[0.16em] ds-mute">
+                    <b className={`font-semibold ${t.textPrimary}`}>{item.name}</b>
+                    {item.role ? <span> — {item.role}</span> : null}
+                  </footer>
+                </motion.blockquote>
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-3">
+              {testimonials.map((item, i) => (
+                <motion.blockquote
+                  key={`${item.name}-${i}`}
+                  initial={motionRise(siteMotion, motionReady)}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ ...siteMotion.section, delay: 0.08 * i }}
+                  className={`rounded-2xl border p-6 ${section.surface} ${section.surfaceBorder}`}
+                >
+                  <p className={`text-base leading-relaxed ${t.textPrimary}`}>“{item.quote}”</p>
+                  <footer className={`mt-5 text-sm ${t.textSecondary}`}>
+                    <span className={`font-semibold ${t.textPrimary}`}>{item.name}</span>
+                    {item.role ? <span> · {item.role}</span> : null}
+                  </footer>
+                </motion.blockquote>
+              ))}
+            </div>
+          )
         )}
       </div>
     </section>

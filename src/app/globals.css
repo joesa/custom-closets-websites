@@ -18,3 +18,151 @@ body {
   /* The layout wrapper handles colors based on theme */
   @apply antialiased overflow-x-hidden;
 }
+
+/* ── Elevated Design System: Micro-Details ──
+ * Opt-in classes that consume --ds-* custom properties for Lumina-level refinement.
+ * Components add these classes alongside existing Tailwind utilities.
+ */
+
+/* Eyebrow label: small-caps text with a decorative horizontal rule */
+.ds-eyebrow {
+  font-size: var(--ds-eyebrow-size, 11px);
+  letter-spacing: var(--ds-eyebrow-tracking, 0.28em);
+  text-transform: uppercase;
+  font-weight: var(--ds-eyebrow-weight, 700);
+  color: var(--ds-accent, currentColor);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ds-eyebrow::before {
+  content: "";
+  width: 34px;
+  height: 1px;
+  background: var(--ds-accent, currentColor);
+  flex-shrink: 0;
+}
+/* Centered variant: rule on both sides */
+.ds-eyebrow--center {
+  justify-content: center;
+}
+.ds-eyebrow--center::after {
+  content: "";
+  width: 34px;
+  height: 1px;
+  background: var(--ds-accent, currentColor);
+  flex-shrink: 0;
+}
+
+/* Hairline border utility */
+.ds-hairline {
+  border-color: var(--ds-hair, rgba(0,0,0,0.14));
+}
+.ds-hairline-soft {
+  border-color: var(--ds-hair-soft, rgba(0,0,0,0.08));
+}
+.ds-hairline-top {
+  border-top: 1px solid var(--ds-hair, rgba(0,0,0,0.14));
+}
+.ds-hairline-bottom {
+  border-bottom: 1px solid var(--ds-hair, rgba(0,0,0,0.14));
+}
+
+/* Section rhythm */
+.ds-section {
+  padding-top: var(--ds-section-pad, 96px);
+  padding-bottom: var(--ds-section-pad, 96px);
+}
+
+/* Heading typography that uses the design system */
+.ds-heading {
+  font-family: var(--ds-heading-family, inherit);
+  letter-spacing: var(--ds-heading-tracking, -0.01em);
+  line-height: 1.08;
+  font-weight: 500;
+}
+
+/* Body text using design system */
+.ds-body {
+  font-family: var(--ds-body-family, inherit);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Muted caption text */
+.ds-mute {
+  color: var(--ds-mute, #7a7065);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Image framing: subtle border like Lumina's portfolio */
+.ds-framed-img {
+  border: 1px solid var(--ds-hair, rgba(0,0,0,0.14));
+}
+
+/* Elevated hover transitions */
+.ds-hover-transition {
+  transition: color var(--ds-transition, 220ms) ease,
+              border-color var(--ds-transition, 220ms) ease,
+              background-color var(--ds-transition, 220ms) ease;
+}
+
+/* Frosted glass surface (for nav, overlays) */
+.ds-frosted {
+  background: color-mix(in srgb, var(--ds-surface, #ffffff) 92%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Quote/testimonial typography */
+.ds-quote {
+  font-family: var(--ds-heading-family, inherit);
+  font-size: 19px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+/* Ledger-style table rows */
+.ds-ledger-header {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ds-mute, #7a7065);
+  font-weight: 700;
+}
+.ds-ledger-cell {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--ds-hair, rgba(0,0,0,0.14));
+  font-size: 16px;
+  color: var(--ds-ink-soft, #4d453c);
+}
+.ds-ledger-cell:first-child {
+  font-family: var(--ds-heading-family, inherit);
+  font-size: 19px;
+  color: var(--ds-ink, #1c1917);
+}
+
+/* Process step counter (Lumina-style numbered articles) */
+.ds-step-counter {
+  counter-reset: ds-step;
+}
+.ds-step-counter > * {
+  counter-increment: ds-step;
+}
+.ds-step-counter > *::before {
+  content: "0" counter(ds-step);
+  font-family: var(--ds-heading-family, inherit);
+  font-size: 44px;
+  color: var(--ds-accent, currentColor);
+  display: block;
+  margin-bottom: 18px;
+  font-weight: 400;
+}
+
+/* Band/CTA section */
+.ds-band {
+  padding: 96px 0;
+  text-align: center;
+}

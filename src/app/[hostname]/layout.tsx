@@ -1,6 +1,7 @@
 import { getActiveConfig } from "@/lib/getConfig";
 import Navbar from "@/components/Navbar";
 import { getDesignVariant, siteSeed } from "@/lib/designVariants";
+import { getThemeStyles, getSectionTokens, applyVoice, generateCssVars, cssVarsToString } from '@/lib/theme';
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
 
@@ -50,12 +51,20 @@ export default async function HostnameLayout({
   // If there are navLinks, it's a multi-page site.
   // We render the Navbar and pass the theme to it.
   const hasNav = config.navLinks && config.navLinks.length > 0;
+  
+  // Generate elevated design system CSS custom properties
   const fontSeed = siteSeed(config);
+  const themeStyles = applyVoice(getThemeStyles(config.theme, config.themeTokens), config.theme, fontSeed, config.themeTokens);
+  const sectionTokens = getSectionTokens(config.theme, fontSeed, config.themeTokens);
+  const cssVars = generateCssVars(themeStyles, sectionTokens, config.theme);
+  const cssVarString = `:root {\n${cssVarsToString(cssVars)}\n}`;
+
   const navStyle = getDesignVariant(fontSeed, config.theme).nav;
   const isSidebarNav = hasNav && navStyle.startsWith('sidebar-left');
 
   return (
     <>
+      <style dangerouslySetInnerHTML={{ __html: cssVarString }} />
       {hasNav && (
         <Navbar 
           brandName={config.brandName} 
