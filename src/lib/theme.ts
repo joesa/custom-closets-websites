@@ -632,6 +632,23 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
         accentColor: 'text-red-700',
         heroGradient: 'bg-gradient-to-t from-zinc-950/70 via-zinc-900/20 to-transparent',
       };
+    case 'lumina-atelier':
+      // Lumina demo: warm plaster ground, near-black ink, one desaturated
+      // brass accent — a cabinetmaker's atelier, not another amber-on-stone
+      // "luxury minimal" clone. No shadows, no rounded corners — flat, paper-like.
+      return {
+        pageBackground: 'bg-[#f6f2ec]',
+        textPrimary: 'text-[#241f1a]',
+        textSecondary: 'text-[#241f1a]/60',
+        headingFont: 'font-fraunces font-normal tracking-tight',
+        bodyFont: 'font-manrope font-light',
+        containerClasses: 'max-w-6xl mx-auto px-8 py-32',
+        button: 'bg-[#241f1a] text-[#f6f2ec] hover:bg-[#3a3229] transition-colors rounded-none px-8 py-4 uppercase tracking-[0.2em] text-sm',
+        productCard: 'group overflow-hidden rounded-none border border-[#241f1a]/10',
+        productImageHover: 'transition-transform duration-1000 group-hover:scale-105',
+        accentColor: 'text-[#8a7256]',
+        heroGradient: 'bg-gradient-to-t from-[#241f1a]/70 via-[#241f1a]/20 to-transparent',
+      };
 
     default:
       return coreThemeStyles(theme);
@@ -713,6 +730,7 @@ const THEME_VOICE: Record<ThemeType, VoiceFamily> = {
 
   // Bespoke demo themes
   'garage-loadrated': 'boldDisplay',
+  'lumina-atelier': 'editorial',
 };
 
 // Interchangeable heading typefaces per voice family (all carry the same mood).
@@ -804,6 +822,7 @@ const SWATCH: Record<string, AccentSwatch> = {
   fuchsia: { textLight: 'text-fuchsia-600', textDark: 'text-fuchsia-300', bg: 'bg-fuchsia-500', on: 'text-white',      hex: '#d946ef' },
   slate:   { textLight: 'text-slate-600',   textDark: 'text-slate-300',   bg: 'bg-slate-700',   on: 'text-white',      hex: '#475569' },
   zen:     { textLight: 'text-[#7d8276]',   textDark: 'text-[#aeb3a6]',   bg: 'bg-[#5b6157]',   on: 'text-white',      hex: '#7d8276' },
+  brass:   { textLight: 'text-[#8a7256]',   textDark: 'text-[#c2ab8c]',   bg: 'bg-[#8a7256]',   on: 'text-white',      hex: '#8a7256' },
 };
 
 const THEME_ACCENTS: Record<ThemeType, string[]> = {
@@ -864,8 +883,10 @@ const THEME_ACCENTS: Record<ThemeType, string[]> = {
   'gourmet-warm':        ['amber', 'bronze', 'red'],
 
   // Bespoke demo themes: a single-swatch pool so every seed resolves to the
-  // same accent — the one tool-red is the brand, not a rotation axis.
-  'garage-loadrated':    ['red'],};
+  // same accent — the one tool-red / brass is the brand, not a rotation axis.
+  'garage-loadrated':    ['red'],
+  'lumina-atelier':      ['brass'],
+};
 
 /** Seed-stable accent swatch for a theme (deterministic; null when no seed). */
 function resolveAccent(theme: ThemeType, seed: string): AccentSwatch | null {
@@ -1024,6 +1045,7 @@ const SECTION_TOKENS: Record<ThemeType, SectionTokens> = {
 
   // Bespoke demo themes
   'garage-loadrated':    { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-zinc-300',        accent: 'text-red-700',    accentBg: 'bg-red-700',    accentText: 'text-white' },
+  'lumina-atelier':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#241f1a]/10',    accent: 'text-[#8a7256]',  accentBg: 'bg-[#241f1a]',  accentText: 'text-[#f6f2ec]' },
 };
 
 export function getSectionTokens(theme: ThemeType, seed = '', tokens?: ThemeTokenSelection | null): SectionTokens {
@@ -1116,6 +1138,8 @@ export function getThemePrimaryHex(theme: ThemeType, seed = '', tokens?: ThemeTo
       return '#fbbf24';
     case 'garage-loadrated':
       return '#b91c1c';
+    case 'lumina-atelier':
+      return '#8a7256';
     default:
       return '#2d2d2d';
   }
