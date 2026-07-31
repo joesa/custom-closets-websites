@@ -82,54 +82,76 @@ export default function BookingEngine({
     return () => { mounted = false }
   }, [contractorId])
 
+  const todayStr = useMemo(() => {
+    const today = new Date()
+    return today.toISOString().split('T')[0]
+  }, [])
+
   const availableDates = useMemo(() => {
-    if (availability.length === 0) return []
     const dates: string[] = []
     const today = new Date()
     today.setHours(0,0,0,0)
     
-    // Generate next 30 days
-    for (let i = 0; i < 30; i++) {
-      const d = new Date(today)
-      d.setDate(d.getDate() + i)
-      const dayOfWeek = d.getDay()
-      if (availability.some(a => a.day_of_week === dayOfWeek)) {
-        dates.push(d.toISOString().split('T')[0])
+    if (availability.length > 0) {
+      for (let i = 0; i < 60; i++) {
+        const d = new Date(today)
+        d.setDate(d.getDate() + i)
+        const dayOfWeek = d.getDay()
+        if (availability.some(a => a.day_of_week === dayOfWeek)) {
+          dates.push(d.toISOString().split('T')[0])
+        }
+      }
+    } else {
+      // Fallback: Next 60 days (Mon-Fri) if no availability rows exist
+      for (let i = 0; i < 60; i++) {
+        const d = new Date(today)
+        d.setDate(d.getDate() + i)
+        const day = d.getDay()
+        if (day >= 1 && day <= 5) {
+          dates.push(d.toISOString().split('T')[0])
+        }
       }
     }
+
+    if (selectedDate && !dates.includes(selectedDate)) {
+      dates.push(selectedDate)
+      dates.sort()
+    }
+
     return dates
-  }, [availability])
+  }, [availability, selectedDate])
 
   const availableTimes = useMemo(() => {
     if (!selectedDate || !selectedService) return []
     const d = new Date(selectedDate + 'T12:00:00Z')
     const dayOfWeek = d.getUTCDay()
-    const windows = availability.filter(a => a.day_of_week === dayOfWeek)
+    let windows = availability.filter(a => a.day_of_week === dayOfWeek)
     
-    if (windows.length === 0) return []
+    if (windows.length === 0) {
+      windows = [{ day_of_week: dayOfWeek, start_time: '09:00:00', end_time: '17:00:00', slot_duration_minutes: 60 }]
+    }
     
     const times: string[] = []
     for (const win of windows) {
-      // Basic slot generation for demonstration
-      // Parse HH:MM:SS
-      const startParts = win.start_time.split(':').map(Number)
-      const endParts = win.end_time.split(':').map(Number)
+      const startParts = (win.start_time || '09:00:00').split(':').map(Number)
+      const endParts = (win.end_time || '17:00:00').split(':').map(Number)
       
       let currentMinutes = startParts[0] * 60 + startParts[1]
       const endMinutes = endParts[0] * 60 + endParts[1]
+      const duration = selectedService.durationMinutes || 30
+      const stepMins = win.slot_duration_minutes || duration
       
-      while (currentMinutes + selectedService.durationMinutes <= endMinutes) {
+      while (currentMinutes + duration <= endMinutes) {
         const h = Math.floor(currentMinutes / 60)
         const m = currentMinutes % 60
         const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`
         
-        // Filter out if booked
         const isBooked = booked.some(b => b.booking_date === selectedDate && b.booking_time === timeStr)
         if (!isBooked) {
           times.push(timeStr)
         }
         
-        currentMinutes += win.slot_duration_minutes || selectedService.durationMinutes
+        currentMinutes += stepMins
       }
     }
     return times
@@ -265,6 +287,23 @@ export default function BookingEngine({
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-zinc-900 mb-2">Select Date</label>
+                  <div className="mb-3 p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-1">
+                      📅 Choose Specific Date
+                    </label>
+                    <input
+                      type="date"
+                      min={todayStr}
+                      value={selectedDate}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setSelectedDate(e.target.value)
+                          setSelectedTime('')
+                        }
+                      }}
+                      className="w-full px-2.5 py-1.5 text-xs font-semibold bg-white border border-zinc-200 rounded text-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
                   <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {availableDates.length === 0 ? (
                       <p className="text-sm text-zinc-500">No availability currently found.</p>
