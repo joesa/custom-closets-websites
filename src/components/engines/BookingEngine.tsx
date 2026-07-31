@@ -165,7 +165,10 @@ export default function BookingEngine({
     }
   }
 
-  const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2).replace(/\.00$/, '')}`
+  const formatPrice = (cents: number) => {
+    if (!cents || cents <= 0) return null;
+    return `$${(cents / 100).toFixed(2).replace(/\.00$/, '')}`;
+  };
   const formatTime = (timeStr: string) => {
     const [h, m] = timeStr.split(':')
     const date = new Date()
@@ -241,7 +244,7 @@ export default function BookingEngine({
                         )}
                         <div className="flex gap-4 mt-2 text-sm text-zinc-600 font-medium">
                           <span className="flex items-center"><Clock className="h-4 w-4 mr-1 opacity-70" /> {service.durationMinutes} min</span>
-                          <span>{formatPrice(service.priceCents)}</span>
+                          {formatPrice(service.priceCents) ? <span>{formatPrice(service.priceCents)}</span> : null}
                         </div>
                       </div>
                       <ChevronRight className="h-5 w-5 text-zinc-300 group-hover:text-zinc-500" />
@@ -341,7 +344,11 @@ export default function BookingEngine({
                   <div className="font-semibold text-zinc-900">{selectedService?.name}</div>
                   <div className="text-sm text-zinc-500 mt-0.5">{formatDate(selectedDate)} at {formatTime(selectedTime)}</div>
                 </div>
-                <div className="font-bold text-zinc-900">{formatPrice(selectedService?.priceCents || 0)}</div>
+                {formatPrice(selectedService?.priceCents || 0) ? (
+                  <div className="font-bold text-zinc-900">{formatPrice(selectedService?.priceCents || 0)}</div>
+                ) : (
+                  <div className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md">In-Office / Insurance</div>
+                )}
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
