@@ -112,7 +112,7 @@ export default function ServicesProductGrid({
                     {product.title}
                   </h3>
                   <span className="text-[11px] tracking-[0.18em] uppercase ds-mute shrink-0">
-                    Job 25-0{i + 1}
+                    {String(i + 1).padStart(2, '0')}
                   </span>
                 </div>
                 <p className={`mt-3 text-sm leading-relaxed break-words ${theme.bodyFont} ${mutedText}`}>
