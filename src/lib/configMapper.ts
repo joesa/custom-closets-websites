@@ -36,6 +36,10 @@ type SiteConfigRow = {
   edit_in_place?: boolean | null;
   custom_config?: CustomSiteConfig | null;
   custom_config_draft?: CustomSiteConfig | null;
+  engine_config_draft?: {
+    pagesConfig?: PageConfig[];
+    navLinks?: NavLink[];
+  } | null;
 };
 type TenantRow = {
   id?: string;
@@ -109,5 +113,14 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     customConfigDraft: isCustomSiteConfig(configRow.custom_config_draft)
       ? configRow.custom_config_draft
       : null,
+    engineConfigDraft:
+      configRow.engine_config_draft &&
+      Array.isArray(configRow.engine_config_draft.pagesConfig) &&
+      Array.isArray(configRow.engine_config_draft.navLinks)
+        ? {
+            pagesConfig: configRow.engine_config_draft.pagesConfig,
+            navLinks: configRow.engine_config_draft.navLinks,
+          }
+        : null,
   };
 }

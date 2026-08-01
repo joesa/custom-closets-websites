@@ -25,6 +25,7 @@ import Image from "next/image";
 import ServicesProductGrid from "@/components/ServicesProductGrid";
 import { PUBLIC_API_URL } from "@/lib/urls";
 import type { Metadata } from "next";
+import { applyEngineDraftPreview } from "@/lib/engineDraftPreview";
 
 // Custom-mode sites carry per-page titles/descriptions in custom_config;
 // surface them instead of the engine's brandName-only metadata.
@@ -119,6 +120,13 @@ export default async function SubPage({
     isAdminBypass,
     draftParam: resolvedSearch.draft,
   });
+  const enginePreviewQuery = wantDraft
+    ? buildCustomDraftPreviewQuery({ adminBypassParam: resolvedSearch.admin_bypass })
+    : undefined;
+  const renderConfig = applyEngineDraftPreview(config, {
+    enabled: wantDraft,
+    previewQuery: enginePreviewQuery,
+  });
   const draftConfig =
     wantDraft && isCustomSiteConfig(config.customConfigDraft)
       ? config.customConfigDraft
@@ -212,11 +220,11 @@ export default async function SubPage({
     );
   }
 
-  if (!config.pagesConfig) {
+  if (!renderConfig.pagesConfig) {
     notFound();
   }
 
-  const pageData = config.pagesConfig.find(
+  const pageData = renderConfig.pagesConfig.find(
     (p) => p.slug === `/${resolvedParams.slug}` || p.slug === resolvedParams.slug
   );
 

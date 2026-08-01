@@ -169,8 +169,12 @@ export default function EditInPlaceLayer({
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error || `Save failed (${res.status})`);
       setStatus('saved');
-      setMessage(
-        `Saved (${json.htmlLength ?? html.length} chars). Hard-refresh if needed — then turn OFF Edit in place in admin.`
+      const issueCount = Array.isArray(json.validation?.issues)
+        ? json.validation.issues.length
+        : 0;
+      setMessage(json.validation?.status === 'passed'
+        ? `Draft saved and validated (${json.htmlLength ?? html.length} chars). Publish it from admin when ready.`
+        : `Draft saved with ${issueCount} quality issue${issueCount === 1 ? '' : 's'}. Review it in admin before publishing.`
       );
     } catch (err) {
       setStatus('error');

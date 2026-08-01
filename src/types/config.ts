@@ -166,6 +166,11 @@ export interface PageConfig {
   content_blocks: ContentBlock[];
 }
 
+export interface EngineConfigDraft {
+  pagesConfig: PageConfig[];
+  navLinks: NavLink[];
+}
+
 export interface BrandConfig {
   brandName: string;
   theme: ThemeType;
@@ -256,4 +261,6 @@ export interface BrandConfig {
   customConfig?: import('@/lib/customSite').CustomSiteConfig | null;
   /** Draft artifact for admin preview (?draft=1 + admin_bypass). */
   customConfigDraft?: import('@/lib/customSite').CustomSiteConfig | null;
+  /** Unpublished template-engine overrides for authorized draft preview. */
+  engineConfigDraft?: EngineConfigDraft | null;
 }

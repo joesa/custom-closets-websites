@@ -7,6 +7,7 @@ function buildRow(overrides?: {
   layoutStyle?: string;
   navLinks?: unknown;
   pagesConfig?: unknown;
+  engineConfigDraft?: unknown;
   widgetId?: string;
 }): SupabaseConfigRow {
   const config = {
@@ -30,6 +31,7 @@ function buildRow(overrides?: {
     before_after_config: { beforeImage: 'b', afterImage: 'a', title: 't', subtitle: 's' },
     nav_links: overrides?.navLinks,
     pages_config: overrides?.pagesConfig,
+    engine_config_draft: overrides?.engineConfigDraft,
   };
   const tenant = {
     widget_id: overrides?.widgetId ?? 'tenant-123',
@@ -70,6 +72,16 @@ describe('mapRowToConfig', () => {
     const row = buildRow();
     (row.tenants as { widget_id?: string }).widget_id = undefined;
     expect(mapRowToConfig(row)!.widgetId).toBe('');
+  });
+
+  it('maps a valid engine draft without applying it to published fields', () => {
+    const engineConfigDraft = {
+      pagesConfig: [{ slug: '/about', title: 'About', hero: { headline: 'About' }, content_blocks: [] }],
+      navLinks: [{ label: 'About', slug: '/about' }],
+    };
+    const config = mapRowToConfig(buildRow({ engineConfigDraft }));
+    expect(config!.engineConfigDraft).toEqual(engineConfigDraft);
+    expect(config!.pagesConfig).toEqual([]);
   });
 
   it('returns null when the tenant is missing', () => {

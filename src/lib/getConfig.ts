@@ -61,7 +61,8 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
           render_mode,
           edit_in_place,
           custom_config,
-          custom_config_draft
+          custom_config_draft,
+          engine_config_draft
         )
       )
     `)

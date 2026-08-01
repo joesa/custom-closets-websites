@@ -16,6 +16,7 @@ import {
 import { isAdminBypassRequest } from "@/lib/adminBypass";
 import { cookies } from "next/headers";
 import { PUBLIC_API_URL } from "@/lib/urls";
+import { applyEngineDraftPreview } from "@/lib/engineDraftPreview";
 import type { Metadata } from "next";
 
 // Custom-mode sites carry per-page titles/descriptions in custom_config;
@@ -99,6 +100,13 @@ export default async function Page({
     isAdminBypass,
     draftParam: resolvedSearch.draft,
   });
+  const enginePreviewQuery = wantDraft
+    ? buildCustomDraftPreviewQuery({ adminBypassParam: resolvedSearch.admin_bypass })
+    : undefined;
+  const renderConfig = applyEngineDraftPreview(config, {
+    enabled: wantDraft,
+    previewQuery: enginePreviewQuery,
+  });
   const draftConfig = wantDraft && isCustomSiteConfig(config.customConfigDraft)
     ? config.customConfigDraft
     : null;
@@ -163,7 +171,7 @@ export default async function Page({
   return (
     <>
       <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}`} />
-      <ClientPage config={config} hostname={resolvedParams.hostname} />
+      <ClientPage config={renderConfig} hostname={resolvedParams.hostname} />
     </>
   );
 }
