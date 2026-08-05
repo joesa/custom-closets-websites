@@ -1,6 +1,32 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Paths owned by the dashboard app (login, tenant dashboard, admin, billing,
+// signup, password flows). When a tenant subdomain (or a verified custom
+// domain) is hit at one of these paths, we send the browser to the dashboard
+// app instead of trying to render it as a tenant site page — otherwise the
+// [hostname]/[slug] catch-all below would treat "/login" as a page slug.
+const RESERVED_APP_PATH_PREFIXES = [
+  '/login',
+  '/dashboard',
+  '/admin',
+  '/billing',
+  '/signup',
+  '/get-started',
+  '/forgot-password',
+  '/update-password',
+  '/force-password-reset',
+  '/auth',
+];
+
+function dashboardAppOrigin(): string {
+  return (
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    process.env.NEXT_PUBLIC_SITE_URL?.trim()?.replace(/\/$/, '') ||
+    'https://www.ditchtheform.com'
+  );
+}
+
 export function proxy(req: NextRequest) {
   const url = req.nextUrl;
 
@@ -9,6 +35,27 @@ export function proxy(req: NextRequest) {
 
   // Remove the port if running locally
   hostname = hostname.split(':')[0];
+
+  // Reserved app paths on a tenant hostname → redirect to the dashboard app,
+  // carrying the tenant hostname so the dashboard can send the user back to
+  // their own subdomain after signing in.
+  const isReservedAppPath = RESERVED_APP_PATH_PREFIXES.some(
+    (prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`)
+  );
+  const dashboardOrigin = dashboardAppOrigin();
+  const isDashboardHost = (() => {
+    try {
+      return new URL(dashboardOrigin).hostname === hostname;
+    } catch {
+      return false;
+    }
+  })();
+
+  if (isReservedAppPath && !isDashboardHost) {
+    const dest = new URL(`${url.pathname}${url.search}`, dashboardOrigin);
+    dest.searchParams.set('tenant', hostname);
+    return NextResponse.redirect(dest);
+  }
 
   // Silently rewrite the request to a dynamic route folder: /app/[hostname]/...
   // We keep the rest of the pathname intact so /api or other routes could theoretically work
