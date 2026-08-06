@@ -3,9 +3,10 @@ import type { NextRequest } from 'next/server';
 
 // Paths owned by the dashboard app (login, tenant dashboard, admin, billing,
 // signup, password flows). When a tenant subdomain (or a verified custom
-// domain) is hit at one of these paths, we send the browser to the dashboard
-// app instead of trying to render it as a tenant site page — otherwise the
-// [hostname]/[slug] catch-all below would treat "/login" as a page slug.
+// domain) is hit at one of these paths, we proxy the dashboard app instead of
+// trying to render it as a tenant site page — otherwise the [hostname]/[slug]
+// catch-all below would treat "/login" as a page slug. This is a rewrite, not
+// a redirect, so the customer keeps seeing their own hostname in the URL bar.
 const RESERVED_APP_PATH_PREFIXES = [
   '/login',
   '/dashboard',
@@ -18,6 +19,17 @@ const RESERVED_APP_PATH_PREFIXES = [
   '/force-password-reset',
   '/auth',
 ];
+
+// API routes this renderer owns. Everything else under /api belongs to the
+// dashboard app and must be proxied, because the proxied dashboard pages call
+// their API routes with same-origin relative URLs.
+const RENDERER_API_PATH_PREFIXES = ['/api/a', '/api/revalidate'];
+
+function matchesPrefix(pathname: string, prefixes: string[]): boolean {
+  return prefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+}
 
 function dashboardAppOrigin(): string {
   return (
@@ -36,12 +48,6 @@ export function proxy(req: NextRequest) {
   // Remove the port if running locally
   hostname = hostname.split(':')[0];
 
-  // Reserved app paths on a tenant hostname → redirect to the dashboard app,
-  // carrying the tenant hostname so the dashboard can send the user back to
-  // their own subdomain after signing in.
-  const isReservedAppPath = RESERVED_APP_PATH_PREFIXES.some(
-    (prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`)
-  );
   const dashboardOrigin = dashboardAppOrigin();
   const isDashboardHost = (() => {
     try {
@@ -51,10 +57,27 @@ export function proxy(req: NextRequest) {
     }
   })();
 
-  if (isReservedAppPath && !isDashboardHost) {
+  const isApiPath = url.pathname === '/api' || url.pathname.startsWith('/api/');
+
+  // Renderer-owned API routes are served here and never hostname-rewritten.
+  if (isApiPath && matchesPrefix(url.pathname, RENDERER_API_PATH_PREFIXES)) {
+    return NextResponse.next();
+  }
+
+  // Dashboard-owned paths on a tenant hostname → proxy to the dashboard app so
+  // the browser URL stays on the customer's domain.
+  if (
+    !isDashboardHost &&
+    (isApiPath || matchesPrefix(url.pathname, RESERVED_APP_PATH_PREFIXES))
+  ) {
     const dest = new URL(`${url.pathname}${url.search}`, dashboardOrigin);
-    dest.searchParams.set('tenant', hostname);
-    return NextResponse.redirect(dest);
+    const headers = new Headers(req.headers);
+    headers.set('x-tenant-host', hostname);
+    return NextResponse.rewrite(dest, { request: { headers } });
+  }
+
+  if (isApiPath) {
+    return NextResponse.next();
   }
 
   // Silently rewrite the request to a dynamic route folder: /app/[hostname]/...
@@ -104,7 +127,8 @@ export function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // Skip all internal paths (_next, images, APIs, static files)
-    '/((?!api|_next/static|_next/image|favicon.ico|brands|widget.js).*)',
+    // Skip all internal paths (_next, images, static files). /api is matched so
+    // dashboard-owned API routes can be proxied from tenant hostnames.
+    '/((?!_next/static|_next/image|favicon.ico|brands|widget.js).*)',
   ],
 };
