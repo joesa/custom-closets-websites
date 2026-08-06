@@ -12,6 +12,7 @@ import {
   Libre_Baskerville,
   Syne,
 } from "next/font/google";
+import { PRECONNECT_ORIGINS } from "@/lib/urls";
 import "./globals.css";
 
 const inter = Inter({
@@ -112,6 +113,11 @@ export default function RootLayout({
       lang="en"
       className={`${fontVariables} h-full antialiased`}
     >
+      <head>
+        {PRECONNECT_ORIGINS.map((origin) => (
+          <link key={origin} rel="preconnect" href={origin} crossOrigin="anonymous" />
+        ))}
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

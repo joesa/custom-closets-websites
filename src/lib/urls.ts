@@ -18,3 +18,24 @@ export const PUBLIC_API_URL =
   process.env.NEXT_PUBLIC_APP_URL?.trim() ||
   process.env.NEXT_PUBLIC_SITE_URL?.trim()?.replace(/\/$/, '') ||
   'https://www.ditchtheform.com'
+
+function originOf(url: string): string | null {
+  try {
+    return new URL(url).origin
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Third-party origins the page hits before it is interactive: the widget bundle
+ * and the API call it makes for contractor settings. Preconnecting overlaps DNS
+ * and TLS with HTML parsing instead of paying for them serially.
+ */
+export const PRECONNECT_ORIGINS = Array.from(
+  new Set(
+    [originOf(WIDGET_CDN_URL), originOf(PUBLIC_API_URL)].filter(
+      (origin): origin is string => Boolean(origin)
+    )
+  )
+)
