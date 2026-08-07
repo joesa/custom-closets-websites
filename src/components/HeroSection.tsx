@@ -21,6 +21,9 @@ interface HeroSectionProps {
   heroHeadlineClasses: string;
   ornament?: SignatureMotif;
   motionProfile?: SiteMotion;
+  imageFit?: 'cover' | 'contain';
+  imagePosition?: 'center' | 'top' | 'bottom' | 'left' | 'right';
+  imageScale?: '90' | '100' | '110' | '125';
 }
 
 export default function HeroSection({
@@ -36,6 +39,9 @@ export default function HeroSection({
   heroHeadlineClasses,
   ornament = 'line',
   motionProfile,
+  imageFit = 'cover',
+  imagePosition = 'center',
+  imageScale = '100',
 }: HeroSectionProps) {
   const [motionReady, setMotionReady] = useState(false);
   useEffect(() => {
@@ -115,6 +121,9 @@ export default function HeroSection({
     ) : null;
 
   const heroAlignText = variant.heroAlign === 'center' ? 'text-center' : 'text-left';
+  const positionClasses = { center: 'object-center', top: 'object-top', bottom: 'object-bottom', left: 'object-left', right: 'object-right' };
+  const scaleClasses = { '90': 'scale-90', '100': 'scale-100', '110': 'scale-110', '125': 'scale-125' };
+  const heroImageClass = (extra = '') => `${imageFit === 'contain' ? 'object-contain' : 'object-cover'} ${positionClasses[imagePosition]} ${scaleClasses[imageScale]} ${extra}`;
 
   // Render the true design-variant hero — do not collapse compositions into a
   // handful of "big image" layouts (that erased studio diversity).
@@ -145,7 +154,7 @@ export default function HeroSection({
             </div>
           </div>
           <div className="relative min-h-[40vh] md:min-h-full">
-            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="50vw" className="object-cover" priority />
+            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="50vw" className={heroImageClass()} priority />
           </div>
         </section>
       );
@@ -174,7 +183,7 @@ export default function HeroSection({
               </motion.div>
             )}
             <div className="relative mt-16 aspect-[21/9] w-full overflow-hidden">
-              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
             </div>
           </div>
         </section>
@@ -206,7 +215,7 @@ export default function HeroSection({
           </div>
           <div className="mx-auto max-w-6xl px-6">
             <div className={`relative aspect-[16/7] w-full overflow-hidden border ${tokens.surfaceBorder}`}>
-              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
             </div>
           </div>
         </section>
@@ -238,7 +247,7 @@ export default function HeroSection({
             </div>
             <div className="md:col-span-3">
               <div className="relative aspect-[5/4] w-full overflow-hidden rounded-2xl shadow-2xl">
-                <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="(max-width: 768px) 100vw, 60vw" className="object-cover" priority />
+                <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="(max-width: 768px) 100vw, 60vw" className={heroImageClass()} priority />
               </div>
             </div>
           </div>
@@ -269,7 +278,7 @@ export default function HeroSection({
               </motion.div>
             )}
             <div className={`relative mx-auto aspect-[16/10] w-full overflow-hidden border ${tokens.surfaceBorder}`}>
-              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
             </div>
           </div>
         </section>
@@ -280,7 +289,7 @@ export default function HeroSection({
         <section key="hero" className={`relative overflow-hidden p-3 md:p-6 ${theme.pageBackground}`}>
           <div className={`relative flex min-h-[84vh] items-end overflow-hidden border-2 ${tokens.surfaceBorder}`}>
             <div className="absolute inset-0 z-0">
-              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
               <div className={`absolute inset-0 ${theme.heroGradient}`} />
             </div>
             <div className={`relative z-10 w-full px-8 py-12 md:px-16 md:py-20 ${heroAlignText}`}>
@@ -311,7 +320,7 @@ export default function HeroSection({
       return (
         <section key="hero" className="relative grid min-h-[90vh] grid-cols-1 overflow-hidden md:grid-cols-3">
           <div className="relative min-h-[36vh] md:min-h-full">
-            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="33vw" className="object-cover" priority />
+            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="33vw" className={heroImageClass()} priority />
           </div>
           <div className={`relative z-10 flex items-center md:col-span-2 ${theme.pageBackground} px-8 py-24 md:px-20`}>
             <div className="max-w-2xl">
@@ -342,7 +351,7 @@ export default function HeroSection({
       return (
         <section key="hero" className={`relative overflow-hidden pb-24 ${theme.pageBackground}`}>
           <div className="relative h-[60vh] w-full overflow-hidden md:h-[70vh]">
-            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
             <div className={`absolute inset-0 ${theme.heroGradient}`} />
           </div>
           <div className="relative z-10 mx-auto -mt-28 max-w-4xl px-6">
@@ -396,7 +405,7 @@ export default function HeroSection({
             )}
           </div>
           <div className="relative h-[42vh] w-full overflow-hidden md:h-[56vh]">
-            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
           </div>
         </section>
       );
@@ -408,7 +417,7 @@ export default function HeroSection({
         // rise to the top edge where a centered nav logo renders on top of it.
         <section key="hero" className="relative flex min-h-[90vh] items-center justify-center overflow-hidden pt-44 pb-16">
           <div className="absolute inset-0 z-0">
-            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
             <div className={`absolute inset-0 ${tokens.accentBg} opacity-30 mix-blend-multiply`} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/40" />
           </div>
@@ -450,10 +459,10 @@ export default function HeroSection({
         <section key="hero" className={`relative overflow-hidden ${theme.pageBackground}`}>
           <div className="grid min-h-[88vh] grid-cols-2">
             <div className="relative">
-              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="50vw" className="object-cover" priority />
+              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="50vw" className={heroImageClass()} priority />
             </div>
             <div className="relative">
-              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="50vw" className="object-cover scale-x-[-1]" />
+              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="50vw" className={heroImageClass('scale-x-[-1]')} />
             </div>
           </div>
           <div className="absolute inset-0 flex items-center justify-center px-6 pt-24 pb-12 sm:pt-28">
@@ -478,7 +487,7 @@ export default function HeroSection({
       return (
         <section key="hero" className="relative flex min-h-[90vh] items-center overflow-hidden pt-40 pb-16">
           <div className="absolute inset-0 z-0">
-            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
             <div className="absolute inset-0 bg-black/30" />
           </div>
           <div className="relative z-10 w-full">
@@ -513,7 +522,7 @@ export default function HeroSection({
         <section key="hero" className={`relative overflow-hidden py-16 ${theme.pageBackground}`}>
           <div className="mx-auto max-w-3xl px-6">
             <div className="relative aspect-[3/4] w-full overflow-hidden md:aspect-[4/5]">
-              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="(max-width: 768px) 100vw, 48rem" className="object-cover" priority />
+              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="(max-width: 768px) 100vw, 48rem" className={heroImageClass()} priority />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-8 text-center md:p-12">
                 <motion.h1
@@ -573,7 +582,7 @@ export default function HeroSection({
             </div>
           </div>
           <div className="relative h-[44vh] w-full overflow-hidden md:h-[58vh]">
-            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
           </div>
         </section>
       );
@@ -588,7 +597,7 @@ export default function HeroSection({
               transition={{ duration: 0.9, delay: 0.1, ease: "easeOut" }}
               className={`relative mx-auto mb-10 aspect-square w-28 overflow-hidden rounded-full border-2 md:w-36 ${tokens.surfaceBorder}`}
             >
-              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="9rem" className="object-cover" priority />
+              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="9rem" className={heroImageClass()} priority />
             </motion.div>
             <div className="mb-6 flex justify-center">{renderOrnament(true)}</div>
             <motion.h1
@@ -611,7 +620,7 @@ export default function HeroSection({
               </motion.div>
             )}
             <div className="relative mx-auto aspect-[21/9] w-full overflow-hidden">
-              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+              <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
             </div>
           </div>
         </section>
@@ -622,7 +631,7 @@ export default function HeroSection({
       return (
         <section key="hero" className="relative flex min-h-[90vh] items-center justify-center overflow-hidden pt-40 pb-16">
           <div className="absolute inset-0 z-0">
-            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className="object-cover" priority />
+            <Image src={heroImage} alt={heroImageAlt || headline} fill sizes="100vw" className={heroImageClass()} priority />
             <div className={`absolute inset-0 ${theme.heroGradient}`} />
           </div>
           <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">

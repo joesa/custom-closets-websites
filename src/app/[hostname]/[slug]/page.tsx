@@ -249,6 +249,7 @@ export default async function SubPage({
   const variant = getDesignVariant(fontSeed, config.theme);
   const tokens = getSectionTokens(config.theme, fontSeed, config.themeTokens);
   const heroImage = pageData.hero.backgroundImage || config.hero.backgroundImage;
+  const heroPresentation = pageData.hero.backgroundImage ? pageData.hero : config.hero;
   const signature = resolveSiteSignature({
     brandName: config.brandName,
     seed: fontSeed,
@@ -306,6 +307,9 @@ export default async function SubPage({
           headline={pageData.hero.headline}
           heroImage={heroImage}
           heroImageAlt={pageData.hero.backgroundImageAlt || config.hero.backgroundImageAlt}
+          imageFit={heroPresentation.imageFit}
+          imagePosition={heroPresentation.imagePosition}
+          imageScale={heroPresentation.imageScale}
           brandName={config.brandName}
           heroHeadlineClasses={pageHeroHeadlineClasses(variant.typeScale)}
           ornament={signature.motif}

@@ -28,6 +28,19 @@ function cleanSerializedHtml(root: HTMLElement) {
   return clone.innerHTML;
 }
 
+export function renderedImagePath(source: string, origin = window.location.origin) {
+  try {
+    const url = new URL(source, origin);
+    if (url.pathname === '/_next/image') {
+      const original = url.searchParams.get('url');
+      if (original) return renderedImagePath(original, origin);
+    }
+    return decodeURIComponent(url.pathname);
+  } catch {
+    return source;
+  }
+}
+
 export default function ContentEditorBridge({
   rootRef,
   mode,
@@ -72,8 +85,7 @@ export default function ContentEditorBridge({
       const images = Array.from(root.querySelectorAll<HTMLImageElement>('img'));
       for (const mapping of mappings.filter((item) => /(?:image|logo)/i.test(item.path))) {
         const match = images.find((image) => {
-          try { return new URL(image.currentSrc || image.src).pathname === new URL(mapping.value, window.location.origin).pathname; }
-          catch { return (image.currentSrc || image.src).includes(mapping.value); }
+          return renderedImagePath(image.currentSrc || image.src) === renderedImagePath(mapping.value);
         });
         if (match) match.dataset.contentPath = mapping.path;
       }

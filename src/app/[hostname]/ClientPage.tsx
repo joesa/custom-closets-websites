@@ -199,6 +199,9 @@ function ClientPageContent({ config }: ClientPageProps) {
       subheadline={heroSubheadline}
       heroImage={heroImage}
       heroImageAlt={config.hero.backgroundImageAlt}
+      imageFit={config.hero.imageFit}
+      imagePosition={config.hero.imagePosition}
+      imageScale={config.hero.imageScale}
       brandName={config.brandName}
       ctaButton={ctaButton}
       heroHeadlineClasses={heroHeadline}

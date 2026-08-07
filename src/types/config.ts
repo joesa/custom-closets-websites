@@ -177,6 +177,9 @@ export interface PageConfig {
     headline: string;
     backgroundImage?: string;
     backgroundImageAlt?: string;
+    imageFit?: 'cover' | 'contain';
+    imagePosition?: 'center' | 'top' | 'bottom' | 'left' | 'right';
+    imageScale?: '90' | '100' | '110' | '125';
     subheadline?: string;
   };
   content_blocks: ContentBlock[];
@@ -195,6 +198,9 @@ export interface BrandConfig {
     subheadline?: string;
     backgroundImage: string;
     backgroundImageAlt?: string;
+    imageFit?: 'cover' | 'contain';
+    imagePosition?: 'center' | 'top' | 'bottom' | 'left' | 'right';
+    imageScale?: '90' | '100' | '110' | '125';
     /** Optional override for the hero primary CTA (defaults to seeded #quote label). */
     primaryCta?: { label: string; href: string };
   };
