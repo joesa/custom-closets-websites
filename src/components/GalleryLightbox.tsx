@@ -6,9 +6,15 @@ import Image from "next/image";
 interface GalleryLightboxProps {
   images: string[];
   altPrefix: string;
+  imageSize?: 'small' | 'medium' | 'large' | 'full';
+  imageAspect?: 'square' | 'landscape' | 'wide' | 'portrait';
+  imageFit?: 'cover' | 'contain';
 }
 
-export default function GalleryLightbox({ images, altPrefix }: GalleryLightboxProps) {
+const sizeClasses = { small: 'max-w-3xl mx-auto', medium: 'max-w-5xl mx-auto', large: 'max-w-7xl mx-auto', full: 'max-w-none' };
+const aspectClasses = { square: 'aspect-square', landscape: 'aspect-[4/3]', wide: 'aspect-video', portrait: 'aspect-[3/4]' };
+
+export default function GalleryLightbox({ images, altPrefix, imageSize = 'full', imageAspect = 'landscape', imageFit = 'cover' }: GalleryLightboxProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -25,21 +31,21 @@ export default function GalleryLightbox({ images, altPrefix }: GalleryLightboxPr
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ${sizeClasses[imageSize]}`}>
         {images.map((src, i) => (
           <button
             key={i}
             type="button"
             onClick={() => setActiveIndex(i)}
             aria-label={`Enlarge ${altPrefix} ${i + 1}`}
-            className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10 cursor-zoom-in group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            className={`relative overflow-hidden rounded-xl border border-white/10 cursor-zoom-in group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 ${aspectClasses[imageAspect]}`}
           >
             <Image
               src={src}
               alt={`${altPrefix} ${i + 1}`}
               fill
               sizes="(max-width: 768px) 100vw, 33vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className={`${imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-transform duration-300 group-hover:scale-105`}
             />
           </button>
         ))}

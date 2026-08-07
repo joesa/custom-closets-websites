@@ -560,8 +560,19 @@ function renderBlock(
     body?: string;
     image?: string;
     imageAlt?: string;
+    imageSize?: "small" | "medium" | "large" | "full";
+    imageAspect?: "square" | "landscape" | "wide" | "portrait";
+    imageFit?: "cover" | "contain";
     images?: string[];
-    items?: Array<{ title: string; description: string; image?: string; imageAlt?: string }>;
+    items?: Array<{
+      title: string;
+      description: string;
+      image?: string;
+      imageAlt?: string;
+      imageSize?: "small" | "medium" | "large" | "full";
+      imageAspect?: "square" | "landscape" | "wide" | "portrait";
+      imageFit?: "cover" | "contain";
+    }>;
   },
   idx: number,
   ctx: {
@@ -573,6 +584,8 @@ function renderBlock(
   }
 ) {
   const { theme, mutedText, cardSurface, pageDataTitle, composition } = ctx;
+  const sizeClasses = { small: "max-w-xs", medium: "max-w-md", large: "max-w-xl", full: "max-w-none" } as const;
+  const aspectClasses = { square: "aspect-square", landscape: "aspect-[4/3]", wide: "aspect-video", portrait: "aspect-[3/4]" } as const;
 
   if (block.type === "text") {
     return (
@@ -609,7 +622,7 @@ function renderBlock(
       >
         {block.image ? (
           <div
-            className={`relative w-full aspect-[4/3] overflow-hidden border border-white/10 ${
+            className={`relative w-full overflow-hidden border border-white/10 mx-auto ${sizeClasses[block.imageSize || "full"]} ${aspectClasses[block.imageAspect || "landscape"]} ${
               isLeft ? "md:order-1" : "md:order-2"
             }`}
           >
@@ -618,7 +631,7 @@ function renderBlock(
               alt={block.imageAlt || block.heading || "Section image"}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
+              className={block.imageFit === "contain" ? "object-contain" : "object-cover"}
             />
           </div>
         ) : null}
@@ -659,7 +672,7 @@ function renderBlock(
             {block.body}
           </p>
         ) : null}
-        <GalleryLightbox images={block.images} altPrefix={`${pageDataTitle} project`} />
+        <GalleryLightbox images={block.images} altPrefix={`${pageDataTitle} project`} imageSize={block.imageSize} imageAspect={block.imageAspect} imageFit={block.imageFit} />
       </div>
     );
   }
@@ -690,13 +703,13 @@ function renderBlock(
               className={`border overflow-hidden transition-colors min-w-0 ${cardSurface}`}
             >
               {item.image ? (
-                <div className="relative aspect-[4/3] w-full">
+                <div className={`relative w-full mx-auto ${sizeClasses[item.imageSize || "full"]} ${aspectClasses[item.imageAspect || "landscape"]}`}>
                   <Image
                     src={item.image}
                     alt={item.imageAlt || item.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover"
+                    className={item.imageFit === "contain" ? "object-contain" : "object-cover"}
                   />
                 </div>
               ) : null}

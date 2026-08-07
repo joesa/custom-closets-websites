@@ -154,8 +154,19 @@ export interface ContentBlock {
   body: string;
   image?: string;
   imageAlt?: string;
+  imageSize?: 'small' | 'medium' | 'large' | 'full';
+  imageAspect?: 'square' | 'landscape' | 'wide' | 'portrait';
+  imageFit?: 'cover' | 'contain';
   images?: string[];
-  items?: Array<{ title: string; description: string; image?: string; imageAlt?: string }>;
+  items?: Array<{
+    title: string;
+    description: string;
+    image?: string;
+    imageAlt?: string;
+    imageSize?: 'small' | 'medium' | 'large' | 'full';
+    imageAspect?: 'square' | 'landscape' | 'wide' | 'portrait';
+    imageFit?: 'cover' | 'contain';
+  }>;
 }
 
 export interface PageConfig {
