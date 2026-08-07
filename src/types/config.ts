@@ -66,6 +66,7 @@ export interface ProductDetails {
 export interface Product {
   title: string;
   image: string;
+  imageAlt?: string;
   description: string;
   details?: ProductDetails;
 }
@@ -136,6 +137,8 @@ export interface SEOConfig {
 export interface BeforeAfterConfig {
   beforeImage: string;
   afterImage: string;
+  beforeImageAlt?: string;
+  afterImageAlt?: string;
   title: string;
   subtitle: string;
 }
@@ -150,8 +153,9 @@ export interface ContentBlock {
   heading: string;
   body: string;
   image?: string;
+  imageAlt?: string;
   images?: string[];
-  items?: Array<{ title: string; description: string; image?: string }>;
+  items?: Array<{ title: string; description: string; image?: string; imageAlt?: string }>;
 }
 
 export interface PageConfig {
@@ -161,6 +165,7 @@ export interface PageConfig {
   hero: {
     headline: string;
     backgroundImage?: string;
+    backgroundImageAlt?: string;
     subheadline?: string;
   };
   content_blocks: ContentBlock[];
@@ -178,6 +183,7 @@ export interface BrandConfig {
     headline: string;
     subheadline?: string;
     backgroundImage: string;
+    backgroundImageAlt?: string;
     /** Optional override for the hero primary CTA (defaults to seeded #quote label). */
     primaryCta?: { label: string; href: string };
   };
@@ -263,4 +269,10 @@ export interface BrandConfig {
   customConfigDraft?: import('@/lib/customSite').CustomSiteConfig | null;
   /** Unpublished template-engine overrides for authorized draft preview. */
   engineConfigDraft?: EngineConfigDraft | null;
+  /** Contractor-controlled homepage section order and visibility. */
+  contentStructure?: {
+    homeSections?: string[];
+    hiddenHomeSections?: string[];
+  };
+  contentVersion?: number;
 }

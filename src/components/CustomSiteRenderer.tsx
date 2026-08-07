@@ -16,6 +16,7 @@ import {
   scopeCss,
 } from '@/lib/customSite';
 import EditInPlaceLayer from '@/components/EditInPlaceLayer';
+import ContentEditorBridge from '@/components/ContentEditorBridge';
 
 const SCOPE = '[data-custom-site]';
 
@@ -248,6 +249,7 @@ export default function CustomSiteRenderer({
         <DraftBanner />
       ) : null}
       {css ? <style dangerouslySetInnerHTML={{ __html: css }} /> : null}
+      <ContentEditorBridge rootRef={siteRef} mode="custom" pagePath={pagePath} />
       {showEditor ? (
         <div data-custom-site ref={siteRef} />
       ) : (

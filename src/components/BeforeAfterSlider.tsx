@@ -128,7 +128,7 @@ export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed
           <div className="absolute inset-0">
             <Image 
               src={config.beforeImage}
-              alt="Before"
+              alt={config.beforeImageAlt || "Before"}
               fill
               className="object-cover pointer-events-none"
               sizes="(max-width: 1152px) 100vw, 1152px"
@@ -145,7 +145,7 @@ export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed
           >
             <Image
               src={config.afterImage}
-              alt="After Transformation"
+              alt={config.afterImageAlt || "After transformation"}
               fill
               className="object-cover"
               sizes="(max-width: 1152px) 100vw, 1152px"

@@ -26,6 +26,8 @@ import ServicesProductGrid from "@/components/ServicesProductGrid";
 import { PUBLIC_API_URL } from "@/lib/urls";
 import type { Metadata } from "next";
 import { applyEngineDraftPreview } from "@/lib/engineDraftPreview";
+import { verifyContentEditorToken } from "@/lib/contentEditorToken";
+import ContentEditorShell from "@/components/ContentEditorShell";
 
 // Custom-mode sites carry per-page titles/descriptions in custom_config;
 // surface them instead of the engine's brandName-only metadata.
@@ -52,7 +54,7 @@ export default async function SubPage({
   searchParams,
 }: {
   params: Promise<{ hostname: string; slug: string }>;
-  searchParams?: Promise<{ draft?: string; admin_bypass?: string; edit_token?: string }>;
+  searchParams?: Promise<{ draft?: string; admin_bypass?: string; edit_token?: string; content_editor_token?: string }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearch = searchParams ? await searchParams : {};
@@ -68,7 +70,8 @@ export default async function SubPage({
     queryValue: resolvedSearch.admin_bypass,
     secret: process.env.ADMIN_BYPASS_SECRET,
   });
-  const gate = getSiteGate(config, isAdminBypass);
+  const isContentEditor = verifyContentEditorToken(resolvedSearch.content_editor_token, config.tenantId);
+  const gate = getSiteGate(config, isAdminBypass || isContentEditor);
 
   if (gate === "blocked") {
     notFound();
@@ -296,6 +299,7 @@ export default async function SubPage({
         url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
       />
 
+      <ContentEditorShell engineDocument={{ pages_config: renderConfig.pagesConfig }}>
       <main className={`${pageBg} min-h-screen ${theme.textPrimary}`}>
         <HeroSection
           variant={variant}
@@ -303,6 +307,7 @@ export default async function SubPage({
           tokens={tokens}
           headline={pageData.hero.headline}
           heroImage={heroImage}
+          heroImageAlt={pageData.hero.backgroundImageAlt || config.hero.backgroundImageAlt}
           brandName={config.brandName}
           heroHeadlineClasses={pageHeroHeadlineClasses(variant.typeScale)}
           ornament={signature.motif}
@@ -540,6 +545,7 @@ export default async function SubPage({
           </section>
         )}
       </main>
+      </ContentEditorShell>
     </>
   );
 }
@@ -556,8 +562,9 @@ function renderBlock(
     heading?: string;
     body?: string;
     image?: string;
+    imageAlt?: string;
     images?: string[];
-    items?: Array<{ title: string; description: string; image?: string }>;
+    items?: Array<{ title: string; description: string; image?: string; imageAlt?: string }>;
   },
   idx: number,
   ctx: {
@@ -611,7 +618,7 @@ function renderBlock(
           >
             <Image
               src={block.image}
-              alt={block.heading || "Section image"}
+              alt={block.imageAlt || block.heading || "Section image"}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
@@ -689,7 +696,7 @@ function renderBlock(
                 <div className="relative aspect-[4/3] w-full">
                   <Image
                     src={item.image}
-                    alt={item.title}
+                    alt={item.imageAlt || item.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover"

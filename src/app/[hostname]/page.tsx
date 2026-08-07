@@ -18,6 +18,7 @@ import { cookies } from "next/headers";
 import { PUBLIC_API_URL } from "@/lib/urls";
 import { applyEngineDraftPreview } from "@/lib/engineDraftPreview";
 import type { Metadata } from "next";
+import { verifyContentEditorToken } from "@/lib/contentEditorToken";
 
 // Custom-mode sites carry per-page titles/descriptions in custom_config;
 // surface them instead of the engine's brandName-only metadata.
@@ -44,7 +45,7 @@ export default async function Page({
   searchParams,
 }: {
   params: Promise<{ hostname: string }>;
-  searchParams?: Promise<{ draft?: string; admin_bypass?: string; edit_token?: string }>;
+  searchParams?: Promise<{ draft?: string; admin_bypass?: string; edit_token?: string; content_editor_token?: string }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearch = searchParams ? await searchParams : {};
@@ -60,7 +61,8 @@ export default async function Page({
     queryValue: resolvedSearch.admin_bypass,
     secret: process.env.ADMIN_BYPASS_SECRET,
   });
-  const gate = getSiteGate(config, isAdminBypass);
+  const isContentEditor = verifyContentEditorToken(resolvedSearch.content_editor_token, config.tenantId);
+  const gate = getSiteGate(config, isAdminBypass || isContentEditor);
 
   // Suspended sites are taken offline entirely.
   if (gate === 'blocked') {

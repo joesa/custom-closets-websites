@@ -40,6 +40,8 @@ type SiteConfigRow = {
     pagesConfig?: PageConfig[];
     navLinks?: NavLink[];
   } | null;
+  content_structure?: BrandConfig['contentStructure'] | null;
+  content_version?: number | null;
 };
 type TenantRow = {
   id?: string;
@@ -122,5 +124,7 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
             navLinks: configRow.engine_config_draft.navLinks,
           }
         : null,
+    contentStructure: configRow.content_structure ?? undefined,
+    contentVersion: Number(configRow.content_version || 1),
   };
 }

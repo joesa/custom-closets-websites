@@ -62,7 +62,9 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
           edit_in_place,
           custom_config,
           custom_config_draft,
-          engine_config_draft
+          engine_config_draft,
+          content_structure,
+          content_version
         )
       )
     `)
@@ -80,11 +82,16 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
 // Cross-request cache keyed by hostname. Revalidates every 60s so config edits
 // (e.g. site approval, theme changes) propagate without a redeploy. Invalidate
 // on demand with revalidateTag('site-config').
-const getCachedActiveConfig = unstable_cache(
-  (hostname: string) => loadActiveConfig(hostname),
-  ['active-config'],
-  { revalidate: 60, tags: ['site-config'] }
-);
+function getCachedActiveConfig(hostname: string) {
+  const cacheHostname = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === ''
+    ? 'lumina.localhost'
+    : hostname.toLowerCase();
+  return unstable_cache(
+    () => loadActiveConfig(cacheHostname),
+    ['active-config', cacheHostname],
+    { revalidate: 60, tags: [`site-config:${cacheHostname}`] }
+  )();
+}
 
 // Per-request memoization so layout.tsx and page.tsx share a single lookup
 // instead of each hitting Supabase independently.
