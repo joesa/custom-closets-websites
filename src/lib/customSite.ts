@@ -167,7 +167,7 @@ export function findUnmountedWidgetShells(html: string): string[] {
 export function scopeCss(css: string, scope: string): string {
   if (!css?.trim()) return ''
   // Strip HTML comments that models sometimes leave in CSS blobs.
-  let input = css.replace(/\/\*[\s\S]*?\*\//g, '')
+  const input = css.replace(/\/\*[\s\S]*?\*\//g, '')
   const parts: string[] = []
   let i = 0
   while (i < input.length) {

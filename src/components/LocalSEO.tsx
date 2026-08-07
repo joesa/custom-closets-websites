@@ -7,6 +7,16 @@ interface LocalSEOProps {
   url: string;
 }
 
+/** Prevent user-controlled SEO strings from terminating the JSON-LD script. */
+export function serializeJsonLd(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')
+}
+
 export default function LocalSEO({ seo, brandName, url }: LocalSEOProps) {
   if (!seo || Object.keys(seo).length === 0) return null;
 
@@ -34,7 +44,7 @@ export default function LocalSEO({ seo, brandName, url }: LocalSEOProps) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
     />
   );
 }
