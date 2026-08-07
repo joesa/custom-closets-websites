@@ -77,6 +77,7 @@ export default async function HostnameLayout({
       pages_config: config.pagesConfig,
       logo_url: config.logoUrl,
       pricing_notes: config.pricingNotes,
+      content_structure: config.contentStructure,
     }}>
       <style dangerouslySetInnerHTML={{ __html: cssVarString }} />
       {hasNav && (

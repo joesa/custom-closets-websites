@@ -290,6 +290,10 @@ export interface BrandConfig {
   contentStructure?: {
     homeSections?: string[];
     hiddenHomeSections?: string[];
+    imagePresentation?: Record<string, {
+      widthPercent: number;
+      aspectRatio: number;
+    }>;
   };
   contentVersion?: number;
 }
