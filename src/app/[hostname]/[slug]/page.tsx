@@ -27,7 +27,6 @@ import { PUBLIC_API_URL } from "@/lib/urls";
 import type { Metadata } from "next";
 import { applyEngineDraftPreview } from "@/lib/engineDraftPreview";
 import { verifyContentEditorToken } from "@/lib/contentEditorToken";
-import ContentEditorShell from "@/components/ContentEditorShell";
 
 // Custom-mode sites carry per-page titles/descriptions in custom_config;
 // surface them instead of the engine's brandName-only metadata.
@@ -299,7 +298,6 @@ export default async function SubPage({
         url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
       />
 
-      <ContentEditorShell engineDocument={{ pages_config: renderConfig.pagesConfig }}>
       <main className={`${pageBg} min-h-screen ${theme.textPrimary}`}>
         <HeroSection
           variant={variant}
@@ -545,7 +543,6 @@ export default async function SubPage({
           </section>
         )}
       </main>
-      </ContentEditorShell>
     </>
   );
 }

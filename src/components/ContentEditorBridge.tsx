@@ -45,7 +45,8 @@ export default function ContentEditorBridge({
     const params = new URLSearchParams(window.location.search);
     if (params.get('content_editor') !== '1') return;
     const editorOriginRaw = params.get('editor_origin');
-    if (!editorOriginRaw) return;
+    const sessionToken = params.get('content_editor_token');
+    if (!editorOriginRaw || !sessionToken) return;
     let editorOrigin: string;
     try { editorOrigin = new URL(editorOriginRaw).origin; } catch { return; }
     const root = rootRef.current;
@@ -97,6 +98,7 @@ export default function ContentEditorBridge({
       editable.dataset.contentSelected = '1';
       window.parent.postMessage({
         type: 'dtf:content-select',
+        sessionToken,
         path: mode === 'engine'
           ? editable.dataset.contentPath
           : `/custom_config/pages/${encodePointer(pagePath)}/html`,
@@ -108,8 +110,23 @@ export default function ContentEditorBridge({
     };
 
     const command = (event: MessageEvent) => {
-      if (event.origin !== editorOrigin || mode !== 'custom') return;
-      if (!event.data || event.data.type !== 'dtf:editor-command') return;
+      if (event.origin !== editorOrigin || event.source !== window.parent) return;
+      if (!event.data || event.data.sessionToken !== sessionToken) return;
+      if (mode === 'engine' && event.data.type === 'dtf:engine-content-update') {
+        const path = typeof event.data.path === 'string' ? event.data.path : '';
+        const value = event.data.value;
+        root.querySelectorAll<HTMLElement>('[data-content-path]').forEach((node) => {
+          if (node.dataset.contentPath !== path) return;
+          if (node instanceof HTMLImageElement && typeof value === 'string') {
+            node.src = value;
+            node.removeAttribute('srcset');
+          } else if (typeof value === 'string' || typeof value === 'number') {
+            node.textContent = String(value);
+          }
+        });
+        return;
+      }
+      if (mode !== 'custom' || event.data.type !== 'dtf:editor-command') return;
       const selected = selectedRef.current;
       if (!selected || !root.contains(selected)) return;
       const action = String(event.data.action || '');
@@ -139,6 +156,7 @@ export default function ContentEditorBridge({
       } else return;
       window.parent.postMessage({
         type: 'dtf:custom-html',
+        sessionToken,
         path: pagePath,
         html: cleanSerializedHtml(root),
       }, editorOrigin);

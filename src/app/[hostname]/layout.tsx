@@ -1,5 +1,6 @@
 import { getActiveConfig } from "@/lib/getConfig";
 import Navbar from "@/components/Navbar";
+import ContentEditorShell from "@/components/ContentEditorShell";
 import { getDesignVariant, siteSeed } from "@/lib/designVariants";
 import { getThemeStyles, getSectionTokens, applyVoice, generateCssVars, cssVarsToString } from '@/lib/theme';
 import { cookies } from "next/headers";
@@ -63,7 +64,20 @@ export default async function HostnameLayout({
   const isSidebarNav = hasNav && navStyle.startsWith('sidebar-left');
 
   return (
-    <>
+    <ContentEditorShell engineDocument={{
+      brand_name: config.brandName,
+      hero_config: config.hero,
+      about_config: config.about,
+      process_config: config.process,
+      products_config: config.products,
+      seo_config: config.seo,
+      before_after_config: config.beforeAfter,
+      quiz_config: config.quiz,
+      nav_links: config.navLinks,
+      pages_config: config.pagesConfig,
+      logo_url: config.logoUrl,
+      pricing_notes: config.pricingNotes,
+    }}>
       <style dangerouslySetInnerHTML={{ __html: cssVarString }} />
       {hasNav && (
         <Navbar 
@@ -80,6 +94,6 @@ export default async function HostnameLayout({
       )}
       {/* Fixed sidebar-left nav is w-64; offset main content so pages aren't cramped. */}
       <div className={isSidebarNav ? 'md:pl-64' : undefined}>{children}</div>
-    </>
+    </ContentEditorShell>
   );
 }

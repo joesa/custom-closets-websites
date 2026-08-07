@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Script from "next/script";
 import * as motion from "framer-motion/client";
@@ -29,7 +29,6 @@ import {
   useMotionHydrated,
 } from "@/components/MotionHydrationProvider";
 import { motionInitial } from "@/lib/motionInitial";
-import ContentEditorBridge from "@/components/ContentEditorBridge";
 
 interface ClientPageProps {
   config: BrandConfig;
@@ -39,7 +38,6 @@ interface ClientPageProps {
 const HERO_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c';
 
 function ClientPageContent({ config }: ClientPageProps) {
-  const editorRootRef = useRef<HTMLDivElement>(null);
   const motionReady = useMotionHydrated();
   // Single canonical seed for the whole site: a resolved (collision-free) design
   // seed if one was assigned at provision time, else the stable site identity.
@@ -553,24 +551,7 @@ function ClientPageContent({ config }: ClientPageProps) {
   const hasNav = !!(config.navLinks && config.navLinks.length > 0);
 
   return (
-    <div ref={editorRootRef} className={`min-h-screen ${theme.pageBackground} ${theme.textPrimary} ${theme.bodyFont}`}>
-      <ContentEditorBridge
-        rootRef={editorRootRef}
-        mode="engine"
-        engineDocument={{
-          brand_name: config.brandName,
-          hero_config: config.hero,
-          about_config: config.about,
-          process_config: config.process,
-          products_config: config.products,
-          seo_config: config.seo,
-          before_after_config: config.beforeAfter,
-          quiz_config: config.quiz,
-          nav_links: config.navLinks,
-          logo_url: config.logoUrl,
-          pricing_notes: config.pricingNotes,
-        }}
-      />
+    <div className={`min-h-screen ${theme.pageBackground} ${theme.textPrimary} ${theme.bodyFont}`}>
       {/* ─── Global Header (only when the layout's Navbar isn't present) ─── */}
       {!hasNav && (
         <header className="pointer-events-none absolute top-0 z-50 w-full py-8">
