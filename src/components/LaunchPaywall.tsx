@@ -32,11 +32,11 @@ export default function LaunchPaywall({ brandName, launchPayUrl }: Props) {
         </p>
         <a
           href={launchPayUrl}
-          className="inline-block w-full rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors"
+          className="inline-block w-full rounded-lg bg-emerald-700 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300"
         >
           Complete launch payment
         </a>
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-neutral-400">
           You will be redirected to our secure checkout. The link is also in your launch email.
         </p>
       </div>

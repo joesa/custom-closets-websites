@@ -40,7 +40,7 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
     bg: t.pageBackground,
     title: `${t.headingFont} ${t.textPrimary}`,
     subtitle: `${t.bodyFont} ${section.accent} text-sm`,
-    card: `${section.surface} ${section.surfaceBorder} ${t.textSecondary} hover:opacity-100 opacity-90`,
+    card: `${section.surface} ${section.surfaceBorder} ${t.textSecondary}`,
     selectedCard: `${section.accentBg} ${section.accentText} border-transparent`,
     button: t.button,
   };

@@ -94,7 +94,7 @@ const SURFACE_POOL: Record<
   'soft-cream': {
     pageBackground: 'bg-[#faf8f5]',
     textPrimary: 'text-amber-950',
-    textSecondary: 'text-amber-900/70',
+    textSecondary: 'text-amber-900',
     heroGradient: 'bg-gradient-to-t from-amber-950/80 via-amber-950/30 to-transparent',
     isDark: false,
     surfaceClasses: 'bg-white',
@@ -248,7 +248,7 @@ function coreThemeStyles(theme: ThemeType): ThemeStyles {
       return {
         pageBackground: 'bg-[#faf8f5]',
         textPrimary: 'text-amber-950',
-        textSecondary: 'text-amber-900/70',
+        textSecondary: 'text-amber-900',
         headingFont: 'font-dm-serif',
         bodyFont: 'font-lora',
         containerClasses: 'max-w-5xl mx-auto px-6 py-24',
@@ -346,7 +346,7 @@ function coreThemeStyles(theme: ThemeType): ThemeStyles {
       return {
         pageBackground: 'bg-purple-50',
         textPrimary: 'text-purple-950',
-        textSecondary: 'text-purple-700/70',
+        textSecondary: 'text-purple-700',
         headingFont: 'font-syne font-bold',
         bodyFont: 'font-space-grotesk',
         containerClasses: 'max-w-7xl mx-auto px-8 py-24',
@@ -663,7 +663,7 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
       return {
         pageBackground: 'bg-[#f6f2ec]',
         textPrimary: 'text-[#241f1a]',
-        textSecondary: 'text-[#241f1a]/60',
+        textSecondary: 'text-[#5c554d]',
         headingFont: 'font-fraunces font-normal',
         bodyFont: 'font-manrope font-light',
         containerClasses: 'max-w-6xl mx-auto px-8 py-32',
@@ -1420,6 +1420,7 @@ export function twTextToColor(twClass: string): string {
     'text-slate-400': '#94a3b8',
     'text-slate-100': '#f1f5f9',
     'text-amber-950': '#451a03',
+    'text-amber-900': '#78350f',
     'text-amber-700': '#b45309',
     'text-zinc-900': '#18181b',
     'text-zinc-100': '#f4f4f5',
@@ -1430,6 +1431,7 @@ export function twTextToColor(twClass: string): string {
     'text-neutral-900': '#171717',
     'text-neutral-500': '#737373',
     'text-purple-950': '#3b0764',
+    'text-purple-700': '#7e22ce',
     'text-blue-600': '#2563eb',
     'text-sky-600': '#0284c7',
     'text-sky-700': '#0369a1',

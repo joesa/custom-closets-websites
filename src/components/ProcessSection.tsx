@@ -118,7 +118,7 @@ export default function ProcessSection({ theme, themeTokens, process, fontSeed }
                 transition={{ duration: 0.8, delay: idx * 0.2 }}
                 className="relative flex flex-col group"
               >
-                <div className={`text-5xl md:text-6xl font-bold opacity-15 ${section.accent} ${t.headingFont}`}>
+                <div className={`text-3xl font-bold ${section.accent} ${t.headingFont}`}>
                   {step.number}
                 </div>
                 <h3 className={`text-2xl mt-4 mb-4 ${t.headingFont} ${t.textPrimary}`}>
