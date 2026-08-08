@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { ACCENT_SWATCHES, twBgToHex, twTextToColor } from './theme';
+import { ACCENT_SWATCHES, THEME_IDS, getThemeStyles, twBgToHex, twTextToColor } from './theme';
 
 function rgb(hex: string): [number, number, number] {
   const value = hex.replace('#', '');
-  if (!/^[0-9a-f]{6}$/i.test(value)) throw new Error(`Unsupported color: ${hex}`);
-  return [0, 2, 4].map((offset) => Number.parseInt(value.slice(offset, offset + 2), 16)) as [number, number, number];
+  if (!/^[0-9a-f]{6}(?:[0-9a-f]{2})?$/i.test(value)) throw new Error(`Unsupported color: ${hex}`);
+  const channels = [0, 2, 4].map((offset) => Number.parseInt(value.slice(offset, offset + 2), 16));
+  if (value.length === 8) {
+    const alpha = Number.parseInt(value.slice(6, 8), 16) / 255;
+    return channels.map((channel) => Math.round(channel * alpha + 255 * (1 - alpha))) as [number, number, number];
+  }
+  return channels as [number, number, number];
 }
 
 function luminance(hex: string): number {
@@ -41,6 +46,38 @@ describe('curated accent swatches', () => {
         ...(lightRatio >= 4.5 ? [] : [`${name}/light: ${lightRatio.toFixed(2)}:1`]),
         ...(darkRatio >= 4.5 ? [] : [`${name}/dark: ${darkRatio.toFixed(2)}:1`]),
       ];
+    });
+
+    expect(failures).toEqual([]);
+  });
+});
+
+describe('complete template theme matrix', () => {
+  it('keeps primary and secondary body text at WCAG AA on every theme surface', () => {
+    const failures = THEME_IDS.flatMap((theme) => {
+      const styles = getThemeStyles(theme);
+      const background = twBgToHex(styles.pageBackground);
+      const primary = contrast(twTextToColor(styles.textPrimary), background);
+      const secondary = contrast(twTextToColor(styles.textSecondary), background);
+      const accent = contrast(twTextToColor(styles.accentColor), background);
+      return [
+        ...(primary >= 4.5 ? [] : [`${theme}/primary: ${primary.toFixed(2)}:1`]),
+        ...(secondary >= 4.5 ? [] : [`${theme}/secondary: ${secondary.toFixed(2)}:1`]),
+        ...(accent >= 4.5 ? [] : [`${theme}/accent: ${accent.toFixed(2)}:1`]),
+      ];
+    });
+
+    expect(failures).toEqual([]);
+  });
+
+  it('keeps every theme button label at WCAG AA on its fill', () => {
+    const failures = THEME_IDS.flatMap((theme) => {
+      const styles = getThemeStyles(theme);
+      const isTransparent = styles.button.split(/\s+/).includes('bg-transparent');
+      const background = isTransparent ? twBgToHex(styles.pageBackground) : twBgToHex(styles.button);
+      const labelClass = styles.button.split(/\s+/).find((className) => className.startsWith('text-')) || styles.textPrimary;
+      const ratio = contrast(twTextToColor(labelClass), background);
+      return ratio >= 4.5 ? [] : [`${theme}/button: ${ratio.toFixed(2)}:1`];
     });
 
     expect(failures).toEqual([]);

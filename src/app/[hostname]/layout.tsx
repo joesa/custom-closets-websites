@@ -5,6 +5,7 @@ import { getDesignVariant, siteSeed } from "@/lib/designVariants";
 import { getThemeStyles, getSectionTokens, applyVoice, generateCssVars, cssVarsToString } from '@/lib/theme';
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
+import { resolveImageArtDirection } from '@/lib/imageArtDirection';
 
 export async function generateMetadata({
   params,
@@ -72,6 +73,8 @@ export default async function HostnameLayout({
   const cssVarString = `:root {\n${cssVarsToString(cssVars)}\n}`;
 
   const navStyle = getDesignVariant(fontSeed, config.theme).nav;
+  const designVariant = getDesignVariant(fontSeed, config.theme);
+  const imageArt = resolveImageArtDirection(config.theme, fontSeed);
   const isSidebarNav = hasNav && navStyle.startsWith('sidebar-left');
 
   return (
@@ -91,21 +94,29 @@ export default async function HostnameLayout({
       content_structure: config.contentStructure,
     }}>
       <style dangerouslySetInnerHTML={{ __html: cssVarString }} />
-      {hasNav && (
-        <Navbar 
-          brandName={config.brandName} 
-          links={config.navLinks || []} 
-          themeName={config.theme} 
-          themeTokens={config.themeTokens}
-          logoUrl={config.logoUrl}
-          fontSeed={fontSeed}
-          navStyle={navStyle}
-          phone={config.seo?.phone}
-          engagementModel={config.engagementModel}
-        />
-      )}
-      {/* Fixed sidebar-left nav is w-64; offset main content so pages aren't cramped. */}
-      <div className={isSidebarNav ? 'md:pl-64' : undefined}>{children}</div>
+      <div
+        data-engine-site="v2"
+        data-type-scale={designVariant.typeScale}
+        data-image-art={imageArt}
+        data-focus-standard="visible-ring"
+        data-performance-standard="reserved-media-next-font"
+      >
+        {hasNav && (
+          <Navbar
+            brandName={config.brandName}
+            links={config.navLinks || []}
+            themeName={config.theme}
+            themeTokens={config.themeTokens}
+            logoUrl={config.logoUrl}
+            fontSeed={fontSeed}
+            navStyle={navStyle}
+            phone={config.seo?.phone}
+            engagementModel={config.engagementModel}
+          />
+        )}
+        {/* Fixed sidebar-left nav is w-64; offset main content so pages aren't cramped. */}
+        <div className={isSidebarNav ? 'md:pl-64' : undefined}>{children}</div>
+      </div>
     </ContentEditorShell>
   );
 }

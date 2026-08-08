@@ -38,6 +38,7 @@ import {
   useMotionHydrated,
 } from "@/components/MotionHydrationProvider";
 import { motionInitial } from "@/lib/motionInitial";
+import { resolveImageArtDirection } from '@/lib/imageArtDirection';
 
 interface ClientPageProps {
   config: BrandConfig;
@@ -54,6 +55,7 @@ function ClientPageContent({ config }: ClientPageProps) {
   const theme = applyVoice(getThemeStyles(config.theme, config.themeTokens), config.theme, fontSeed, config.themeTokens);
   const tokens = getSectionTokens(config.theme, fontSeed, config.themeTokens);
   const variant = getDesignVariant(fontSeed, config.theme);
+  const imageArt = resolveImageArtDirection(config.theme, fontSeed);
   const siteMotion = getSiteMotion(fontSeed);
   const signature = resolveSiteSignature({
     brandName: config.brandName,
@@ -372,14 +374,14 @@ function ClientPageContent({ config }: ClientPageProps) {
             className={`flex flex-col cursor-pointer ${theme.productCard} ${portfolioItemExtra} overflow-hidden ${cardRadiusClass}`}
             onClick={() => setSelectedProduct(product)}
           >
-            <div className={`relative ${portfolioAspectFor(idx)} w-full overflow-hidden`}>
+            <div className={`ds-image-frame relative ${portfolioAspectFor(idx)} w-full overflow-hidden`}>
               {product.image ? (
                 <Image
                   src={product.image}
                   alt={product.imageAlt || product.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  className={`object-cover ${theme.productImageHover}`}
+                  className={`ds-art-image object-cover ${theme.productImageHover}`}
                 />
               ) : (
                 <div className={`absolute inset-0 flex items-center justify-center ${tokens.accentBg} opacity-80`}>
@@ -540,7 +542,14 @@ function ClientPageContent({ config }: ClientPageProps) {
   const hasNav = !!(config.navLinks && config.navLinks.length > 0);
 
   return (
-    <div className={`min-h-screen ${theme.pageBackground} ${theme.textPrimary} ${theme.bodyFont}`}>
+    <div
+      data-engine-site="v2"
+      data-type-scale={variant.typeScale}
+      data-image-art={imageArt}
+      data-focus-standard="visible-ring"
+      data-performance-standard="reserved-media-next-font"
+      className={`min-h-screen ${theme.pageBackground} ${theme.textPrimary} ${theme.bodyFont}`}
+    >
       <a
         href="#main-content"
         className="fixed left-4 top-4 z-[100] -translate-y-24 bg-white px-4 py-3 text-sm font-semibold text-black shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-black"

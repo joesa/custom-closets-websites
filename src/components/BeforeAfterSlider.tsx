@@ -117,7 +117,7 @@ export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden select-none touch-none cursor-ew-resize group"
+          className="ds-image-frame relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden select-none touch-none cursor-ew-resize group"
           ref={containerRef}
           onMouseDown={(e) => startDragging(e.clientX)}
           onTouchStart={(e) => startDragging(e.touches[0].clientX)}
@@ -130,7 +130,7 @@ export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed
               src={config.beforeImage}
               alt={config.beforeImageAlt || "Before"}
               fill
-              className="object-cover pointer-events-none"
+              className="ds-art-image object-cover pointer-events-none"
               sizes="(max-width: 1152px) 100vw, 1152px"
             />
             <div className="absolute top-4 right-4 z-10 px-4 py-1 text-xs font-bold bg-black/60 text-white backdrop-blur-sm">
@@ -147,7 +147,7 @@ export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed
               src={config.afterImage}
               alt={config.afterImageAlt || "After"}
               fill
-              className="object-cover"
+              className="ds-art-image object-cover"
               sizes="(max-width: 1152px) 100vw, 1152px"
             />
             {/* Label */}

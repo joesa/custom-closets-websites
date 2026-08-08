@@ -35,7 +35,7 @@ export default function SiteFooter({
 
   const hairline = section.isDark ? 'border-white/10' : 'border-black/10';
   const muted = `${t.bodyFont} ${t.textSecondary} text-sm leading-relaxed`;
-  const faint = `${t.bodyFont} ${t.textSecondary} text-xs opacity-70`;
+  const faint = `${t.bodyFont} ${t.textSecondary} text-xs`;
 
   const streetAddress = seo?.streetAddress?.trim() || '';
   const localityParts = [seo?.addressLocality?.trim(), seo?.addressRegion?.trim()].filter(Boolean).join(', ');
@@ -82,7 +82,7 @@ export default function SiteFooter({
           <Link
             key={i}
             href={link.slug}
-            className={`${t.bodyFont} ${t.textSecondary} text-sm hover:opacity-100 opacity-90 transition-opacity ${linkClassName ?? ''}`}
+            className={`${t.bodyFont} ${t.textSecondary} text-sm hover:underline underline-offset-4 ${linkClassName ?? ''}`}
           >
             {link.label}
           </Link>

@@ -101,14 +101,14 @@ export default function ServicesProductGrid({
               onClick={() => setSelected(product)}
               className={`border overflow-hidden transition-colors text-left min-w-0 cursor-pointer group ds-framed-img ${theme.productCard} ${cardSurface} ${getStaggerClasses(i)}`}
             >
-              <div className="relative aspect-[4/3] w-full">
+              <div className="ds-image-frame relative aspect-[4/3] w-full">
                 {product.image ? (
                   <Image
                     src={product.image}
                     alt={product.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    className={`object-cover ${theme.productImageHover}`}
+                    className={`ds-art-image object-cover ${theme.productImageHover}`}
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/5">

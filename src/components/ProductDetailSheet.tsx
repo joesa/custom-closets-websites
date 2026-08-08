@@ -70,14 +70,14 @@ export default function ProductDetailSheet({ isOpen, onClose, product, theme, th
             </div>
 
             {product.image ? (
-              <div className="relative aspect-[4/3] w-full mb-12 overflow-hidden rounded-sm group shadow-sm">
+              <div className="ds-image-frame relative aspect-[4/3] w-full mb-12 overflow-hidden rounded-sm group shadow-sm">
                 <Image
                   src={product.image}
                   alt={product.title}
                   fill
                   priority
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover"
+                  className="ds-art-image object-cover"
                 />
               </div>
             ) : null}

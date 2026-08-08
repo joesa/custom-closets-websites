@@ -639,7 +639,7 @@ function renderBlock(
       >
         {block.image ? (
           <div
-            className={`relative w-full overflow-hidden border border-white/10 mx-auto ${sizeClasses[block.imageSize || "full"]} ${aspectClasses[block.imageAspect || "landscape"]} ${
+            className={`ds-image-frame relative w-full overflow-hidden border border-white/10 mx-auto ${sizeClasses[block.imageSize || "full"]} ${aspectClasses[block.imageAspect || "landscape"]} ${
               isLeft ? "md:order-1" : "md:order-2"
             }`}
           >
@@ -648,7 +648,7 @@ function renderBlock(
               alt={block.imageAlt || block.heading || "Section image"}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className={block.imageFit === "contain" ? "object-contain" : "object-cover"}
+              className={`ds-art-image ${block.imageFit === "contain" ? "object-contain" : "object-cover"}`}
             />
           </div>
         ) : null}
@@ -727,13 +727,13 @@ function renderBlock(
               className={`border overflow-hidden transition-colors min-w-0 ${cardSurface}`}
             >
               {item.image ? (
-                <div className={`relative w-full mx-auto ${sizeClasses[item.imageSize || "full"]} ${aspectClasses[item.imageAspect || "landscape"]}`}>
+                <div className={`ds-image-frame relative w-full mx-auto ${sizeClasses[item.imageSize || "full"]} ${aspectClasses[item.imageAspect || "landscape"]}`}>
                   <Image
                     src={item.image}
                     alt={item.imageAlt || item.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className={item.imageFit === "contain" ? "object-contain" : "object-cover"}
+                    className={`ds-art-image ${item.imageFit === "contain" ? "object-contain" : "object-cover"}`}
                   />
                 </div>
               ) : null}

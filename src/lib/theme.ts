@@ -280,10 +280,10 @@ function coreThemeStyles(theme: ThemeType): ThemeStyles {
         headingFont: 'font-syne font-black',
         bodyFont: 'font-manrope',
         containerClasses: 'max-w-6xl mx-auto px-6 py-24',
-        button: 'bg-rose-500 text-white hover:bg-rose-600 transition-transform hover:scale-105 rounded-full px-8 py-4 font-bold text-lg shadow-lg',
+        button: 'bg-rose-700 text-white hover:bg-rose-800 transition-transform hover:scale-105 rounded-full px-8 py-4 font-bold text-lg shadow-lg',
         productCard: 'group overflow-hidden rounded-3xl bg-white shadow-xl border-4 border-transparent hover:border-rose-400 transition-all',
         productImageHover: 'transition-transform duration-300 group-hover:rotate-1 group-hover:scale-105',
-        accentColor: 'text-rose-500',
+        accentColor: 'text-rose-700',
         heroGradient: 'bg-gradient-to-t from-sky-900/60 to-transparent',
       };
     case 'rustic-pantry':
@@ -318,14 +318,14 @@ function coreThemeStyles(theme: ThemeType): ThemeStyles {
       return {
         pageBackground: 'bg-[#fffaf0]',
         textPrimary: 'text-[#4a3f35]',
-        textSecondary: 'text-[#8a7f75]',
+        textSecondary: 'text-[#74695f]',
         headingFont: 'font-cormorant font-medium italic',
         bodyFont: 'font-manrope font-light',
         containerClasses: 'max-w-6xl mx-auto px-8 py-32',
-        button: 'bg-[#d4af37] text-white hover:bg-[#b5952f] transition-colors rounded-full px-10 py-4 uppercase tracking-widest text-sm shadow-md',
+        button: 'bg-[#806818] text-white hover:bg-[#665313] transition-colors rounded-full px-10 py-4 uppercase tracking-widest text-sm shadow-md',
         productCard: 'group overflow-hidden rounded-t-full bg-white shadow-sm',
         productImageHover: 'transition-transform duration-1000 group-hover:scale-110',
-        accentColor: 'text-[#d4af37]',
+        accentColor: 'text-[#806818]',
         heroGradient: 'bg-gradient-to-t from-[#4a3f35]/60 to-transparent',
       };
     case 'functional-utility':
@@ -367,7 +367,7 @@ function coreThemeStyles(theme: ThemeType): ThemeStyles {
         button: 'bg-[#5c1c24] text-[#e6d5cc] hover:bg-[#4a151d] transition-colors rounded-none px-10 py-4 uppercase tracking-[0.2em] border border-[#5c1c24]',
         productCard: 'group overflow-hidden bg-[#24181a] border border-[#362427]',
         productImageHover: 'transition-transform duration-1000 group-hover:scale-105 opacity-80 group-hover:opacity-100',
-        accentColor: 'text-[#8c2a35]',
+        accentColor: 'text-[#d49aa1]',
         heroGradient: 'bg-gradient-to-t from-[#1a1112] via-[#1a1112]/80 to-transparent',
       };
     case 'cozy-library':
@@ -388,14 +388,14 @@ function coreThemeStyles(theme: ThemeType): ThemeStyles {
       return {
         pageBackground: 'bg-[#faf9f7]',
         textPrimary: 'text-[#2a2b2a]',
-        textSecondary: 'text-[#6b6e68]',
+        textSecondary: 'text-[#565a54]',
         headingFont: 'font-space-grotesk font-light tracking-widest uppercase',
         bodyFont: 'font-manrope font-light',
         containerClasses: 'max-w-4xl mx-auto px-12 py-32',
         button: 'bg-transparent text-[#2a2b2a] hover:bg-[#2a2b2a] hover:text-white transition-colors rounded-none px-12 py-4 uppercase tracking-[0.3em] text-xs border border-[#2a2b2a]',
         productCard: 'group overflow-hidden rounded-none',
         productImageHover: 'transition-transform duration-1000 group-hover:scale-105',
-        accentColor: 'text-[#7d8276]',
+        accentColor: 'text-[#62675d]',
         heroGradient: 'bg-gradient-to-t from-[#faf9f7]/80 to-transparent',
       };
     case 'pantry-fresh':
@@ -408,14 +408,14 @@ function coreThemeStyles(theme: ThemeType): ThemeStyles {
       return {
         pageBackground: 'bg-sky-50',
         textPrimary: 'text-slate-800',
-        textSecondary: 'text-slate-500',
+        textSecondary: 'text-slate-600',
         headingFont: 'font-space-grotesk font-semibold',
         bodyFont: 'font-manrope',
         containerClasses: 'max-w-6xl mx-auto px-6 py-20',
-        button: 'bg-sky-600 text-white hover:bg-sky-700 transition-colors rounded-lg px-8 py-3 font-medium',
+        button: 'bg-sky-700 text-white hover:bg-sky-800 transition-colors rounded-lg px-8 py-3 font-medium',
         productCard: 'group overflow-hidden rounded-xl bg-white border border-sky-100 shadow-sm',
         productImageHover: 'transition-transform duration-500 group-hover:scale-105',
-        accentColor: 'text-sky-600',
+        accentColor: 'text-sky-700',
         heroGradient: 'bg-gradient-to-t from-sky-900/50 to-transparent',
       };
     case 'coastal-climate':
@@ -492,7 +492,7 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
       return {
         ...coreThemeStyles('laundry-clean'),
         pageBackground: 'bg-white',
-        accentColor: 'text-sky-600',
+        accentColor: 'text-sky-700',
       };
     case 'warm-handyman':
       return coreThemeStyles('classic-warm');
@@ -511,7 +511,7 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
     case 'swift-mobile':
       return {
         ...coreThemeStyles('sleek-entertainment'),
-        button: 'bg-indigo-500 text-white hover:bg-indigo-400 transition-colors rounded-none px-8 py-4 font-bold tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.4)]',
+        button: 'bg-indigo-600 text-white hover:bg-indigo-500 transition-colors rounded-none px-8 py-4 font-bold tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.4)]',
         accentColor: 'text-indigo-400',
       };
     case 'clean-move':
@@ -522,9 +522,9 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
       };
     case 'urban-reclaim':
       return {
-        ...coreThemeStyles('garage-industrial'),
+        ...coreThemeStyles('brutalist'),
         button: 'bg-emerald-500 text-black hover:bg-emerald-400 transition-colors rounded-none px-8 py-4 uppercase font-bold text-base border-2 border-emerald-500',
-        accentColor: 'text-emerald-400',
+        accentColor: 'text-emerald-300',
       };
     case 'stone-masonry':
       return {
@@ -549,8 +549,8 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
       return {
         ...coreThemeStyles('playful-kids'),
         pageBackground: 'bg-rose-50',
-        button: 'bg-emerald-500 text-white hover:bg-emerald-600 transition-transform hover:scale-105 rounded-full px-8 py-4 font-bold text-lg shadow-lg',
-        accentColor: 'text-emerald-600',
+        button: 'bg-emerald-700 text-white hover:bg-emerald-800 transition-transform hover:scale-105 rounded-full px-8 py-4 font-bold text-lg shadow-lg',
+        accentColor: 'text-emerald-700',
       };
 
     // ── Second wave ──
@@ -566,15 +566,15 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
     case 'eco-solar':
       return {
         ...coreThemeStyles('modern-office'),
-        button: 'bg-emerald-600 text-white hover:bg-emerald-700 transition-colors rounded-md px-8 py-4 font-medium',
-        accentColor: 'text-emerald-600',
+        button: 'bg-emerald-700 text-white hover:bg-emerald-800 transition-colors rounded-md px-8 py-4 font-medium',
+        accentColor: 'text-emerald-700',
       };
     case 'pastoral-pet':
       return {
         ...coreThemeStyles('playful-kids'),
         pageBackground: 'bg-emerald-50',
-        button: 'bg-sky-500 text-white hover:bg-sky-600 transition-transform hover:scale-105 rounded-full px-8 py-4 font-bold text-lg shadow-lg',
-        accentColor: 'text-sky-600',
+        button: 'bg-sky-700 text-white hover:bg-sky-800 transition-transform hover:scale-105 rounded-full px-8 py-4 font-bold text-lg shadow-lg',
+        accentColor: 'text-sky-700',
       };
     case 'hearth-warm':
       return {
@@ -619,8 +619,8 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
     case 'event-festive':
       return {
         ...coreThemeStyles('playful-kids'),
-        button: 'bg-fuchsia-500 text-white hover:bg-fuchsia-600 transition-transform hover:scale-105 rounded-full px-8 py-4 font-bold text-lg shadow-lg',
-        accentColor: 'text-fuchsia-500',
+        button: 'bg-purple-700 text-white hover:bg-purple-800 transition-transform hover:scale-105 rounded-full px-8 py-4 font-bold text-lg shadow-lg',
+        accentColor: 'text-purple-600',
       };
     case 'wellness-calm':
       return coreThemeStyles('minimalist-zen');
@@ -670,7 +670,7 @@ export function getThemeStyles(theme: ThemeType, tokens?: ThemeTokenSelection | 
         button: 'bg-[#241f1a] text-[#f6f2ec] hover:bg-[#3a3229] transition-colors rounded-none px-8 py-4 uppercase tracking-[0.2em] text-sm',
         productCard: 'group overflow-hidden rounded-none border border-[#241f1a]/10',
         productImageHover: 'transition-transform duration-1000 group-hover:scale-105',
-        accentColor: 'text-[#8a7256]',
+        accentColor: 'text-[#70583d]',
         heroGradient: 'bg-gradient-to-t from-[#241f1a]/70 via-[#241f1a]/20 to-transparent',
       };
 
@@ -756,6 +756,11 @@ const THEME_VOICE: Record<ThemeType, VoiceFamily> = {
   'garage-loadrated': 'boldDisplay',
   'lumina-atelier': 'editorial',
 };
+
+/** Runtime inventory used by exhaustive CI checks. The Record above makes a
+ * missing ThemeType a TypeScript error; this list makes the same matrix
+ * enumerable without maintaining a second hand-written catalog. */
+export const THEME_IDS = Object.freeze(Object.keys(THEME_VOICE) as ThemeType[]);
 
 // Interchangeable heading typefaces per voice family (all carry the same mood).
 // Syne and Inter are absent on purpose: FULL_REDESIGN_DESIGN_SYSTEM bans both as
@@ -1029,45 +1034,45 @@ const SECTION_TOKENS: Record<ThemeType, SectionTokens> = {
   'brutalist':           { isDark: true,  surface: 'bg-white/[0.03]',     surfaceBorder: 'border-white/15',        accent: 'text-yellow-400', accentBg: 'bg-yellow-400', accentText: 'text-black' },
   'classic-warm':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-amber-900/10',    accent: 'text-amber-800',  accentBg: 'bg-amber-900',  accentText: 'text-white' },
   'modern-office':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-slate-200',       accent: 'text-blue-600',   accentBg: 'bg-blue-600',   accentText: 'text-white' },
-  'playful-kids':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-rose-500',   accentBg: 'bg-rose-500',   accentText: 'text-white' },
+  'playful-kids':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-rose-700',   accentBg: 'bg-rose-500',   accentText: 'text-white' },
   'rustic-pantry':       { isDark: false, surface: 'bg-[#ece8df]',        surfaceBorder: 'border-[#515c4a]/20',    accent: 'text-[#515c4a]',  accentBg: 'bg-[#515c4a]',  accentText: 'text-white' },
   'sleek-entertainment': { isDark: true,  surface: 'bg-zinc-900',         surfaceBorder: 'border-zinc-800',        accent: 'text-cyan-400',   accentBg: 'bg-cyan-500',   accentText: 'text-black' },
-  'elegant-dressing':    { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#d4af37]/30',    accent: 'text-[#d4af37]',  accentBg: 'bg-[#d4af37]',  accentText: 'text-white' },
+  'elegant-dressing':    { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#d4af37]/30',    accent: 'text-[#806818]',  accentBg: 'bg-[#d4af37]',  accentText: 'text-white' },
   'functional-utility':  { isDark: false, surface: 'bg-neutral-50',       surfaceBorder: 'border-neutral-200',     accent: 'text-blue-500',   accentBg: 'bg-neutral-900', accentText: 'text-white' },
   'creative-craft':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-purple-100',      accent: 'text-purple-600', accentBg: 'bg-purple-600', accentText: 'text-white' },
-  'sophisticated-wine':  { isDark: true,  surface: 'bg-[#24181a]',        surfaceBorder: 'border-[#362427]',       accent: 'text-[#8c2a35]',  accentBg: 'bg-[#5c1c24]',  accentText: 'text-[#e6d5cc]' },
+  'sophisticated-wine':  { isDark: true,  surface: 'bg-[#24181a]',        surfaceBorder: 'border-[#362427]',       accent: 'text-[#d49aa1]',  accentBg: 'bg-[#5c1c24]',  accentText: 'text-[#e6d5cc]' },
   'cozy-library':        { isDark: true,  surface: 'bg-[#362c22]',        surfaceBorder: 'border-[#4a3d2f]',       accent: 'text-[#d2a679]',  accentBg: 'bg-[#8b5a2b]',  accentText: 'text-[#f4efe8]' },
-  'minimalist-zen':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#2a2b2a]/15',    accent: 'text-[#7d8276]',  accentBg: 'bg-[#2a2b2a]',  accentText: 'text-white' },
+  'minimalist-zen':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#2a2b2a]/15',    accent: 'text-[#62675d]',  accentBg: 'bg-[#2a2b2a]',  accentText: 'text-white' },
   'garage-industrial':   { isDark: true,  surface: 'bg-white/[0.03]',     surfaceBorder: 'border-white/15',        accent: 'text-yellow-400', accentBg: 'bg-yellow-400', accentText: 'text-black' },
   'pantry-fresh':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-emerald-200',     accent: 'text-emerald-800', accentBg: 'bg-emerald-800', accentText: 'text-white' },
-  'laundry-clean':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-sky-200',         accent: 'text-sky-600',    accentBg: 'bg-sky-600',    accentText: 'text-white' },
+  'laundry-clean':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-sky-200',         accent: 'text-sky-700',    accentBg: 'bg-sky-600',    accentText: 'text-white' },
   'mudroom-family':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-amber-900/10',    accent: 'text-amber-800',  accentBg: 'bg-amber-900',  accentText: 'text-white' },
   'commercial-pro':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-slate-200',       accent: 'text-blue-600',   accentBg: 'bg-blue-600',   accentText: 'text-white' },
   'coastal-climate':     { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-teal-200',        accent: 'text-teal-700',   accentBg: 'bg-teal-700',   accentText: 'text-white' },
   'historic-classic':    { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-amber-900/10',    accent: 'text-amber-800',  accentBg: 'bg-amber-900',  accentText: 'text-white' },
-  'luxury-gallery':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#d4af37]/30',    accent: 'text-[#d4af37]',  accentBg: 'bg-[#d4af37]',  accentText: 'text-white' },
-  'kids-playful':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-rose-500',   accentBg: 'bg-rose-500',   accentText: 'text-white' },
+  'luxury-gallery':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#d4af37]/30',    accent: 'text-[#806818]',  accentBg: 'bg-[#d4af37]',  accentText: 'text-white' },
+  'kids-playful':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-rose-700',   accentBg: 'bg-rose-500',   accentText: 'text-white' },
   'media-theater':       { isDark: true,  surface: 'bg-zinc-900',         surfaceBorder: 'border-zinc-800',        accent: 'text-cyan-400',   accentBg: 'bg-cyan-500',   accentText: 'text-black' },
   'office-executive':    { isDark: true,  surface: 'bg-slate-800',        surfaceBorder: 'border-slate-700',       accent: 'text-amber-400',  accentBg: 'bg-amber-500',  accentText: 'text-slate-900' },
-  'wine-cellar':         { isDark: true,  surface: 'bg-[#24181a]',        surfaceBorder: 'border-[#362427]',       accent: 'text-[#8c2a35]',  accentBg: 'bg-[#5c1c24]',  accentText: 'text-[#e6d5cc]' },
+  'wine-cellar':         { isDark: true,  surface: 'bg-[#24181a]',        surfaceBorder: 'border-[#362427]',       accent: 'text-[#d49aa1]',  accentBg: 'bg-[#5c1c24]',  accentText: 'text-[#e6d5cc]' },
 
   // New trade-vertical themes
-  'fresh-clean':         { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-sky-200',         accent: 'text-sky-600',    accentBg: 'bg-sky-600',    accentText: 'text-white' },
+  'fresh-clean':         { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-sky-200',         accent: 'text-sky-700',    accentBg: 'bg-sky-600',    accentText: 'text-white' },
   'warm-handyman':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-amber-900/10',    accent: 'text-amber-800',  accentBg: 'bg-amber-900',  accentText: 'text-white' },
   'rich-flooring':       { isDark: true,  surface: 'bg-[#4a3b2c]',        surfaceBorder: 'border-[#5f4c39]',       accent: 'text-[#c98a4b]',  accentBg: 'bg-[#c98a4b]',  accentText: 'text-[#2c2318]' },
   'artisan-wood':        { isDark: false, surface: 'bg-[#ece8df]',        surfaceBorder: 'border-[#7a5230]/20',    accent: 'text-[#7a5230]',  accentBg: 'bg-[#7a5230]',  accentText: 'text-white' },
   'swift-mobile':        { isDark: true,  surface: 'bg-zinc-900',         surfaceBorder: 'border-zinc-800',        accent: 'text-indigo-400', accentBg: 'bg-indigo-500', accentText: 'text-white' },
   'clean-move':          { isDark: false, surface: 'bg-neutral-50',       surfaceBorder: 'border-neutral-200',     accent: 'text-blue-600',   accentBg: 'bg-blue-700',   accentText: 'text-white' },
-  'urban-reclaim':       { isDark: true,  surface: 'bg-white/[0.03]',     surfaceBorder: 'border-white/15',        accent: 'text-emerald-400', accentBg: 'bg-emerald-500', accentText: 'text-black' },
+  'urban-reclaim':       { isDark: true,  surface: 'bg-white/[0.03]',     surfaceBorder: 'border-white/15',        accent: 'text-emerald-300', accentBg: 'bg-emerald-500', accentText: 'text-black' },
   'stone-masonry':       { isDark: false, surface: 'bg-stone-100',        surfaceBorder: 'border-stone-400/40',    accent: 'text-stone-700',  accentBg: 'bg-stone-800',  accentText: 'text-white' },
   'appliance-pro':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-slate-200',       accent: 'text-slate-600',  accentBg: 'bg-slate-700',  accentText: 'text-white' },
-  'care-comfort':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-emerald-600', accentBg: 'bg-emerald-500', accentText: 'text-white' },
+  'care-comfort':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-emerald-700', accentBg: 'bg-emerald-500', accentText: 'text-white' },
 
   // Second wave
   'pool-resort':         { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-cyan-200',        accent: 'text-cyan-700',   accentBg: 'bg-cyan-700',   accentText: 'text-white' },
   'home-guardian':       { isDark: true,  surface: 'bg-slate-800',        surfaceBorder: 'border-slate-700',       accent: 'text-amber-400',  accentBg: 'bg-amber-500',  accentText: 'text-slate-900' },
-  'eco-solar':           { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-slate-200',       accent: 'text-emerald-600', accentBg: 'bg-emerald-600', accentText: 'text-white' },
-  'pastoral-pet':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-emerald-200',     accent: 'text-sky-600',    accentBg: 'bg-sky-500',    accentText: 'text-white' },
+  'eco-solar':           { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-slate-200',       accent: 'text-emerald-700', accentBg: 'bg-emerald-600', accentText: 'text-white' },
+  'pastoral-pet':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-emerald-200',     accent: 'text-sky-700',    accentBg: 'bg-sky-500',    accentText: 'text-white' },
   'hearth-warm':         { isDark: true,  surface: 'bg-[#2f2119]',        surfaceBorder: 'border-[#4a3327]',       accent: 'text-[#c9704f]',  accentBg: 'bg-[#8c3a2a]',  accentText: 'text-[#f4e9de]' },
   'seasonal-outdoor':    { isDark: false, surface: 'bg-neutral-50',       surfaceBorder: 'border-neutral-200',     accent: 'text-emerald-700', accentBg: 'bg-emerald-700', accentText: 'text-white' },
   'garage-smart':        { isDark: true,  surface: 'bg-zinc-900',         surfaceBorder: 'border-zinc-800',        accent: 'text-blue-400',   accentBg: 'bg-blue-500',   accentText: 'text-black' },
@@ -1076,15 +1081,15 @@ const SECTION_TOKENS: Record<ThemeType, SectionTokens> = {
   // Third wave
   'bold-remodel':        { isDark: true,  surface: 'bg-white/[0.03]',     surfaceBorder: 'border-white/15',        accent: 'text-orange-400', accentBg: 'bg-orange-500', accentText: 'text-black' },
   'winter-ready':         { isDark: false, surface: 'bg-white',           surfaceBorder: 'border-slate-200',       accent: 'text-sky-700',    accentBg: 'bg-sky-700',    accentText: 'text-white' },
-  'event-festive':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-fuchsia-500', accentBg: 'bg-fuchsia-500', accentText: 'text-white' },
-  'wellness-calm':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#2a2b2a]/15',    accent: 'text-[#7d8276]',  accentBg: 'bg-[#2a2b2a]',  accentText: 'text-white' },
+  'event-festive':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-rose-200',        accent: 'text-purple-600', accentBg: 'bg-fuchsia-500', accentText: 'text-white' },
+  'wellness-calm':       { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#2a2b2a]/15',    accent: 'text-[#62675d]',  accentBg: 'bg-[#2a2b2a]',  accentText: 'text-white' },
   'fleet-logistics':     { isDark: true,  surface: 'bg-slate-800',        surfaceBorder: 'border-slate-700',       accent: 'text-amber-400',  accentBg: 'bg-amber-500',  accentText: 'text-slate-900' },
   'media-creative':      { isDark: true,  surface: 'bg-zinc-900',         surfaceBorder: 'border-zinc-800',        accent: 'text-fuchsia-400', accentBg: 'bg-fuchsia-500', accentText: 'text-black' },
   'gourmet-warm':        { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-amber-900/10',    accent: 'text-red-800',    accentBg: 'bg-red-800',    accentText: 'text-white' },
 
   // Bespoke demo themes
   'garage-loadrated':    { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-zinc-300',        accent: 'text-red-700',    accentBg: 'bg-red-700',    accentText: 'text-white' },
-  'lumina-atelier':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#241f1a]/10',    accent: 'text-[#8a7256]',  accentBg: 'bg-[#241f1a]',  accentText: 'text-[#f6f2ec]' },
+  'lumina-atelier':      { isDark: false, surface: 'bg-white',            surfaceBorder: 'border-[#241f1a]/10',    accent: 'text-[#70583d]',  accentBg: 'bg-[#241f1a]',  accentText: 'text-[#f6f2ec]' },
 };
 
 export function getSectionTokens(theme: ThemeType, seed = '', tokens?: ThemeTokenSelection | null): SectionTokens {
@@ -1339,26 +1344,38 @@ export function twBgToHex(twClass: string): string {
     'bg-sky-50': '#f0f9ff',
     'bg-purple-50': '#faf5ff',
     'bg-stone-200': '#e7e5e4',
+    'bg-stone-800': '#292524',
+    'bg-stone-900': '#1c1917',
     'bg-rose-50': '#fff1f2',
     'bg-emerald-50/40': '#ecfdf540',
     'bg-cyan-50': '#ecfeff',
     'bg-sky-50/40': '#f0f9ff66',
     'bg-slate-100': '#f1f5f9',
     'bg-neutral-50': '#fafafa',
+    'bg-neutral-900': '#171717',
     'bg-amber-600': '#d97706',
     'bg-yellow-500': '#eab308',
     'bg-orange-700': '#c2410c',
     'bg-amber-800': '#92400e',
     'bg-blue-600': '#2563eb',
+    'bg-blue-700': '#1d4ed8',
     'bg-indigo-600': '#4f46e5',
+    'bg-indigo-500': '#6366f1',
     'bg-teal-600': '#0d9488',
+    'bg-teal-700': '#0f766e',
     'bg-cyan-500': '#06b6d4',
+    'bg-cyan-700': '#0e7490',
     'bg-sky-600': '#0284c7',
+    'bg-sky-700': '#0369a1',
     'bg-emerald-600': '#059669',
+    'bg-emerald-500': '#10b981',
+    'bg-emerald-700': '#047857',
     'bg-green-700': '#15803d',
     'bg-rose-500': '#f43f5e',
+    'bg-rose-700': '#be123c',
     'bg-red-700': '#b91c1c',
     'bg-purple-600': '#9333ea',
+    'bg-purple-700': '#7e22ce',
     'bg-violet-600': '#7c3aed',
     'bg-fuchsia-500': '#d946ef',
     'bg-slate-700': '#334155',
@@ -1438,6 +1455,7 @@ export function twTextToColor(twClass: string): string {
     'text-violet-600': '#7c3aed',
     'text-fuchsia-600': '#c026d3',
     'text-rose-600': '#e11d48',
+    'text-rose-700': '#be123c',
     'text-green-700': '#15803d',
     'text-amber-300': '#fcd34d',
     'text-yellow-300': '#fde047',

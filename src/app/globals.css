@@ -19,6 +19,77 @@ body {
   @apply antialiased overflow-x-hidden;
 }
 
+/* Engine-site craft foundation. The scale is fluid but bounded, keeping long
+ * local-business copy readable without making small screens feel compressed. */
+[data-engine-site] {
+  --ds-step--1: clamp(0.82rem, 0.79rem + 0.12vw, 0.9rem);
+  --ds-step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --ds-step-1: clamp(1.2rem, 1.1rem + 0.45vw, 1.5rem);
+  --ds-step-2: clamp(1.44rem, 1.25rem + 0.85vw, 2rem);
+  --ds-step-3: clamp(1.73rem, 1.4rem + 1.45vw, 2.75rem);
+  --ds-step-4: clamp(2.07rem, 1.5rem + 2.55vw, 4rem);
+  --ds-step-5: clamp(2.49rem, 1.55rem + 4vw, 5.75rem);
+  font-size: var(--ds-step-0);
+  line-height: 1.65;
+}
+[data-engine-site][data-type-scale="compact"] { --ds-step-5: clamp(2.25rem, 1.7rem + 2.7vw, 4.5rem); }
+[data-engine-site][data-type-scale="oversized"] { --ds-step-5: clamp(3rem, 1.6rem + 5vw, 7rem); }
+[data-engine-site][data-type-scale="monumental"] { --ds-step-5: clamp(3.35rem, 1.4rem + 6.4vw, 8.5rem); }
+[data-engine-site] h1,
+[data-engine-site] .ds-display {
+  font-size: var(--ds-step-5);
+  line-height: 0.98;
+  letter-spacing: var(--ds-heading-tracking, -0.025em);
+  max-width: 18ch;
+  text-wrap: balance;
+}
+[data-engine-site] h2 { font-size: var(--ds-step-3); line-height: 1.08; text-wrap: balance; }
+[data-engine-site] h3 { font-size: var(--ds-step-1); line-height: 1.2; text-wrap: balance; }
+[data-engine-site] p { max-width: 68ch; }
+
+/* A visible keyboard focus treatment is a platform invariant, independent of
+ * palette. outline-offset keeps the ring legible on both light and dark cards. */
+[data-engine-site] :where(a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 3px solid var(--ds-accent, #2563eb);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--ds-surface, #fff);
+}
+[data-engine-site] :where(closet-quote-widget, closet-order-widget, closet-booking-widget, closet-ticket-widget):focus-visible {
+  outline: 3px solid var(--ds-accent, #2563eb);
+  outline-offset: 3px;
+}
+[data-engine-site] nav a[href] { min-height: 2.75rem; display: inline-flex; align-items: center; }
+
+/* Site-wide photographic art direction. Containers reserve aspect ratio; the
+ * non-destructive grade and tint make unrelated source photos feel authored as
+ * one set. Interactive editor overlays remain above the tint via z-index. */
+.ds-image-frame { position: relative; isolation: isolate; overflow: hidden; background: var(--ds-surface-raised, #f5f5f4); }
+.ds-image-frame::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; mix-blend-mode: color; background: var(--ds-accent, transparent); }
+.ds-art-image { transition: transform var(--ds-transition, 220ms) ease, filter var(--ds-transition, 220ms) ease; }
+[data-image-art="warm-film"] .ds-art-image { filter: saturate(0.9) sepia(0.1) contrast(1.03); }
+[data-image-art="warm-film"] .ds-image-frame::after { opacity: 0.055; }
+[data-image-art="cool-editorial"] .ds-art-image { filter: saturate(0.82) contrast(1.07) hue-rotate(3deg); }
+[data-image-art="cool-editorial"] .ds-image-frame::after { opacity: 0.035; }
+[data-image-art="soft-matte"] .ds-art-image { filter: saturate(0.78) contrast(0.94) brightness(1.03); }
+[data-image-art="soft-matte"] .ds-image-frame::after { opacity: 0.045; mix-blend-mode: soft-light; }
+[data-image-art="high-contrast"] .ds-art-image { filter: saturate(0.75) contrast(1.16); }
+[data-image-art="high-contrast"] .ds-image-frame::after { opacity: 0.04; }
+
+@media (hover: hover) {
+  [data-engine-site] .ds-image-frame:hover .ds-art-image { transform: scale(1.018); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-engine-site] *,
+  [data-engine-site] *::before,
+  [data-engine-site] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ── Elevated Design System: Micro-Details ──
  * Opt-in classes that consume --ds-* custom properties for Lumina-level refinement.
  * Components add these classes alongside existing Tailwind utilities.

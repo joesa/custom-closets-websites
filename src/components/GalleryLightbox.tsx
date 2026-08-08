@@ -62,14 +62,14 @@ export default function GalleryLightbox({
               type="button"
               onClick={() => setActiveIndex(i)}
               aria-label={`Enlarge ${alt}`}
-              className={`relative overflow-hidden rounded-xl border border-white/10 cursor-zoom-in group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 ${aspectClasses[imageAspect]}`}
+              className={`ds-image-frame relative overflow-hidden rounded-xl border border-white/10 cursor-zoom-in group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 ${aspectClasses[imageAspect]}`}
             >
               <Image
                 src={src}
                 alt={alt}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
-                className={`${imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-transform duration-300 group-hover:scale-105`}
+                className={`ds-art-image ${imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-transform duration-300 group-hover:scale-105`}
               />
             </button>
           );
@@ -127,14 +127,14 @@ export default function GalleryLightbox({
 
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full h-full max-w-5xl max-h-[85vh]"
+            className="ds-image-frame relative w-full h-full max-w-5xl max-h-[85vh]"
           >
             <Image
               src={images[activeIndex]}
               alt={galleryAlt(altPrefix, activeIndex, imageAlts)}
               fill
               sizes="100vw"
-              className="object-contain"
+              className="ds-art-image object-contain"
               priority
             />
           </div>
