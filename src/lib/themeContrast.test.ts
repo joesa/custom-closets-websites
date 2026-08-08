@@ -60,10 +60,17 @@ describe('complete template theme matrix', () => {
       const primary = contrast(twTextToColor(styles.textPrimary), background);
       const secondary = contrast(twTextToColor(styles.textSecondary), background);
       const accent = contrast(twTextToColor(styles.accentColor), background);
+      const cardBackground = /bg-(?:white|black)\/(?:\[)?\d/.test(styles.productCard)
+        ? background
+        : twBgToHex(styles.productCard);
+      const cardPrimary = contrast(twTextToColor(styles.textPrimary), cardBackground);
+      const cardSecondary = contrast(twTextToColor(styles.textSecondary), cardBackground);
       return [
         ...(primary >= 4.5 ? [] : [`${theme}/primary: ${primary.toFixed(2)}:1`]),
         ...(secondary >= 4.5 ? [] : [`${theme}/secondary: ${secondary.toFixed(2)}:1`]),
         ...(accent >= 4.5 ? [] : [`${theme}/accent: ${accent.toFixed(2)}:1`]),
+        ...(cardPrimary >= 4.5 ? [] : [`${theme}/card-primary: ${cardPrimary.toFixed(2)}:1`]),
+        ...(cardSecondary >= 4.5 ? [] : [`${theme}/card-secondary: ${cardSecondary.toFixed(2)}:1`]),
       ];
     });
 
