@@ -823,7 +823,7 @@ export function applyFontVoice(styles: ThemeStyles, theme: ThemeType, seed: stri
  * NOTE: every token below is a literal string so Tailwind's scanner emits the
  * class. Do not build these dynamically.
  */
-interface AccentSwatch {
+export interface AccentSwatch {
   textLight: string;
   textDark: string;
   bg: string;
@@ -831,26 +831,26 @@ interface AccentSwatch {
   hex: string;
 }
 
-const SWATCH: Record<string, AccentSwatch> = {
-  amber:   { textLight: 'text-amber-700',   textDark: 'text-amber-300',   bg: 'bg-amber-600',   on: 'text-white',      hex: '#b45309' },
+export const ACCENT_SWATCHES: Readonly<Record<string, AccentSwatch>> = {
+  amber:   { textLight: 'text-amber-700',   textDark: 'text-amber-300',   bg: 'bg-amber-600',   on: 'text-black',      hex: '#b45309' },
   gold:    { textLight: 'text-yellow-700',  textDark: 'text-yellow-300',  bg: 'bg-yellow-500',  on: 'text-black',      hex: '#ca8a04' },
   copper:  { textLight: 'text-orange-700',  textDark: 'text-orange-300',  bg: 'bg-orange-700',  on: 'text-white',      hex: '#c2410c' },
   bronze:  { textLight: 'text-amber-800',   textDark: 'text-amber-200',   bg: 'bg-amber-800',   on: 'text-white',      hex: '#92400e' },
   blue:    { textLight: 'text-blue-600',    textDark: 'text-blue-300',    bg: 'bg-blue-600',    on: 'text-white',      hex: '#2563eb' },
   indigo:  { textLight: 'text-indigo-600',  textDark: 'text-indigo-300',  bg: 'bg-indigo-600',  on: 'text-white',      hex: '#4f46e5' },
-  teal:    { textLight: 'text-teal-700',    textDark: 'text-teal-300',    bg: 'bg-teal-600',    on: 'text-white',      hex: '#0d9488' },
+  teal:    { textLight: 'text-teal-700',    textDark: 'text-teal-300',    bg: 'bg-teal-600',    on: 'text-black',      hex: '#0d9488' },
   cyan:    { textLight: 'text-cyan-600',    textDark: 'text-cyan-300',    bg: 'bg-cyan-500',    on: 'text-black',      hex: '#06b6d4' },
-  sky:     { textLight: 'text-sky-600',     textDark: 'text-sky-300',     bg: 'bg-sky-600',     on: 'text-white',      hex: '#0284c7' },
-  emerald: { textLight: 'text-emerald-700', textDark: 'text-emerald-300', bg: 'bg-emerald-600', on: 'text-white',      hex: '#059669' },
+  sky:     { textLight: 'text-sky-700',     textDark: 'text-sky-300',     bg: 'bg-sky-600',     on: 'text-black',      hex: '#0284c7' },
+  emerald: { textLight: 'text-emerald-700', textDark: 'text-emerald-300', bg: 'bg-emerald-600', on: 'text-black',      hex: '#059669' },
   green:   { textLight: 'text-green-700',   textDark: 'text-green-300',   bg: 'bg-green-700',   on: 'text-white',      hex: '#15803d' },
-  rose:    { textLight: 'text-rose-600',    textDark: 'text-rose-300',    bg: 'bg-rose-500',    on: 'text-white',      hex: '#f43f5e' },
+  rose:    { textLight: 'text-rose-600',    textDark: 'text-rose-300',    bg: 'bg-rose-500',    on: 'text-black',      hex: '#f43f5e' },
   red:     { textLight: 'text-red-700',     textDark: 'text-red-300',     bg: 'bg-red-700',     on: 'text-white',      hex: '#b91c1c' },
   wine:    { textLight: 'text-rose-800',    textDark: 'text-[#c97a83]',   bg: 'bg-[#5c1c24]',   on: 'text-[#e6d5cc]',  hex: '#8c2a35' },
   purple:  { textLight: 'text-purple-600',  textDark: 'text-purple-300',  bg: 'bg-purple-600',  on: 'text-white',      hex: '#9333ea' },
   violet:  { textLight: 'text-violet-600',  textDark: 'text-violet-300',  bg: 'bg-violet-600',  on: 'text-white',      hex: '#7c3aed' },
-  fuchsia: { textLight: 'text-fuchsia-600', textDark: 'text-fuchsia-300', bg: 'bg-fuchsia-500', on: 'text-white',      hex: '#d946ef' },
+  fuchsia: { textLight: 'text-fuchsia-600', textDark: 'text-fuchsia-300', bg: 'bg-fuchsia-500', on: 'text-black',      hex: '#d946ef' },
   slate:   { textLight: 'text-slate-600',   textDark: 'text-slate-300',   bg: 'bg-slate-700',   on: 'text-white',      hex: '#475569' },
-  zen:     { textLight: 'text-[#7d8276]',   textDark: 'text-[#aeb3a6]',   bg: 'bg-[#5b6157]',   on: 'text-white',      hex: '#7d8276' },
+  zen:     { textLight: 'text-[#686d62]',   textDark: 'text-[#aeb3a6]',   bg: 'bg-[#5b6157]',   on: 'text-white',      hex: '#7d8276' },
   brass:   { textLight: 'text-[#8a7256]',   textDark: 'text-[#c2ab8c]',   bg: 'bg-[#8a7256]',   on: 'text-white',      hex: '#8a7256' },
   // Mixed rather than lifted from Tailwind's default ramp, so an accent reads as
   // a chosen colour instead of a framework preset. Offered to new builds in place
@@ -861,6 +861,8 @@ const SWATCH: Record<string, AccentSwatch> = {
   denim:   { textLight: 'text-[#35506b]',   textDark: 'text-[#a8c0da]',   bg: 'bg-[#35506b]',   on: 'text-white',      hex: '#35506b' },
   ochre:   { textLight: 'text-[#8a6a1f]',   textDark: 'text-[#d9be7a]',   bg: 'bg-[#8a6a1f]',   on: 'text-white',      hex: '#8a6a1f' },
 };
+
+const SWATCH = ACCENT_SWATCHES;
 
 const THEME_ACCENTS: Record<ThemeType, string[]> = {
   'luxury-minimal':      ['amber', 'bronze', 'copper', 'slate'],
@@ -1343,6 +1345,23 @@ export function twBgToHex(twClass: string): string {
     'bg-sky-50/40': '#f0f9ff66',
     'bg-slate-100': '#f1f5f9',
     'bg-neutral-50': '#fafafa',
+    'bg-amber-600': '#d97706',
+    'bg-yellow-500': '#eab308',
+    'bg-orange-700': '#c2410c',
+    'bg-amber-800': '#92400e',
+    'bg-blue-600': '#2563eb',
+    'bg-indigo-600': '#4f46e5',
+    'bg-teal-600': '#0d9488',
+    'bg-cyan-500': '#06b6d4',
+    'bg-sky-600': '#0284c7',
+    'bg-emerald-600': '#059669',
+    'bg-green-700': '#15803d',
+    'bg-rose-500': '#f43f5e',
+    'bg-red-700': '#b91c1c',
+    'bg-purple-600': '#9333ea',
+    'bg-violet-600': '#7c3aed',
+    'bg-fuchsia-500': '#d946ef',
+    'bg-slate-700': '#334155',
   };
   // strip Tailwind modifier classes (keep only the bg- one)
   const bgPart = twClass.split(/\s+/).find(c => c.startsWith('bg-')) || twClass;
@@ -1390,11 +1409,13 @@ export function twTextToColor(twClass: string): string {
     'text-zinc-400': '#a1a1aa',
     'text-zinc-600': '#52525b',
     'text-white': '#ffffff',
+    'text-black': '#000000',
     'text-neutral-900': '#171717',
     'text-neutral-500': '#737373',
     'text-purple-950': '#3b0764',
     'text-blue-600': '#2563eb',
     'text-sky-600': '#0284c7',
+    'text-sky-700': '#0369a1',
     'text-rose-500': '#f43f5e',
     'text-cyan-400': '#22d3ee',
     'text-emerald-700': '#047857',
@@ -1411,6 +1432,30 @@ export function twTextToColor(twClass: string): string {
     'text-emerald-400': '#34d399',
     'text-blue-400': '#60a5fa',
     'text-emerald-600': '#059669',
+    'text-yellow-700': '#a16207',
+    'text-orange-700': '#c2410c',
+    'text-indigo-600': '#4f46e5',
+    'text-violet-600': '#7c3aed',
+    'text-fuchsia-600': '#c026d3',
+    'text-rose-600': '#e11d48',
+    'text-green-700': '#15803d',
+    'text-amber-300': '#fcd34d',
+    'text-yellow-300': '#fde047',
+    'text-orange-300': '#fdba74',
+    'text-amber-200': '#fde68a',
+    'text-blue-300': '#93c5fd',
+    'text-indigo-300': '#a5b4fc',
+    'text-teal-300': '#5eead4',
+    'text-cyan-300': '#67e8f9',
+    'text-sky-300': '#7dd3fc',
+    'text-emerald-300': '#6ee7b7',
+    'text-green-300': '#86efac',
+    'text-rose-300': '#fda4af',
+    'text-red-300': '#fca5a5',
+    'text-purple-300': '#d8b4fe',
+    'text-violet-300': '#c4b5fd',
+    'text-fuchsia-300': '#f0abfc',
+    'text-slate-300': '#cbd5e1',
   };
   // handle opacity modifiers like text-amber-900/70
   const withoutOpacity = twClass.replace(/\/\d+$/, '');

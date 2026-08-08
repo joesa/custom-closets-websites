@@ -43,11 +43,13 @@ export default function SiteFooter({
   const phone = seo?.phone?.trim() || '';
   const telHref = phone ? `tel:${phone.replace(/[^\d+]/g, '')}` : '';
   const hours = seo?.openingHours?.trim() || '';
-  const servingLine = serviceArea?.trim() ? `Serving ${serviceArea.trim()}` : '';
-  const licenseLine = licenseNumber?.trim() ? `License #${licenseNumber.trim()}` : '';
+  const resolvedServiceArea = serviceArea?.trim() || seo?.serviceArea?.trim() || '';
+  const resolvedLicenseNumber = licenseNumber?.trim() || seo?.licenseNumber?.trim() || '';
+  const servingLine = resolvedServiceArea ? `Serving ${resolvedServiceArea}` : '';
+  const licenseLine = resolvedLicenseNumber ? `License #${resolvedLicenseNumber}` : '';
   const copyrightLine = `\u00A9 ${new Date().getFullYear()} ${brandName}`;
 
-  const HoursLine = ({ className }: { className?: string }) =>
+  const renderHoursLine = (className?: string) =>
     hours ? <p className={className ?? muted}>{hours}</p> : null;
 
   const links = (navLinks ?? []).filter(
@@ -58,14 +60,14 @@ export default function SiteFooter({
       link.slug !== '/quote'
   );
 
-  const PhoneLink = ({ className }: { className?: string }) =>
+  const renderPhoneLink = (className?: string) =>
     phone ? (
       <a href={telHref} className={`hover:opacity-100 transition-opacity ${className ?? muted}`}>
         {phone}
       </a>
     ) : null;
 
-  const AddressBlock = ({ centered = false }: { centered?: boolean }) =>
+  const renderAddressBlock = (centered = false) =>
     streetAddress || localityLine ? (
       <address className={`not-italic ${muted} ${centered ? 'text-center' : ''}`}>
         {streetAddress && <span className="block">{streetAddress}</span>}
@@ -73,7 +75,7 @@ export default function SiteFooter({
       </address>
     ) : null;
 
-  const FooterNav = ({ className, linkClassName }: { className?: string; linkClassName?: string }) =>
+  const renderFooterNav = (className?: string, linkClassName?: string) =>
     links.length > 0 ? (
       <nav aria-label="Footer" className={className}>
         {links.map((link, i) => (
@@ -88,7 +90,7 @@ export default function SiteFooter({
       </nav>
     ) : null;
 
-  const SmallPrint = ({ centered = false }: { centered?: boolean }) => (
+  const renderSmallPrint = (centered = false) => (
     <div className={`flex flex-wrap gap-x-4 gap-y-1 ${centered ? 'justify-center' : ''}`}>
       {licenseLine && <span className={faint}>{licenseLine}</span>}
       <span className={faint}>{copyrightLine}</span>
@@ -107,14 +109,14 @@ export default function SiteFooter({
             {servingLine && <p className={`${muted} mt-2`}>{servingLine}</p>}
           </div>
           <div className="md:text-right space-y-1">
-            <AddressBlock />
-            <PhoneLink />
-            <HoursLine className={`${muted} md:text-right`} />
+            {renderAddressBlock()}
+            {renderPhoneLink()}
+            {renderHoursLine(`${muted} md:text-right`)}
           </div>
         </div>
-        <FooterNav className="mt-8 flex flex-wrap gap-x-6 gap-y-2" />
+        {renderFooterNav('mt-8 flex flex-wrap gap-x-6 gap-y-2')}
         <div className={`mt-10 pt-6 border-t ${hairline}`}>
-          <SmallPrint />
+          {renderSmallPrint()}
         </div>
       </div>
     );
@@ -129,11 +131,11 @@ export default function SiteFooter({
             {licenseLine && <p className={`${muted} mt-1`}>{licenseLine}</p>}
           </div>
           <div className="space-y-1">
-            <AddressBlock />
-            <PhoneLink />
-            <HoursLine />
+            {renderAddressBlock()}
+            {renderPhoneLink()}
+            {renderHoursLine()}
           </div>
-          <FooterNav className="flex flex-col gap-2 md:items-end" />
+          {renderFooterNav('flex flex-col gap-2 md:items-end')}
         </div>
         <div className={`mt-12 pt-6 border-t ${hairline}`}>
           <span className={faint}>{copyrightLine}</span>
@@ -147,14 +149,14 @@ export default function SiteFooter({
         <div className={`w-10 h-px mx-auto mb-8 ${section.accentBg}`} />
         <p className={`${t.headingFont} ${t.textPrimary} text-xl`}>{brandName}</p>
         <div className="mt-4 space-y-1">
-          <AddressBlock centered />
-          <PhoneLink />
-          <HoursLine className={`${muted} text-center`} />
+          {renderAddressBlock(true)}
+          {renderPhoneLink()}
+          {renderHoursLine(`${muted} text-center`)}
         </div>
         {servingLine && <p className={`${muted} mt-3`}>{servingLine}</p>}
-        <FooterNav className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2" />
+        {renderFooterNav('mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2')}
         <div className="mt-10">
-          <SmallPrint centered />
+          {renderSmallPrint(true)}
         </div>
       </div>
     );
@@ -167,15 +169,15 @@ export default function SiteFooter({
         </p>
         <div className="mt-8 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
           <div className="space-y-1">
-            <AddressBlock />
-            <PhoneLink />
-            <HoursLine />
+            {renderAddressBlock()}
+            {renderPhoneLink()}
+            {renderHoursLine()}
             {servingLine && <p className={muted}>{servingLine}</p>}
           </div>
-          <FooterNav className="flex flex-wrap gap-x-6 gap-y-2" />
+          {renderFooterNav('flex flex-wrap gap-x-6 gap-y-2')}
         </div>
         <div className={`mt-10 pt-6 border-t ${hairline}`}>
-          <SmallPrint />
+          {renderSmallPrint()}
         </div>
       </div>
     );

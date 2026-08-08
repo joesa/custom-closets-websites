@@ -541,6 +541,12 @@ function ClientPageContent({ config }: ClientPageProps) {
 
   return (
     <div className={`min-h-screen ${theme.pageBackground} ${theme.textPrimary} ${theme.bodyFont}`}>
+      <a
+        href="#main-content"
+        className="fixed left-4 top-4 z-[100] -translate-y-24 bg-white px-4 py-3 text-sm font-semibold text-black shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-black"
+      >
+        Skip to main content
+      </a>
       {/* ─── Global Header (only when the layout's Navbar isn't present) ─── */}
       {!hasNav && (
         <header className="pointer-events-none absolute top-0 z-50 w-full py-8">
@@ -569,7 +575,9 @@ function ClientPageContent({ config }: ClientPageProps) {
       )}
 
       {/* Render selected structural layout */}
-      {renderLayout()}
+      <main id="main-content" tabIndex={-1}>
+        {renderLayout()}
+      </main>
 
       {/* ─── Themed, seeded NAP footer (real local businesses have one) ─── */}
       <SiteFooter

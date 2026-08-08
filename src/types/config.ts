@@ -126,6 +126,10 @@ export interface SEOConfig {
   addressLocality: string;
   addressRegion: string;
   postalCode: string;
+  /** Human-entered coverage area used in the footer when it differs from the address. */
+  serviceArea?: string;
+  /** Optional contractor license identifier supplied by the business. */
+  licenseNumber?: string;
   geo: {
     latitude: string;
     longitude: string;
