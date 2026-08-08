@@ -1,4 +1,4 @@
-import { DEFAULT_WIDGET_CDN_BASE, withWidgetCacheBust } from '@/lib/widgetCdn'
+import { DEFAULT_WIDGET_CDN_BASE, normalizeWidgetCdnUrl } from '@/lib/widgetCdn'
 
 function defaultWidgetScriptUrl(): string {
   const site =
@@ -9,7 +9,7 @@ function defaultWidgetScriptUrl(): string {
   if (/localhost|127\.0\.0\.1/.test(site)) return '/widget.js'
   const base =
     process.env.NEXT_PUBLIC_WIDGET_CDN_URL?.trim() || DEFAULT_WIDGET_CDN_BASE
-  return withWidgetCacheBust(base)
+  return normalizeWidgetCdnUrl(base)
 }
 
 export const WIDGET_CDN_URL = defaultWidgetScriptUrl()
