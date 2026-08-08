@@ -10,6 +10,10 @@ function makeRequest(host: string, path: string) {
   });
 }
 
+function rewriteUrl(response: Response) {
+  return new URL(response.headers.get('x-middleware-rewrite')!);
+}
+
 describe('proxy — reserved app path routing', () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_APP_URL = 'https://www.ditchtheform.com';
@@ -19,33 +23,31 @@ describe('proxy — reserved app path routing', () => {
     process.env.NEXT_PUBLIC_APP_URL = ORIGINAL_APP_URL;
   });
 
-  it('redirects /login on a tenant subdomain to the dashboard app, carrying the tenant hostname', () => {
+  it('rewrites /login on a tenant subdomain to the dashboard app', () => {
     const req = makeRequest('sotoy-parking-services.ditchtheform.com', '/login');
     const res = proxy(req);
-    expect(res.status).toBe(307);
-    const location = new URL(res.headers.get('location')!);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('location')).toBeNull();
+    const location = rewriteUrl(res);
     expect(location.hostname).toBe('www.ditchtheform.com');
     expect(location.pathname).toBe('/login');
-    expect(location.searchParams.get('tenant')).toBe(
-      'sotoy-parking-services.ditchtheform.com'
-    );
   });
 
-  it('redirects /dashboard on a custom tenant domain to the dashboard app', () => {
+  it('rewrites /dashboard on a custom tenant domain to the dashboard app', () => {
     const req = makeRequest('www.sotoyparkingservices.com', '/dashboard');
     const res = proxy(req);
-    expect(res.status).toBe(307);
-    const location = new URL(res.headers.get('location')!);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('location')).toBeNull();
+    const location = rewriteUrl(res);
     expect(location.hostname).toBe('www.ditchtheform.com');
     expect(location.pathname).toBe('/dashboard');
-    expect(location.searchParams.get('tenant')).toBe('www.sotoyparkingservices.com');
   });
 
-  it('redirects nested reserved paths like /admin/users', () => {
+  it('rewrites nested reserved paths like /admin/users', () => {
     const req = makeRequest('sotoy-parking-services.ditchtheform.com', '/admin/users');
     const res = proxy(req);
-    expect(res.status).toBe(307);
-    const location = new URL(res.headers.get('location')!);
+    expect(res.status).toBe(200);
+    const location = rewriteUrl(res);
     expect(location.pathname).toBe('/admin/users');
   });
 
@@ -67,5 +69,17 @@ describe('proxy — reserved app path routing', () => {
     const req = makeRequest('sotoy-parking-services.ditchtheform.com', '/');
     const res = proxy(req);
     expect(res.headers.get('location')).toBeNull();
+  });
+
+  it('rewrites dashboard-owned APIs but leaves renderer APIs local', () => {
+    const dashboardApi = proxy(
+      makeRequest('sotoy-parking-services.ditchtheform.com', '/api/admin/sites')
+    );
+    expect(rewriteUrl(dashboardApi).hostname).toBe('www.ditchtheform.com');
+
+    const rendererApi = proxy(
+      makeRequest('sotoy-parking-services.ditchtheform.com', '/api/revalidate')
+    );
+    expect(rendererApi.headers.get('x-middleware-rewrite')).toBeNull();
   });
 });

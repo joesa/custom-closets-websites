@@ -218,6 +218,7 @@ export default function CustomSiteRenderer({
     const srcDoc = buildSrcDoc(page, custom, widgetId, model, previewQuery);
     return (
       <div className="relative min-h-screen w-full" ref={rootRef}>
+        <CustomSiteSkipLink />
         {isDraftPreview ? <DraftBanner /> : null}
         {editInPlace ? (
           <div className="sticky top-0 z-[10000] bg-amber-500 px-4 py-2 text-center text-sm font-semibold text-black">
@@ -225,6 +226,8 @@ export default function CustomSiteRenderer({
           </div>
         ) : null}
         <iframe
+          id="custom-site-content"
+          tabIndex={-1}
           title={page.title || 'Custom site'}
           srcDoc={srcDoc}
           sandbox="allow-scripts allow-forms allow-popups"
@@ -237,6 +240,7 @@ export default function CustomSiteRenderer({
 
   return (
     <div className="relative min-h-screen w-full" ref={rootRef}>
+      <CustomSiteSkipLink />
       {showEditor ? (
         <EditInPlaceLayer
           siteRef={siteRef}
@@ -251,15 +255,38 @@ export default function CustomSiteRenderer({
       {css ? <style dangerouslySetInnerHTML={{ __html: css }} /> : null}
       <ContentEditorBridge rootRef={siteRef} mode="custom" pagePath={pagePath} />
       {showEditor ? (
-        <div data-custom-site ref={siteRef} />
+        <div
+          data-custom-site
+          id="custom-site-content"
+          tabIndex={-1}
+          className="overflow-x-clip"
+          ref={siteRef}
+        />
       ) : (
-        <div data-custom-site dangerouslySetInnerHTML={{ __html: html }} />
+        <div
+          data-custom-site
+          id="custom-site-content"
+          tabIndex={-1}
+          className="overflow-x-clip"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       )}
       {/* afterInteractive: do not wait for window.load (blocked by many large
           gallery images). lazyOnload deferred the 450KB widget until every
           eager img finished — extending the main-thread hitch. */}
       <Script src={WIDGET_CDN_URL} strategy="afterInteractive" />
     </div>
+  );
+}
+
+function CustomSiteSkipLink() {
+  return (
+    <a
+      href="#custom-site-content"
+      className="fixed left-4 top-4 z-[10001] -translate-y-24 bg-white px-4 py-3 text-sm font-semibold text-black shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-black"
+    >
+      Skip to main content
+    </a>
   );
 }
 

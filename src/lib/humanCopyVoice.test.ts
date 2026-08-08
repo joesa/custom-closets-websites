@@ -14,7 +14,7 @@ import {
  * repo edits its table without mirroring the change, that repo's test fails —
  * same drift-guard pattern as designFingerprint.
  */
-export const AI_TELL_CANON_HASH = 'a2d010856f7c4834';
+export const AI_TELL_CANON_HASH = '75cd4707fcd9c9b3';
 
 function canonHash(): string {
   const canon = JSON.stringify(
