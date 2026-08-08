@@ -25,7 +25,7 @@ export default function LaunchPaywall({ brandName, launchPayUrl }: Props) {
             />
           </svg>
         </div>
-        <h1 className="text-3xl font-light tracking-tight">{title}</h1>
+        <h1 className="text-3xl font-light">{title}</h1>
         <p className="text-neutral-400 leading-relaxed text-sm">
           Your customized site has been built and reviewed. Complete your remaining launch payment to
           make it publicly available on this address.

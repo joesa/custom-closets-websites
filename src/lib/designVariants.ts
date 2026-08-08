@@ -502,14 +502,14 @@ export function heroHeadlineClasses(scale: TypeScale): string {
   const wrap = 'text-balance break-words';
   switch (scale) {
     case 'monumental':
-      return `text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight ${wrap}`;
+      return `text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] ${wrap}`;
     case 'oversized':
-      return `text-4xl sm:text-5xl md:text-6xl leading-[1.08] tracking-tight ${wrap}`;
+      return `text-4xl sm:text-5xl md:text-6xl leading-[1.08] ${wrap}`;
     case 'compact':
       return `text-3xl sm:text-4xl md:text-5xl leading-snug tracking-[0.01em] ${wrap}`;
     case 'standard':
     default:
-      return `text-4xl sm:text-5xl md:text-6xl leading-tight tracking-[-0.01em] ${wrap}`;
+      return `text-4xl sm:text-5xl md:text-6xl leading-tight ${wrap}`;
   }
 }
 

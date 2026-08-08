@@ -164,7 +164,7 @@ export default function SiteFooter({
     // Big brand wordmark with small print underneath.
     body = (
       <div className="max-w-6xl mx-auto">
-        <p className={`${t.headingFont} ${t.textPrimary} text-4xl md:text-6xl tracking-tight`}>
+        <p className={`${t.headingFont} ${t.textPrimary} text-4xl md:text-6xl`}>
           {brandName}
         </p>
         <div className="mt-8 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
