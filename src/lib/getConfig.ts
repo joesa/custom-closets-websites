@@ -40,6 +40,7 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
         validation_status,
         site_configs (
           brand_name,
+          industry,
           theme,
           layout_style,
           default_room,

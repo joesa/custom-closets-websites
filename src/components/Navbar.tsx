@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { getSectionTokens, getThemeStyles, applyVoice, ThemeTokenSelection } from '@/lib/theme';
 import { NavLink, ThemeType } from '@/types/config';
 import type { NavComposition } from '@/lib/designVariants';
+import { navCtaLabel, topbarFallbackLine } from '@/lib/chromeCopy';
 
 interface NavbarProps {
   brandName: string;
@@ -90,10 +91,9 @@ export default function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const chrome = navChrome(themeName, scrolled, themeTokens, bg);
-  const ctaLabel = engagementModel === 'order' ? 'Order Now' 
-                 : engagementModel === 'booking' ? 'Book Now' 
-                 : engagementModel === 'ticket' ? 'Get Tickets' 
-                 : 'Get Quote';
+  // Seeded per site so the nav CTA is not the same literal on every engine
+  // site (a fleet-wide "Get Quote" is a recognisable template fingerprint).
+  const ctaLabel = navCtaLabel(fontSeed ?? brandName, engagementModel);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -412,7 +412,7 @@ export default function Navbar({
       <div className="fixed top-0 left-0 right-0 z-50">
         <div className={`w-full text-xs tracking-wide py-1.5 ${chrome.topbar}`}>
           <div className="max-w-7xl mx-auto px-6 flex items-center justify-end gap-2">
-            {phone ? <span>Call now: {phone}</span> : <span>Free estimates — book today</span>}
+            {phone ? <span>Call now: {phone}</span> : <span>{topbarFallbackLine(fontSeed ?? brandName, engagementModel)}</span>}
           </div>
         </div>
         <nav className={`transition-all duration-300 ${chrome.bar}`}>

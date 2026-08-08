@@ -10,7 +10,7 @@ type Props = {
  * Applies on every hostname (platform subdomain and custom domain).
  */
 export default function LaunchPaywall({ brandName, launchPayUrl }: Props) {
-  const title = brandName ? `${brandName} — almost live` : 'Your site is ready to launch';
+  const title = brandName ? `${brandName} is almost live` : 'Your site is ready to launch';
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 font-sans text-white">

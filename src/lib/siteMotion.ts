@@ -17,17 +17,37 @@ export type SiteMotion = {
   rise: number
   /** Stagger children delay (kinetic). */
   staggerChildren: number
+  /** True when the visitor prefers reduced motion. */
+  reducedMotion: boolean
+}
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+const REDUCED: Omit<SiteMotion, 'personality' | 'reducedMotion'> = {
+  section: { duration: 0 },
+  hero: { duration: 0 },
+  heroLate: { duration: 0 },
+  rise: 0,
+  staggerChildren: 0,
 }
 
 export function getSiteMotion(seed?: string | null): SiteMotion {
   const key = (seed || '').trim()
   const personality =
     PERSONALITIES[hashSeed(`${key || 'default'}::motion`) % PERSONALITIES.length]
+  const reducedMotion = prefersReducedMotion()
+  if (reducedMotion) {
+    return { personality, reducedMotion, ...REDUCED }
+  }
 
   switch (personality) {
     case 'commercial':
       return {
         personality,
+        reducedMotion,
         section: { duration: 0.45, ease: 'easeOut' },
         hero: { duration: 0.5, delay: 0.08, ease: 'easeOut' },
         heroLate: { duration: 0.45, delay: 0.2, ease: 'easeOut' },
@@ -37,6 +57,7 @@ export function getSiteMotion(seed?: string | null): SiteMotion {
     case 'luxury':
       return {
         personality,
+        reducedMotion,
         section: { duration: 1.15, ease: [0.22, 1, 0.36, 1] },
         hero: { duration: 1.2, delay: 0.18, ease: [0.22, 1, 0.36, 1] },
         heroLate: { duration: 1.1, delay: 0.38, ease: [0.22, 1, 0.36, 1] },
@@ -46,6 +67,7 @@ export function getSiteMotion(seed?: string | null): SiteMotion {
     case 'kinetic':
       return {
         personality,
+        reducedMotion,
         section: { duration: 0.55, ease: 'easeOut' },
         hero: { duration: 0.6, delay: 0.05, ease: 'easeOut' },
         heroLate: { duration: 0.55, delay: 0.18, ease: 'easeOut' },
@@ -56,6 +78,7 @@ export function getSiteMotion(seed?: string | null): SiteMotion {
     default:
       return {
         personality,
+        reducedMotion,
         section: { duration: 0.85, ease: 'easeOut' },
         hero: { duration: 1, delay: 0.2, ease: 'easeOut' },
         heroLate: { duration: 1, delay: 0.4, ease: 'easeOut' },
@@ -69,5 +92,7 @@ export function motionRise(
   motion: SiteMotion,
   hydrated: boolean
 ): false | TargetAndTransition {
-  return hydrated ? { opacity: 0, y: motion.rise } : false
+  if (!hydrated) return false
+  if (motion.reducedMotion) return { opacity: 0 }
+  return { opacity: 0, y: motion.rise }
 }

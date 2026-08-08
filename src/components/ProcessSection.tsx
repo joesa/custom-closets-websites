@@ -7,6 +7,7 @@ import { getThemeStyles, getSectionTokens, applyVoice, ThemeTokenSelection } fro
 import { useMotionHydrated } from '@/components/MotionHydrationProvider';
 import { motionInitial } from '@/lib/motionInitial';
 import { hashSeed } from '@/lib/designVariants';
+import { processEyebrow } from '@/lib/chromeCopy';
 
 interface ProcessSectionProps {
   theme: ThemeType;
@@ -33,7 +34,7 @@ export default function ProcessSection({ theme, themeTokens, process, fontSeed }
       <div className="max-w-7xl mx-auto">
         <div className={`${layout === 'stacked' || layout === 'lumina-method' ? 'text-left max-w-3xl' : 'text-center'} mb-16 md:mb-24`}>
           {layout === 'lumina-method' && (
-            <p className="ds-eyebrow mb-4">Method</p>
+            <p className="ds-eyebrow mb-4">{processEyebrow(fontSeed ?? '')}</p>
           )}
           <h2 className={`text-3xl md:text-5xl ${t.headingFont} ${t.textPrimary}`}>
             {process.title}

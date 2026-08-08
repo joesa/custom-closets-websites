@@ -98,9 +98,11 @@ const fontVariables = [
   syne.variable,
 ].join(" ");
 
+// Per-tenant layouts override this. It only surfaces on 404s and error pages,
+// so it must never leak platform internals (e.g. "Template Factory").
 export const metadata: Metadata = {
-  title: "Template Factory",
-  description: "Generated dynamically via Active Brand config",
+  title: "Page not found",
+  description: "The page you are looking for is not available.",
 };
 
 export default function RootLayout({

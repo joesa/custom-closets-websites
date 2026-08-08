@@ -145,7 +145,7 @@ export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed
           >
             <Image
               src={config.afterImage}
-              alt={config.afterImageAlt || "After transformation"}
+              alt={config.afterImageAlt || "After"}
               fill
               className="object-cover"
               sizes="(max-width: 1152px) 100vw, 1152px"

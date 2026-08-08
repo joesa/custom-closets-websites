@@ -5,7 +5,7 @@ import Image from "next/image";
 import Script from "next/script";
 import * as motion from "framer-motion/client";
 import { getThemeStyles, getGridClasses, getThemePrimaryHex, getSectionTokens, applyVoice } from "@/lib/theme";
-import { getDesignVariant, heroHeadlineClasses, hashSeed, siteSeed } from "@/lib/designVariants";
+import { getDesignVariant, heroHeadlineClasses, siteSeed } from "@/lib/designVariants";
 import {
   resolvePageArchitecture,
   mergeLayoutWithArchitecture,
@@ -14,6 +14,14 @@ import {
 } from "@/lib/pageArchitectures";
 import { getSiteMotion, motionRise } from "@/lib/siteMotion";
 import { resolveSiteSignature, widgetRadiusFromSeed } from "@/lib/siteSignature";
+import {
+  heroCtaLabel,
+  portfolioSectionTitle,
+  widgetTitleLabel,
+  widgetHeading,
+  widgetSubheading,
+} from "@/lib/chromeCopy";
+import { heroFallbackForTheme } from "@/lib/themeHeroFallback";
 import HeroSection from "@/components/HeroSection";
 import ProcessSection from "@/components/ProcessSection";
 import ProductDetailSheet from "@/components/ProductDetailSheet";
@@ -23,6 +31,7 @@ import SocialProofSection from "@/components/SocialProofSection";
 import { BrandConfig, Product } from "@/types/config";
 import BookingEngine from "@/components/engines/BookingEngine";
 import TicketEngine from "@/components/engines/TicketEngine";
+import SiteFooter from "@/components/SiteFooter";
 import { PUBLIC_API_URL, WIDGET_CDN_URL } from "@/lib/urls";
 import {
   MotionHydrationProvider,
@@ -34,8 +43,6 @@ interface ClientPageProps {
   config: BrandConfig;
   hostname?: string;
 }
-
-const HERO_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c';
 
 function ClientPageContent({ config }: ClientPageProps) {
   const motionReady = useMotionHydrated();
@@ -60,7 +67,9 @@ function ClientPageContent({ config }: ClientPageProps) {
 
   // ─── Section Definitions ───
 
-  const heroImage = config.hero.backgroundImage || HERO_FALLBACK_IMAGE;
+  // Theme-keyed fallback: a heroless site gets an image that at least fits its
+  // theme instead of the one shared closet photo every heroless site used to get.
+  const heroImage = config.hero.backgroundImage || heroFallbackForTheme(config.theme);
   const heroHeadline = heroHeadlineClasses(variant.typeScale);
   const heroAlignText = variant.heroAlign === 'left' ? 'text-left' : 'text-center';
 
@@ -82,13 +91,7 @@ function ClientPageContent({ config }: ClientPageProps) {
   const isBookingBusiness = engagementModel === 'booking';
   const isTicketBusiness = engagementModel === 'ticket';
   
-  const QUOTE_CTA_LABELS = ['Get Your Free Quote', 'Request a Quote', 'Get a Free Estimate', 'Request a Consultation', 'Schedule a Visit'];
-  const ORDER_CTA_LABELS = ['Order Now', 'View Menu', 'Start Your Order', 'Order Online', 'Place an Order'];
-  const BOOKING_CTA_LABELS = ['Book an Appointment', 'Schedule Now', 'Book a Session', 'Reserve a Time', 'Book Service'];
-  const TICKET_CTA_LABELS = ['Get Tickets', 'Buy Tickets', 'Reserve Your Spot', 'Find Tickets', 'Book Event'];
-  
-  const ctaLabels = isOrderBusiness ? ORDER_CTA_LABELS : isBookingBusiness ? BOOKING_CTA_LABELS : isTicketBusiness ? TICKET_CTA_LABELS : QUOTE_CTA_LABELS;
-  const seededCtaLabel = ctaLabels[hashSeed(`${fontSeed}:cta`) % ctaLabels.length];
+  const seededCtaLabel = heroCtaLabel(fontSeed, engagementModel);
   const heroPrimaryCta = config.hero.primaryCta;
   const ctaHref = heroPrimaryCta?.href?.trim() || '#quote';
   const ctaLabel = heroPrimaryCta?.label?.trim() || seededCtaLabel;
@@ -100,25 +103,8 @@ function ClientPageContent({ config }: ClientPageProps) {
     </div>
   );
 
-  const PORTFOLIO_TITLES_QUOTE = ['Our Work', 'Recent Projects', 'Featured Jobs', 'What we build', 'Selected projects'];
-  const PORTFOLIO_TITLES_ORDER = ['Menu', 'What we serve', 'From the kitchen', 'Popular picks', 'Order favorites'];
-  const PORTFOLIO_TITLES_BOOKING = ['Services', 'What we offer', 'Appointments', 'Treatments', 'Book these'];
-  const PORTFOLIO_TITLES_TICKET = ['Events', 'Upcoming', 'On the calendar', 'Experiences', 'Get tickets for'];
-  const portfolioTitles = isOrderBusiness
-    ? PORTFOLIO_TITLES_ORDER
-    : isBookingBusiness
-      ? PORTFOLIO_TITLES_BOOKING
-      : isTicketBusiness
-        ? PORTFOLIO_TITLES_TICKET
-        : PORTFOLIO_TITLES_QUOTE;
-  const portfolioTitle = portfolioTitles[hashSeed(`${fontSeed}:portfolioTitle`) % portfolioTitles.length];
-  const widgetTitle = isOrderBusiness
-    ? 'Place an order'
-    : isBookingBusiness
-      ? 'Book a time'
-      : isTicketBusiness
-        ? 'Get tickets'
-        : 'Get an estimate';
+  const portfolioTitle = portfolioSectionTitle(fontSeed, engagementModel);
+  const widgetTitle = widgetTitleLabel(fontSeed, engagementModel);
   const cardRadiusClass =
     widgetRadius === 'sharp' ? 'rounded-none' : widgetRadius === 'pill' ? 'rounded-2xl' : 'rounded-lg';
   const sectionPadClass = siteMotion.personality === 'commercial' ? 'pb-20' : siteMotion.personality === 'luxury' ? 'pb-36' : 'pb-32';
@@ -433,17 +419,11 @@ function ClientPageContent({ config }: ClientPageProps) {
           <div className="mb-4 flex flex-col items-center">
             {renderOrnament(true)}
             <h2 className={`text-4xl ${theme.headingFont}`}>
-              {isOrderBusiness ? 'Order Online' : isBookingBusiness ? 'Book Now' : isTicketBusiness ? 'Get Tickets' : 'Get an Instant Quote'}
+              {widgetHeading(fontSeed, engagementModel)}
             </h2>
           </div>
           <p className={`${config.pricingNotes ? 'mb-4' : 'mb-12'} text-lg ${theme.textSecondary}`}>
-            {isOrderBusiness
-              ? 'Browse the menu and place your order.'
-              : isBookingBusiness
-                ? 'Pick a service and a time that works for you.'
-                : isTicketBusiness
-                  ? 'Choose a date and reserve your spot.'
-                  : 'Tell us about your project and get a clear estimate.'}
+            {widgetSubheading(fontSeed, engagementModel)}
           </p>
           {config.pricingNotes && (
             <p className={`mx-auto mb-12 max-w-2xl text-sm ${theme.textSecondary} opacity-80`}>
@@ -467,12 +447,18 @@ function ClientPageContent({ config }: ClientPageProps) {
                 contractorId={config.widgetId}
                 accentColor={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
                 radius={widgetRadius}
+                theme={config.theme}
+                themeTokens={config.themeTokens}
+                fontSeed={fontSeed}
               />
             ) : isTicketBusiness ? (
               <TicketEngine 
                 contractorId={config.widgetId}
                 accentColor={getThemePrimaryHex(config.theme, fontSeed, config.themeTokens)}
                 radius={widgetRadius}
+                theme={config.theme}
+                themeTokens={config.themeTokens}
+                fontSeed={fontSeed}
               />
             ) : (
               // @ts-expect-error Custom web component
@@ -584,6 +570,16 @@ function ClientPageContent({ config }: ClientPageProps) {
 
       {/* Render selected structural layout */}
       {renderLayout()}
+
+      {/* ─── Themed, seeded NAP footer (real local businesses have one) ─── */}
+      <SiteFooter
+        brandName={config.brandName}
+        theme={config.theme}
+        themeTokens={config.themeTokens}
+        fontSeed={fontSeed}
+        seo={config.seo}
+        navLinks={config.navLinks}
+      />
 
       {/* ─── Interactive Product Detail Sheet (Global) ─── */}
       <ProductDetailSheet 

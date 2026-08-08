@@ -8,6 +8,7 @@ import type { QuizConfig } from '@/types/config';
 import { getThemeStyles, getSectionTokens, applyVoice, ThemeTokenSelection } from '@/lib/theme';
 import { useMotionHydrated } from '@/components/MotionHydrationProvider';
 import { motionInitial } from '@/lib/motionInitial';
+import { quizEyebrowFallback, quizHeadlineFallback, quizFinishLine, navCtaLabel } from '@/lib/chromeCopy';
 
 interface QuizSectionProps {
   theme: ThemeType;
@@ -27,8 +28,10 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
 
   const QUESTIONS = quizConfig?.questions?.length ? quizConfig.questions : [];
   const hasQuiz = QUESTIONS.length > 0;
-  const eyebrowText = quizConfig?.eyebrow?.trim() || 'Quick questions';
-  const headlineText = quizConfig?.headline?.trim() || 'A few details help us help you.';
+  // Fallbacks are seeded so no two engine sites share the same quiz chrome.
+  const eyebrowText = quizConfig?.eyebrow?.trim() || quizEyebrowFallback(fontSeed ?? '');
+  const headlineText = quizConfig?.headline?.trim() || quizHeadlineFallback(fontSeed ?? '');
+  const finishText = quizFinishLine(fontSeed ?? '');
 
   const t = applyVoice(getThemeStyles(theme, themeTokens), theme, fontSeed ?? '', themeTokens);
   const section = getSectionTokens(theme, fontSeed ?? '', themeTokens);
@@ -68,7 +71,7 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
         <div className="text-center mb-12">
           <h3 className={`mb-4 ${activeStyles.subtitle}`}>{eyebrowText}</h3>
           <h2 className={`text-3xl md:text-5xl mb-6 ${activeStyles.title}`}>
-            {isFinished ? 'Thanks — that helps.' : headlineText}
+            {isFinished ? finishText : headlineText}
           </h2>
           {!isFinished && (
             <div className="flex justify-center gap-2 mb-8">
@@ -132,13 +135,7 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
                   href="#quote" 
                   className={`inline-block py-4 px-8 text-lg ${activeStyles.button}`}
                 >
-                  {engagementModel === 'booking'
-                    ? 'Book Your Appointment'
-                    : engagementModel === 'order'
-                      ? 'Order Now'
-                      : engagementModel === 'ticket'
-                        ? 'Get Tickets'
-                        : 'Continue to estimate'}
+                  {navCtaLabel(fontSeed ?? '', engagementModel)}
                 </a>
               </motion.div>
             )}

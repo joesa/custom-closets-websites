@@ -28,22 +28,22 @@ const MOTIFS: SignatureMotif[] = [
 ]
 
 const EYEBROWS_MEDICAL = [
-  'Compassionate care',
   'Patient care',
   'In practice',
   'How we care',
   'For your family',
   'Our approach',
-  'Clinical excellence',
+  'Clinical care',
   'Patient-first',
+  'At the clinic',
 ]
 
 const EYEBROWS_WELLNESS = [
   'Serene care',
   'The experience',
   'In studio',
-  'Holistic care',
   'Mind & Body',
+  'Your wellbeing',
 ]
 
 const EYEBROWS_PROFESSIONAL = [
@@ -65,28 +65,77 @@ const EYEBROWS_TRADE = [
   'Master craftsmanship',
 ]
 
-function getEyebrowPool(brandName?: string | null, services?: string[] | null): string[] {
+// Process-section titles for legacy rows without a provisioned signature.
+// Deliberately NOT the "The {Brand} Method" formula — that fill-in-the-blank
+// title is a recognisable generator signature. Mirrors the pools in
+// closet-dashboard/src/lib/provision/siteSignature.ts.
+const PROCESS_TITLES_TRADE = [
+  'How we run a job',
+  'From first call to final walkthrough',
+  'What happens after you book',
+  'How the work gets done',
+  'Start to finish',
+  'How a project moves',
+  'The order we work in',
+  'What to expect on site',
+]
+const PROCESS_TITLES_MEDICAL = [
+  'What a visit looks like',
+  'From booking to follow-up',
+  'How appointments work',
+  'Your first visit, step by step',
+  'What to expect at your visit',
+  'How care moves forward',
+]
+const PROCESS_TITLES_PROFESSIONAL = [
+  'How an engagement works',
+  'From consultation to resolution',
+  'What working together looks like',
+  'How we take on new work',
+  'From first meeting to final filing',
+  'What happens after you reach out',
+]
+const PROCESS_TITLES_WELLNESS = [
+  'What to expect',
+  'From booking to your first session',
+  'How sessions work',
+  'Your first visit, start to finish',
+  'How we set up your routine',
+  'What a session looks like',
+]
+
+type VerticalHint = 'medical' | 'wellness' | 'professional' | 'trade'
+
+function detectVerticalHint(brandName?: string | null, services?: string[] | null): VerticalHint {
   const text = `${brandName || ''} ${(services || []).join(' ')}`.toLowerCase()
   if (/med|clinic|pediatr|doctor|health|urgent care|hospital|dental|dentist|physician|therapy|therapist|optom|eye care|dermatol|chiro|vet|psych|counsel|rehab/i.test(text)) {
-    return EYEBROWS_MEDICAL
+    return 'medical'
   }
   if (/salon|spa|barber|hair|beauty|esthetic|skincare|fitness|gym|yoga|pilates|massage|wellness/i.test(text)) {
-    return EYEBROWS_WELLNESS
+    return 'wellness'
   }
   if (/legal|law|attorney|lawyer|account|cpa|tax|financial|real estate|insurance|consulting|architect/i.test(text)) {
-    return EYEBROWS_PROFESSIONAL
+    return 'professional'
   }
-  return EYEBROWS_TRADE
+  return 'trade'
 }
 
-function brandToken(brandName: string): string {
-  const cleaned = brandName
-    .replace(/\b(llc|inc|co|company|the|and|&)\b/gi, ' ')
-    .replace(/[^a-zA-Z0-9\s]/g, ' ')
-    .trim()
-  const parts = cleaned.split(/\s+/).filter(Boolean)
-  if (parts.length === 0) return 'Studio'
-  return parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
+function getEyebrowPool(hint: VerticalHint): string[] {
+  switch (hint) {
+    case 'medical': return EYEBROWS_MEDICAL
+    case 'wellness': return EYEBROWS_WELLNESS
+    case 'professional': return EYEBROWS_PROFESSIONAL
+    default: return EYEBROWS_TRADE
+  }
+}
+
+function getProcessTitlePool(hint: VerticalHint): string[] {
+  switch (hint) {
+    case 'medical': return PROCESS_TITLES_MEDICAL
+    case 'wellness': return PROCESS_TITLES_WELLNESS
+    case 'professional': return PROCESS_TITLES_PROFESSIONAL
+    default: return PROCESS_TITLES_TRADE
+  }
 }
 
 /**
@@ -100,19 +149,16 @@ export function resolveSiteSignature(opts: {
   services?: string[] | null
 }): SiteSignature {
   const seed = (opts.seed || opts.brandName || 'site').trim()
-  const brand = brandToken(opts.brandName || 'Studio')
-  
-  const text = `${opts.brandName || ''} ${(opts.services || []).join(' ')}`.toLowerCase()
-  const isMedical = /med|clinic|pediatr|doctor|health|urgent care|hospital|dental|dentist|physician|therapy|therapist|optom|eye care/i.test(text)
-  const methodSuffix = isMedical ? 'Care Approach' : 'Method'
-  const defaultProcess = `The ${brand} ${methodSuffix}`
+  const hint = detectVerticalHint(opts.brandName, opts.services)
+  const titlePool = getProcessTitlePool(hint)
+  const defaultProcess = titlePool[hashSeed(`${seed}::method`) % titlePool.length]
 
   const motif =
     (opts.signature?.motif && MOTIFS.includes(opts.signature.motif)
       ? opts.signature.motif
       : MOTIFS[hashSeed(`${seed}::motif`) % MOTIFS.length]) as SignatureMotif
 
-  const pool = getEyebrowPool(opts.brandName, opts.services)
+  const pool = getEyebrowPool(hint)
   const eyebrow =
     opts.signature?.eyebrow?.trim() ||
     pool[hashSeed(`${seed}::eyebrow`) % pool.length]

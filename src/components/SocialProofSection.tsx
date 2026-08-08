@@ -7,6 +7,7 @@ import { getSiteMotion, motionRise } from '@/lib/siteMotion';
 import { useMotionHydrated } from '@/components/MotionHydrationProvider';
 
 import { hashSeed } from '@/lib/designVariants';
+import { socialProofEyebrowFallback, socialProofHeadlineFallback } from '@/lib/chromeCopy';
 
 interface SocialProofSectionProps {
   config: SocialProofConfig;
@@ -43,10 +44,10 @@ export default function SocialProofSection({
           className={`mb-14 ${isLuminaStyle ? 'text-left' : 'text-center'}`}
         >
           <p className={`mb-3 ${isLuminaStyle ? 'ds-eyebrow' : 'text-sm uppercase tracking-[0.2em] ' + section.accent}`}>
-            {config.eyebrow?.trim() || 'Clients'}
+            {config.eyebrow?.trim() || socialProofEyebrowFallback(fontSeed)}
           </p>
           <h2 className={`text-3xl md:text-5xl ${t.headingFont} ${t.textPrimary}`}>
-            {config.headline?.trim() || 'In their words'}
+            {config.headline?.trim() || socialProofHeadlineFallback(fontSeed)}
           </h2>
         </motion.div>
 
@@ -85,7 +86,7 @@ export default function SocialProofSection({
                   <p className={`text-lg leading-relaxed ${t.headingFont} ${t.textPrimary}`}>“{item.quote}”</p>
                   <footer className="mt-6 text-xs uppercase tracking-[0.16em] ds-mute">
                     <b className={`font-semibold ${t.textPrimary}`}>{item.name}</b>
-                    {item.role ? <span> — {item.role}</span> : null}
+                    {item.role ? <span>, {item.role}</span> : null}
                   </footer>
                 </motion.blockquote>
               ))}

@@ -11,6 +11,7 @@ import HeroSection from "@/components/HeroSection";
 import { getThemeStyles, getGridClasses, applyVoice, getSectionTokens } from "@/lib/theme";
 import { siteSeed, getDesignVariant, pageHeroHeadlineClasses } from "@/lib/designVariants";
 import { resolveSiteSignature } from "@/lib/siteSignature";
+import { offerHeading, glanceLabel, navCtaLabel } from "@/lib/chromeCopy";
 import { resolvePageComposition } from "@/lib/pageCompositions";
 import { getCustomPage, isCustomSiteConfig } from "@/lib/customSite";
 import { cloakCustomSiteConfig } from "@/lib/mediaProxy";
@@ -23,6 +24,7 @@ import { isAdminBypassRequest } from "@/lib/adminBypass";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import ServicesProductGrid from "@/components/ServicesProductGrid";
+import SiteFooter from "@/components/SiteFooter";
 import { PUBLIC_API_URL } from "@/lib/urls";
 import type { Metadata } from "next";
 import { applyEngineDraftPreview } from "@/lib/engineDraftPreview";
@@ -82,6 +84,7 @@ export default async function SubPage({
         <LocalSEO
           seo={config.seo}
           brandName={config.brandName}
+          industry={config.industry}
           url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
         />
         <PendingApproval reason={gate === "edit_locked" ? "edit_locked" : "pending"} />
@@ -97,6 +100,7 @@ export default async function SubPage({
           <LocalSEO
             seo={config.seo}
             brandName={config.brandName}
+            industry={config.industry}
             url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
           />
           <PendingApproval />
@@ -108,6 +112,7 @@ export default async function SubPage({
         <LocalSEO
           seo={config.seo}
           brandName={config.brandName}
+          industry={config.industry}
           url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
         />
         <LaunchPaywall brandName={config.brandName} launchPayUrl={payUrl} />
@@ -160,6 +165,7 @@ export default async function SubPage({
         <LocalSEO
           seo={config.seo}
           brandName={config.brandName}
+          industry={config.industry}
           url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
         />
         <DraftEmptyNotice brandName={config.brandName} />
@@ -181,6 +187,7 @@ export default async function SubPage({
           <LocalSEO
             seo={config.seo}
             brandName={config.brandName}
+            industry={config.industry}
             url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
           />
           <DraftMissingPageNotice
@@ -199,6 +206,7 @@ export default async function SubPage({
         <LocalSEO
           seo={config.seo}
           brandName={config.brandName}
+          industry={config.industry}
           url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
         />
         <CustomSiteRenderer
@@ -282,20 +290,14 @@ export default async function SubPage({
   if (config.seo.addressLocality) {
     credentialBullets.push(`Serving ${config.seo.addressLocality}`);
   }
-  const contactCta =
-    config.engagementModel === "order"
-      ? "Place an order"
-      : config.engagementModel === "booking"
-        ? "Book a time"
-        : config.engagementModel === "ticket"
-          ? "Get tickets"
-          : "Get a quote";
+  const contactCta = navCtaLabel(fontSeed, config.engagementModel);
 
   return (
     <>
       <LocalSEO
         seo={{ ...config.seo, legalName: `${pageData.title} | ${config.seo.legalName}` }}
         brandName={config.brandName}
+        industry={config.industry}
         url={`https://${resolvedParams.hostname}/${resolvedParams.slug}`}
       />
 
@@ -339,7 +341,8 @@ export default async function SubPage({
                     themeType={config.theme}
                     themeTokens={config.themeTokens}
                     fontSeed={fontSeed}
-                    heading="What we offer"
+                    heading={offerHeading(fontSeed)}
+                    engagementModel={config.engagementModel}
                     mutedText={mutedText}
                     cardSurface={cardSurface}
                   />
@@ -369,7 +372,8 @@ export default async function SubPage({
                   themeType={config.theme}
                   themeTokens={config.themeTokens}
                   fontSeed={fontSeed}
-                  heading="What we offer"
+                  heading={offerHeading(fontSeed)}
+                  engagementModel={config.engagementModel}
                   mutedText={mutedText}
                   cardSurface={cardSurface}
                 />
@@ -433,7 +437,7 @@ export default async function SubPage({
                 {credentialBullets.length > 0 ? (
                   <aside className={`md:col-span-5 space-y-5 p-8 border ${cardSurface}`}>
                     <h3 className={`text-lg md:text-xl ${theme.headingFont} ${theme.accentColor}`}>
-                      At a glance
+                      {glanceLabel(fontSeed)}
                     </h3>
                     <ul className={`space-y-3 text-base leading-relaxed ${theme.bodyFont} ${mutedText}`}>
                       {credentialBullets.map((b) => (
@@ -547,6 +551,15 @@ export default async function SubPage({
           </section>
         )}
       </main>
+
+      <SiteFooter
+        brandName={config.brandName}
+        theme={config.theme}
+        themeTokens={config.themeTokens}
+        fontSeed={fontSeed}
+        seo={config.seo}
+        navLinks={config.navLinks}
+      />
     </>
   );
 }
@@ -676,7 +689,14 @@ function renderBlock(
             {block.body}
           </p>
         ) : null}
-        <GalleryLightbox images={block.images} altPrefix={`${pageDataTitle} project`} imageSize={block.imageSize} imageAspect={block.imageAspect} imageFit={block.imageFit} />
+        <GalleryLightbox
+          images={block.images}
+          altPrefix={block.heading?.trim() || pageDataTitle}
+          imageAlts={block.items?.map((item) => item.imageAlt || item.title)}
+          imageSize={block.imageSize}
+          imageAspect={block.imageAspect}
+          imageFit={block.imageFit}
+        />
       </div>
     );
   }

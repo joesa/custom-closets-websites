@@ -20,7 +20,7 @@ export default function PendingApproval({
         <p className="text-neutral-400 leading-relaxed text-sm">
           {isEdit
             ? 'This site is temporarily offline while content is being edited. Please check back shortly.'
-            : 'This customized storage solution portal is currently being designed and assembled. Please check back soon for the final launch.'}
+            : 'This site is being built and will be live soon. Please check back shortly.'}
         </p>
       </div>
     </div>

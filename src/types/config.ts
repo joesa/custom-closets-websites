@@ -130,6 +130,8 @@ export interface SEOConfig {
     latitude: string;
     longitude: string;
   };
+  /** Free-text hours line when the business supplies them (e.g. "Mon–Fri 8–5"). */
+  openingHours?: string;
   /** Optional homepage social proof (stored in seo_config JSONB). */
   socialProof?: SocialProofConfig;
 }
@@ -192,6 +194,8 @@ export interface EngineConfigDraft {
 
 export interface BrandConfig {
   brandName: string;
+  /** Industry / trade label (e.g. "Plumbing"). Drives JSON-LD @type and meta fallbacks. */
+  industry?: string;
   theme: ThemeType;
   hero: {
     headline: string;

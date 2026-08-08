@@ -3,6 +3,8 @@
  * adhere to Lumina-level design standards and are free of AI tell-words.
  */
 
+import { AI_TELL_PHRASES, findAiTellPhrases } from './humanCopyVoice';
+
 export interface QualityReport {
   score: number; // 0 - 100
   passed: boolean; // score >= 80 and no critical errors
@@ -16,24 +18,15 @@ export interface QualityReport {
   warnings: string[];
 }
 
-export const BANNED_AI_TELLS = [
-  'solutions',
-  'leverage',
-  'cutting-edge',
-  'state-of-the-art',
-  'comprehensive',
-  'game-changer',
-  'synergy',
-  'streamline',
-  'empower',
-  'delve',
-  'testament to',
-  'nestled in',
-  "in today's fast-paced world",
-  'whether you need',
-  'we are committed to',
-  'our team of experienced professionals',
-];
+/**
+ * Renderer-only additions on top of the shared humanCopyVoice ban table.
+ * "solutions" is too broad for generated marketing copy at large (the shared
+ * table bans the telly "tailored solutions") but in custom-mode HTML — the only
+ * thing this audit scans — bare "solutions" is reliably filler.
+ */
+const RENDERER_EXTRA_TELLS = ['solutions'];
+
+export const BANNED_AI_TELLS = [...AI_TELL_PHRASES, ...RENDERER_EXTRA_TELLS];
 
 export function auditDesignQuality(html: string, css: string = ''): QualityReport {
   const combined = `${html} ${css}`.toLowerCase();
@@ -41,8 +34,13 @@ export function auditDesignQuality(html: string, css: string = ''): QualityRepor
   const warnings: string[] = [];
   const bannedWordsFound: string[] = [];
 
-  // Check 1: AI Tell-Words Ban (Critical)
-  for (const word of BANNED_AI_TELLS) {
+  // Check 1: AI Tell-Words Ban (Critical). The shared table is rule-aware
+  // (word boundaries, narrow trade exemptions like "seamless gutters");
+  // renderer-only extras are plain substring bans.
+  bannedWordsFound.push(
+    ...new Set(findAiTellPhrases(combined).map((hit) => hit.toLowerCase()))
+  );
+  for (const word of RENDERER_EXTRA_TELLS) {
     if (combined.includes(word.toLowerCase())) {
       bannedWordsFound.push(word);
     }

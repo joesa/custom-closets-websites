@@ -51,10 +51,34 @@ describe('Navbar structural nav compositions', () => {
     expect(html).toContain('Acme Closets');
   });
 
-  it('classic, centered-stack, split-cta and boxed-floating all show a "Get Quote" CTA button', () => {
+  it('classic, centered-stack, split-cta and boxed-floating all show a CTA button linking to #quote', () => {
+    // The label itself is seeded (chromeCopy navCtaLabel), never the old
+    // fleet-wide "Get Quote" literal.
     for (const navStyle of ['classic::glass::fade', 'centered-stack::glass::fade', 'split-cta::glass::fade', 'boxed-floating::glass::fade', 'two-tier-topbar::glass::fade'] as NavComposition[]) {
-      expect(renderVariant(navStyle)).toContain('Get Quote');
+      const html = renderVariant(navStyle);
+      expect(html).toContain('href="/#quote"');
+      expect(html).not.toContain('Get Quote');
     }
+  });
+
+  it('different seeds produce different CTA labels (seeded chrome, not a fixed literal)', () => {
+    const labels = new Set(
+      ['seed-a', 'seed-b', 'seed-c', 'seed-d', 'seed-e'].map((seed) => {
+        const html = renderToStaticMarkup(
+          <Navbar
+            brandName="Acme Closets"
+            links={LINKS}
+            themeName="luxury-minimal"
+            fontSeed={seed}
+            navStyle="classic::glass::fade"
+            phone="(555) 010-0100"
+          />
+        );
+        const match = html.match(/href="\/#quote"[^>]*>([^<]+)</);
+        return match?.[1] ?? '';
+      })
+    );
+    expect(labels.size).toBeGreaterThan(1);
   });
 
   it('two-tier-topbar renders the utility bar with the phone number', () => {

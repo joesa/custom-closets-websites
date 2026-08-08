@@ -14,6 +14,7 @@ import { isCustomSiteConfig, type CustomSiteConfig } from '@/lib/customSite';
 // Relations may come back as a single object or a one-element array.
 type SiteConfigRow = {
   brand_name: string;
+  industry?: string | null;
   theme: string;
   layout_style?: string;
   default_room?: string;
@@ -85,6 +86,7 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
 
   return {
     brandName: configRow.brand_name,
+    industry: configRow.industry ?? undefined,
     theme: configRow.theme as ThemeType,
     hero: configRow.hero_config,
     about: configRow.about_config,

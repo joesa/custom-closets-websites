@@ -16,12 +16,23 @@ export async function generateMetadata({
   if (!config) {
     return { title: "DitchTheForm" };
   }
+  // Last-resort description is derived from real config (industry + locality),
+  // never a fleet-wide closet-specific literal.
+  const industry = config.industry?.trim();
+  const locality = config.seo?.addressLocality?.trim();
+  const derived = [
+    industry ? `${industry} by ${config.brandName}` : config.brandName,
+    locality ? `serving ${locality}` : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
   const description =
     config.hero.subheadline?.trim() ||
     config.about.description?.trim() ||
-    `${config.brandName} — custom storage and instant quotes.`;
+    `${derived}.`;
+  const title = locality ? `${config.brandName} | ${locality}` : config.brandName;
   return {
-    title: config.brandName,
+    title,
     description: description.slice(0, 160),
   };
 }

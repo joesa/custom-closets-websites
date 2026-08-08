@@ -72,7 +72,7 @@ export default async function Page({
   if (gate === 'pending' || gate === 'edit_locked') {
     return (
       <>
-        <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}`} />
+        <LocalSEO seo={config.seo} brandName={config.brandName} industry={config.industry} url={`https://${resolvedParams.hostname}`} />
         <PendingApproval reason={gate === 'edit_locked' ? 'edit_locked' : 'pending'} />
       </>
     );
@@ -83,14 +83,14 @@ export default async function Page({
     if (!payUrl) {
       return (
         <>
-          <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}`} />
+          <LocalSEO seo={config.seo} brandName={config.brandName} industry={config.industry} url={`https://${resolvedParams.hostname}`} />
           <PendingApproval />
         </>
       );
     }
     return (
       <>
-        <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}`} />
+        <LocalSEO seo={config.seo} brandName={config.brandName} industry={config.industry} url={`https://${resolvedParams.hostname}`} />
         <LaunchPaywall brandName={config.brandName} launchPayUrl={payUrl} />
       </>
     );
@@ -134,7 +134,7 @@ export default async function Page({
   if (draftConfig && !getCustomPage(draftConfig, '/')) {
     return (
       <>
-        <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}`} />
+        <LocalSEO seo={config.seo} brandName={config.brandName} industry={config.industry} url={`https://${resolvedParams.hostname}`} />
         <DraftEmptyNotice brandName={config.brandName} />
       </>
     );
@@ -146,6 +146,7 @@ export default async function Page({
         <LocalSEO
           seo={config.seo}
           brandName={config.brandName}
+          industry={config.industry}
           url={`https://${resolvedParams.hostname}`}
         />
         <CustomSiteRenderer
@@ -172,7 +173,7 @@ export default async function Page({
   // No custom page for "/" → fall through to the shared template engine.
   return (
     <>
-      <LocalSEO seo={config.seo} brandName={config.brandName} url={`https://${resolvedParams.hostname}`} />
+      <LocalSEO seo={config.seo} brandName={config.brandName} industry={config.industry} url={`https://${resolvedParams.hostname}`} />
       <ClientPage config={renderConfig} hostname={resolvedParams.hostname} />
     </>
   );

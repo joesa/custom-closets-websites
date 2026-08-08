@@ -5,7 +5,10 @@ import Image from "next/image";
 
 interface GalleryLightboxProps {
   images: string[];
+  /** Page/section heading used when a per-image caption is absent. */
   altPrefix: string;
+  /** Optional per-image captions/alts from page copy (preferred over formulaic numbering). */
+  imageAlts?: Array<string | undefined | null>;
   imageSize?: 'small' | 'medium' | 'large' | 'full';
   imageAspect?: 'square' | 'landscape' | 'wide' | 'portrait';
   imageFit?: 'cover' | 'contain';
@@ -14,7 +17,26 @@ interface GalleryLightboxProps {
 const sizeClasses = { small: 'max-w-3xl mx-auto', medium: 'max-w-5xl mx-auto', large: 'max-w-7xl mx-auto', full: 'max-w-none' };
 const aspectClasses = { square: 'aspect-square', landscape: 'aspect-[4/3]', wide: 'aspect-video', portrait: 'aspect-[3/4]' };
 
-export default function GalleryLightbox({ images, altPrefix, imageSize = 'full', imageAspect = 'landscape', imageFit = 'cover' }: GalleryLightboxProps) {
+function galleryAlt(
+  altPrefix: string,
+  index: number,
+  imageAlts?: Array<string | undefined | null>
+): string {
+  const caption = imageAlts?.[index]?.trim();
+  if (caption) return caption;
+  const base = altPrefix.trim() || 'Gallery';
+  // Prefer page copy over formulaic "project N" numbering.
+  return base;
+}
+
+export default function GalleryLightbox({
+  images,
+  altPrefix,
+  imageAlts,
+  imageSize = 'full',
+  imageAspect = 'landscape',
+  imageFit = 'cover',
+}: GalleryLightboxProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -32,23 +54,26 @@ export default function GalleryLightbox({ images, altPrefix, imageSize = 'full',
   return (
     <>
       <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ${sizeClasses[imageSize]}`}>
-        {images.map((src, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => setActiveIndex(i)}
-            aria-label={`Enlarge ${altPrefix} ${i + 1}`}
-            className={`relative overflow-hidden rounded-xl border border-white/10 cursor-zoom-in group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 ${aspectClasses[imageAspect]}`}
-          >
-            <Image
-              src={src}
-              alt={`${altPrefix} ${i + 1}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              className={`${imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-transform duration-300 group-hover:scale-105`}
-            />
-          </button>
-        ))}
+        {images.map((src, i) => {
+          const alt = galleryAlt(altPrefix, i, imageAlts);
+          return (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveIndex(i)}
+              aria-label={`Enlarge ${alt}`}
+              className={`relative overflow-hidden rounded-xl border border-white/10 cursor-zoom-in group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 ${aspectClasses[imageAspect]}`}
+            >
+              <Image
+                src={src}
+                alt={alt}
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className={`${imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-transform duration-300 group-hover:scale-105`}
+              />
+            </button>
+          );
+        })}
       </div>
 
       {activeIndex !== null && (
@@ -106,7 +131,7 @@ export default function GalleryLightbox({ images, altPrefix, imageSize = 'full',
           >
             <Image
               src={images[activeIndex]}
-              alt={`${altPrefix} ${activeIndex + 1}`}
+              alt={galleryAlt(altPrefix, activeIndex, imageAlts)}
               fill
               sizes="100vw"
               className="object-contain"

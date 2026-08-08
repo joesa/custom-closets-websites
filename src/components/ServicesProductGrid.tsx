@@ -8,6 +8,7 @@ import type { ThemeTokenSelection } from "@/lib/theme";
 import { getGridClasses } from "@/lib/theme";
 
 import { hashSeed } from "@/lib/designVariants";
+import { servicesGridEyebrow } from "@/lib/chromeCopy";
 
 type ThemeLike = {
   headingFont: string;
@@ -20,7 +21,7 @@ type ThemeLike = {
 /** Short teaser for the card face — full copy lives in the detail drawer. */
 export function productCardTeaser(product: Product, maxChars = 140): string {
   const raw = (product.description || "").trim();
-  if (!raw) return "Tap for details.";
+  if (!raw) return "See details.";
   if (raw.length <= maxChars) return raw;
   const cut = raw.slice(0, maxChars);
   const lastSpace = cut.lastIndexOf(" ");
@@ -34,6 +35,8 @@ export default function ServicesProductGrid({
   themeTokens,
   fontSeed,
   heading,
+  eyebrow,
+  engagementModel,
   mutedText,
   cardSurface,
 }: {
@@ -43,6 +46,9 @@ export default function ServicesProductGrid({
   themeTokens?: ThemeTokenSelection | null;
   fontSeed?: string;
   heading?: string;
+  /** Small label above the heading. Defaults to a seeded, model-aware pick. */
+  eyebrow?: string;
+  engagementModel?: string;
   mutedText: string;
   cardSurface: string;
 }) {
@@ -52,6 +58,10 @@ export default function ServicesProductGrid({
   if (list.length === 0) return null;
 
   const isStaggered = fontSeed && list.length >= 3 && hashSeed(`${fontSeed}::staggered-grid`) % 2 === 0;
+  // Index chips (01 / 02 / 03) are a recognisable generator flourish when they
+  // appear on every site; seed them so only some sites render them.
+  const showIndexChips = hashSeed(`${fontSeed || 'grid'}::index-chips`) % 3 === 0;
+  const eyebrowText = eyebrow ?? servicesGridEyebrow(fontSeed || 'grid', engagementModel);
 
   const getStaggerClasses = (index: number) => {
     if (!isStaggered) return "";
@@ -74,7 +84,7 @@ export default function ServicesProductGrid({
       <div className="w-full">
         {heading ? (
           <div className="mb-12">
-            <p className="ds-eyebrow mb-3">Recent jobs</p>
+            <p className="ds-eyebrow mb-3">{eyebrowText}</p>
             <h2
               className={`text-2xl md:text-4xl leading-tight text-balance ${theme.headingFont}`}
             >
@@ -111,9 +121,11 @@ export default function ServicesProductGrid({
                   <h3 className={`text-lg md:text-xl break-words ${theme.headingFont}`}>
                     {product.title}
                   </h3>
-                  <span className="text-[11px] tracking-[0.18em] uppercase ds-mute shrink-0">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
+                  {showIndexChips && (
+                    <span className="text-[11px] tracking-[0.18em] uppercase ds-mute shrink-0">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                  )}
                 </div>
                 <p className={`mt-3 text-sm leading-relaxed break-words ${theme.bodyFont} ${mutedText}`}>
                   {productCardTeaser(product)}
