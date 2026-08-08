@@ -26,6 +26,7 @@ jobs:
           node-version: '20'
           cache: npm
       - run: npm ci
+      - run: npm run lint
       - run: npm test
       - name: shared lib sync (customSite + widgetCdn)
         run: npm run test:custom-site-sync

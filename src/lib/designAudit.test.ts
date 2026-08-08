@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { auditDesignQuality, BANNED_AI_TELLS } from './designAudit';
+import { auditDesignQuality } from './designAudit';
 
 describe('auditDesignQuality', () => {
   it('passes on Lumina-style HTML and CSS', () => {

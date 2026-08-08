@@ -109,7 +109,7 @@ export default function Navbar({
     (link) => typeof link?.slug === 'string' && link.slug.length > 0 && !link.slug.includes('#quote') && link.slug !== '/quote'
   );
 
-  const Brand = () => (
+  const renderBrand = () => (
     <Link
       href="/"
       className={`text-lg md:text-xl font-bold tracking-wide shrink-0 ${chrome.brand} ${chrome.linkShadow} ${theme.bodyFont}`}
@@ -129,7 +129,7 @@ export default function Navbar({
     </Link>
   );
 
-  const NavItems = () => (
+  const renderNavItems = () => (
     <>
       {visibleLinks.map((link, i) => {
         let hoverClasses = 'hover:opacity-75'; // default fade
@@ -161,7 +161,7 @@ export default function Navbar({
     </>
   );
 
-  const CtaButton = ({ filled = false }: { filled?: boolean }) => (
+  const renderCtaButton = (filled = false) => (
     <Link
       href="/#quote"
       className={`shrink-0 px-5 py-2 text-xs uppercase tracking-widest font-bold border transition-all ${theme.bodyFont} ${rounded} ${
@@ -173,7 +173,7 @@ export default function Navbar({
   );
 
   // ─── mobile: hamburger toggle + dropdown panel, shared across every composition ───
-  const MobileToggle = () => (
+  const renderMobileToggle = () => (
     <button
       type="button"
       aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
@@ -196,7 +196,7 @@ export default function Navbar({
     </button>
   );
 
-  const MobileMenu = () => {
+  const renderMobileMenu = () => {
     if (!mobileOpen) return null;
     return (
       <div
@@ -229,16 +229,16 @@ export default function Navbar({
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${chrome.bar}`}>
         <div className="relative max-w-7xl mx-auto px-6 flex flex-col items-center gap-3">
           <div className="w-full flex items-center justify-center relative">
-            <Brand />
+            {renderBrand()}
             <div className="absolute right-0 top-1/2 -translate-y-1/2">
-              <MobileToggle />
+              {renderMobileToggle()}
             </div>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <NavItems />
-            <CtaButton />
+            {renderNavItems()}
+            {renderCtaButton()}
           </div>
-          <MobileMenu />
+          {renderMobileMenu()}
         </div>
       </nav>
     );
@@ -249,17 +249,17 @@ export default function Navbar({
     return (
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${chrome.bar}`}>
         <div className="relative max-w-7xl mx-auto px-6 grid grid-cols-[auto_1fr_auto] items-center gap-6">
-          <Brand />
+          {renderBrand()}
           <div className="hidden md:flex items-center justify-center gap-8">
-            <NavItems />
+            {renderNavItems()}
           </div>
           <div className="justify-self-end flex items-center gap-3">
             <div className="hidden md:block">
-              <CtaButton filled />
+              {renderCtaButton(true)}
             </div>
-            <MobileToggle />
+            {renderMobileToggle()}
           </div>
-          <MobileMenu />
+          {renderMobileMenu()}
         </div>
       </nav>
     );
@@ -272,13 +272,13 @@ export default function Navbar({
         <div
           className={`relative max-w-7xl mx-auto px-6 py-4 flex items-center justify-between rounded-2xl transition-all duration-300 ${chrome.bar} rounded-2xl`}
         >
-          <Brand />
+          {renderBrand()}
           <div className="hidden md:flex items-center gap-8">
-            <NavItems />
-            <CtaButton />
+            {renderNavItems()}
+            {renderCtaButton()}
           </div>
-          <MobileToggle />
-          <MobileMenu />
+          {renderMobileToggle()}
+          {renderMobileMenu()}
         </div>
       </nav>
     );
@@ -291,9 +291,9 @@ export default function Navbar({
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${chrome.bar}`}
       >
         <div className="relative max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Brand />
-          <MobileToggle />
-          <MobileMenu />
+          {renderBrand()}
+          {renderMobileToggle()}
+          {renderMobileMenu()}
         </div>
       </nav>
     );
@@ -304,13 +304,13 @@ export default function Navbar({
     return (
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${chrome.bar}`}>
         <div className="relative max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between flex-row-reverse gap-4">
-          <Brand />
+          {renderBrand()}
           <div className="hidden md:flex items-center gap-4 lg:gap-6 flex-row-reverse min-w-0">
-            <NavItems />
-            <CtaButton />
+            {renderNavItems()}
+            {renderCtaButton()}
           </div>
-          <MobileToggle />
-          <MobileMenu />
+          {renderMobileToggle()}
+          {renderMobileMenu()}
         </div>
       </nav>
     );
@@ -323,12 +323,12 @@ export default function Navbar({
         <div
           className={`relative max-w-7xl mx-auto px-6 py-4 flex items-center justify-between rounded-2xl transition-all duration-300 ${chrome.bar} rounded-2xl shadow-2xl shadow-black/20`}
         >
-          <Brand />
+          {renderBrand()}
           <div className="hidden md:flex items-center gap-8">
-            <NavItems />
-            <CtaButton />
+            {renderNavItems()}
+            {renderCtaButton()}
           </div>
-          <MobileToggle />
+          {renderMobileToggle()}
           {mobileOpen && (
              <div className={`md:hidden absolute bottom-full mb-3 left-0 right-0 rounded-2xl p-6 flex flex-col items-start gap-4 shadow-xl ${chrome.bar}`}>
                {visibleLinks.map((link, i) => (
@@ -354,22 +354,22 @@ export default function Navbar({
         <div className="md:hidden fixed top-0 left-0 right-0 z-50">
            <nav className={`transition-all duration-300 ${chrome.bar}`}>
             <div className="px-6 flex items-center justify-between">
-              <Brand />
-              <MobileToggle />
-              <MobileMenu />
+              {renderBrand()}
+              {renderMobileToggle()}
+              {renderMobileMenu()}
             </div>
           </nav>
         </div>
         {/* Desktop Sidebar */}
         <nav className={`hidden md:flex fixed top-0 left-0 bottom-0 w-64 z-50 flex-col py-10 px-8 transition-all duration-300 ${chrome.bar.replace('border-b', 'border-r').replace('py-4', '').replace('py-5', '').replace('py-6', '')}`}>
           <div className="mb-12">
-            <Brand />
+            {renderBrand()}
           </div>
           <div className="flex flex-col gap-6 flex-1">
-            <NavItems />
+            {renderNavItems()}
           </div>
           <div className="mt-8">
-            <CtaButton filled />
+            {renderCtaButton(true)}
           </div>
         </nav>
       </>
@@ -389,17 +389,17 @@ export default function Navbar({
             ))}
           </div>
           <div className="flex justify-start md:justify-center">
-            <Brand />
+            {renderBrand()}
           </div>
           <div className="hidden md:flex items-center gap-8 justify-start">
             {rightLinks.map((link, i) => (
               <Link key={i} href={link.slug} className={`group relative text-sm tracking-widest transition-colors font-medium ${chrome.link} ${chrome.linkShadow}`}>{link.label}</Link>
             ))}
-            <CtaButton />
+            {renderCtaButton()}
           </div>
           <div className="md:hidden">
-            <MobileToggle />
-            <MobileMenu />
+            {renderMobileToggle()}
+            {renderMobileMenu()}
           </div>
         </div>
       </nav>
@@ -417,13 +417,13 @@ export default function Navbar({
         </div>
         <nav className={`transition-all duration-300 ${chrome.bar}`}>
           <div className="relative max-w-7xl mx-auto px-6 flex items-center justify-between">
-            <Brand />
+            {renderBrand()}
             <div className="hidden md:flex items-center gap-8">
-              <NavItems />
-              <CtaButton />
+              {renderNavItems()}
+              {renderCtaButton()}
             </div>
-            <MobileToggle />
-            <MobileMenu />
+            {renderMobileToggle()}
+            {renderMobileMenu()}
           </div>
         </nav>
       </div>
@@ -434,15 +434,14 @@ export default function Navbar({
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${chrome.bar}`}>
       <div className="relative max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <Brand />
+        {renderBrand()}
         <div className="hidden md:flex items-center gap-8">
-          <NavItems />
-          <CtaButton />
+          {renderNavItems()}
+          {renderCtaButton()}
         </div>
-        <MobileToggle />
-        <MobileMenu />
+        {renderMobileToggle()}
+        {renderMobileMenu()}
       </div>
     </nav>
   );
 }
-

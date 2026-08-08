@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Clock, User, Mail, Phone, CheckCircle2, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react'
+import { Clock, User, Mail, Phone, CheckCircle2, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react'
 import { PUBLIC_API_URL } from '@/lib/urls'
 import type { ThemeType } from '@/types/config'
 import { getSectionTokens, type ThemeTokenSelection } from '@/lib/theme'
@@ -214,8 +214,8 @@ export default function BookingEngine({
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       setStep(4)
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit booking.')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to submit booking.')
     } finally {
       setSubmitting(false)
     }
@@ -251,7 +251,7 @@ export default function BookingEngine({
         <div className={`px-6 py-4 border-b flex items-center justify-between ${ui.headerBg}`}>
           {step > 1 ? (
             <button 
-              onClick={() => setStep(step - 1 as any)}
+              onClick={() => setStep(step === 4 ? 3 : step === 3 ? 2 : 1)}
               className={`flex items-center text-sm font-medium transition-colors ${ui.body} ${ui.hoverHeading}`}
             >
               <ArrowLeft className="h-4 w-4 mr-1" /> Back
@@ -278,7 +278,7 @@ export default function BookingEngine({
             <motion.div key="step1" initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="space-y-6">
               <div>
                 <h3 className={`text-2xl font-bold ${ui.heading}`}>Select a Service</h3>
-                <p className={`mt-1 ${ui.body}`}>Choose the service you'd like to book.</p>
+                <p className={`mt-1 ${ui.body}`}>Choose the service you’d like to book.</p>
               </div>
               
               {services.length === 0 ? (
@@ -481,11 +481,11 @@ export default function BookingEngine({
               </div>
               <h3 className={`text-3xl font-bold ${ui.heading}`}>Booking Confirmed!</h3>
               <p className={`max-w-sm mx-auto text-lg leading-relaxed ${ui.body}`}>
-                You're all set for <strong>{selectedService?.name}</strong> on <br/>
+                You’re all set for <strong>{selectedService?.name}</strong> on <br/>
                 <span className={`font-medium ${ui.heading}`}>{formatDate(selectedDate)} at {formatTime(selectedTime)}</span>.
               </p>
               <p className={`text-sm pt-4 ${ui.muted}`}>
-                We've sent a confirmation email to {email}.
+                We’ve sent a confirmation email to {email}.
               </p>
             </motion.div>
           )}

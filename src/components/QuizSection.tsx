@@ -56,7 +56,17 @@ export default function QuizSection({ theme, themeTokens, quizConfig, onComplete
     } else {
       setTimeout(() => {
         setIsFinished(true);
-        onComplete(newAnswers);
+        // The quote widget and lead notification need useful, human-readable
+        // answers. Keep ids internally for selection state, then hand the
+        // selected labels to the downstream widget contract.
+        const labeledAnswers = Object.fromEntries(
+          QUESTIONS.map((question) => {
+            const selectedId = newAnswers[question.id];
+            const selected = question.options.find((option) => option.id === selectedId);
+            return [question.id, selected?.label ?? selectedId ?? ''];
+          }),
+        );
+        onComplete(labeledAnswers);
       }, 400);
     }
   };

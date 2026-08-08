@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { DesignVariant } from "@/lib/designVariants";
 import type { SiteMotion } from "@/lib/siteMotion";
 import type { SignatureMotif } from "@/lib/siteSignature";
 import { getSiteMotion, motionRise } from "@/lib/siteMotion";
+import type { SectionTokens, ThemeStyles } from "@/lib/theme";
+import { useMotionHydrated } from "@/components/MotionHydrationProvider";
+import { motionInitial } from "@/lib/motionInitial";
 
 interface HeroSectionProps {
   variant: DesignVariant;
-  theme: any;
-  tokens: any;
+  theme: ThemeStyles;
+  tokens: SectionTokens;
   headline: string;
   subheadline?: string;
   heroImage: string;
@@ -43,15 +45,9 @@ export default function HeroSection({
   imagePosition = 'center',
   imageScale = '100',
 }: HeroSectionProps) {
-  const [motionReady, setMotionReady] = useState(false);
-  useEffect(() => {
-    setMotionReady(true);
-  }, []);
+  const motionReady = useMotionHydrated();
 
   const siteMotion = motionProfile ?? getSiteMotion('hero');
-
-  const motionInitial = (ready: boolean, style: any) =>
-    ready ? style : { opacity: 0 };
 
   const renderOrnament = (centered: boolean) => {
     switch (ornament) {

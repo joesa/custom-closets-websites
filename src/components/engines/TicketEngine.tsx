@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CalendarDays, MapPin, User, Mail, Phone, Ticket, CheckCircle2, ChevronRight, ArrowLeft, Loader2, Minus, Plus } from 'lucide-react'
+import { CalendarDays, MapPin, User, Mail, Phone, Ticket, ChevronRight, ArrowLeft, Loader2, Minus, Plus } from 'lucide-react'
 import { PUBLIC_API_URL } from '@/lib/urls'
 import type { ThemeType } from '@/types/config'
 import { getSectionTokens, type ThemeTokenSelection } from '@/lib/theme'
@@ -117,8 +117,8 @@ export default function TicketEngine({
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       setStep(3)
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit ticket request.')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to submit ticket request.')
     } finally {
       setSubmitting(false)
     }
@@ -152,7 +152,7 @@ export default function TicketEngine({
         <div className={`px-6 py-4 border-b flex items-center justify-between ${ui.headerBg}`}>
           {step > 1 ? (
             <button 
-              onClick={() => setStep(step - 1 as any)}
+              onClick={() => setStep(step === 3 ? 2 : 1)}
               className={`flex items-center text-sm font-medium transition-colors ${ui.body} ${ui.hoverHeading}`}
             >
               <ArrowLeft className="h-4 w-4 mr-1" /> Back
@@ -327,9 +327,9 @@ export default function TicketEngine({
               >
                 <Ticket className="h-10 w-10" />
               </div>
-              <h3 className={`text-3xl font-bold ${ui.heading}`}>You're going!</h3>
+              <h3 className={`text-3xl font-bold ${ui.heading}`}>You’re going!</h3>
               <p className={`max-w-sm mx-auto text-lg leading-relaxed ${ui.body}`}>
-                We've reserved {quantity} ticket{quantity > 1 ? 's' : ''} for <strong>{selectedEvent?.name}</strong>.
+                We’ve reserved {quantity} ticket{quantity > 1 ? 's' : ''} for <strong>{selectedEvent?.name}</strong>.
               </p>
               <div className={`p-4 rounded-xl border max-w-sm mx-auto mt-6 text-left space-y-2 text-sm ${ui.panel} ${ui.bodyStrong}`}>
                 <div className={`flex justify-between border-b pb-2 ${ui.dividerStrong}`}>

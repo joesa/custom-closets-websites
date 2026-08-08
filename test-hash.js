@@ -7,8 +7,6 @@ function hashSeed(input) {
   return hash >>> 0;
 }
 
-const HERO_AXIS = Array.from({length: 16}, (_, i) => i);
-
 const seed1 = 'yaweg food truck service|yaweg-food-truck-service|food truck booking,festival & pop-up vending,corporate lunch rotation|food truck city|maincity|storyteller';
 const seed2 = 'another brand|subdomain|services|city|state|vibe';
 const seed3 = '1234';
@@ -37,4 +35,3 @@ function weightedIndex(seed, salt, weights) {
 
 console.log("weighted 1", weightedIndex(seed1, 'hero', HERO_WEIGHTS.modern));
 console.log("weighted 2", weightedIndex(seed2, 'hero', HERO_WEIGHTS.modern));
-

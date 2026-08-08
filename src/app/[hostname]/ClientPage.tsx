@@ -12,7 +12,7 @@ import {
   layoutStyleSectionOrder,
   type SectionKey,
 } from "@/lib/pageArchitectures";
-import { getSiteMotion, motionRise } from "@/lib/siteMotion";
+import { getSiteMotion } from "@/lib/siteMotion";
 import { resolveSiteSignature, widgetRadiusFromSeed } from "@/lib/siteSignature";
 import {
   heroCtaLabel,
@@ -73,20 +73,7 @@ function ClientPageContent({ config }: ClientPageProps) {
   // theme instead of the one shared closet photo every heroless site used to get.
   const heroImage = config.hero.backgroundImage || heroFallbackForTheme(config.theme);
   const heroHeadline = heroHeadlineClasses(variant.typeScale);
-  const heroAlignText = variant.heroAlign === 'left' ? 'text-left' : 'text-center';
-
   const heroSubheadline = config.hero.subheadline?.trim();
-  const renderHeroSub = (colorClass: string, centered: boolean) =>
-    heroSubheadline ? (
-      <motion.p
-        initial={motionRise(siteMotion, motionReady)}
-        animate={{ opacity: 1, y: 0 }}
-        transition={siteMotion.heroLate}
-        className={`mb-10 max-w-2xl text-lg md:text-xl leading-relaxed ${colorClass} ${centered ? 'mx-auto' : ''}`}
-      >
-        {heroSubheadline}
-      </motion.p>
-    ) : null;
 
   const engagementModel = config.engagementModel || 'quote';
   const isOrderBusiness = engagementModel === 'order';

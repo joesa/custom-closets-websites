@@ -17,7 +17,7 @@ interface BeforeAfterSliderProps {
 
 export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed }: BeforeAfterSliderProps) {
   const motionReady = useMotionHydrated();
-  const [sliderPosition, setSliderPosition] = useState(68);
+  const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -38,10 +38,7 @@ export default function BeforeAfterSlider({ config, theme, themeTokens, fontSeed
     const reduced =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
-      setSliderPosition(50);
-      return;
-    }
+    if (reduced) return;
     const t1 = window.setTimeout(() => setSliderPosition(42), 700);
     const t2 = window.setTimeout(() => setSliderPosition(50), 1400);
     return () => {

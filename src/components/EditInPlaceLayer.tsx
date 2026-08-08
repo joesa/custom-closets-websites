@@ -56,20 +56,27 @@ export default function EditInPlaceLayer({
 }: Props) {
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [message, setMessage] = useState('');
-  const [resolvedToken, setResolvedToken] = useState<string | null>(editToken);
-  const [editMode, setEditMode] = useState(false);
+  const [storedToken] = useState<string | null>(() => {
+    if (editToken || typeof window === 'undefined') return null;
+    try {
+      return sessionStorage.getItem(tokenStorageKey(tenantId));
+    } catch {
+      return null;
+    }
+  });
+  const resolvedToken = editToken || storedToken;
+  const [editMode, setEditMode] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return sessionStorage.getItem(editModeStorageKey(tenantId)) === '1';
+    } catch {
+      return false;
+    }
+  });
   const dirtyHtmlRef = useRef<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const replaceImgRef = useRef<HTMLImageElement | null>(null);
   const addModeRef = useRef(false);
-
-  useEffect(() => {
-    try {
-      setEditMode(sessionStorage.getItem(editModeStorageKey(tenantId)) === '1');
-    } catch {
-      setEditMode(false);
-    }
-  }, [tenantId]);
 
   useEffect(() => {
     if (editToken) {
@@ -78,13 +85,6 @@ export default function EditInPlaceLayer({
       } catch {
         /* ignore */
       }
-      setResolvedToken(editToken);
-      return;
-    }
-    try {
-      setResolvedToken(sessionStorage.getItem(tokenStorageKey(tenantId)));
-    } catch {
-      setResolvedToken(null);
     }
   }, [editToken, tenantId]);
 
