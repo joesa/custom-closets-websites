@@ -45,7 +45,7 @@ export default function ProcessSection({ theme, themeTokens, process, fontSeed }
         </div>
 
         {layout === 'lumina-method' ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ds-step-counter">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {process.steps.map((step, idx) => (
               <motion.article
                 key={`${idx}-${step.number}`}
@@ -78,7 +78,6 @@ export default function ProcessSection({ theme, themeTokens, process, fontSeed }
                 <span
                   className={`absolute -left-[2.4rem] top-1 h-4 w-4 rounded-full border-2 ${section.accentBg} border-current`}
                 />
-                <p className={`text-xs mb-2 ${section.accent}`}>{step.number}</p>
                 <h3 className={`text-xl md:text-2xl mb-2 ${t.headingFont} ${t.textPrimary}`}>
                   {step.title}
                 </h3>
@@ -95,9 +94,8 @@ export default function ProcessSection({ theme, themeTokens, process, fontSeed }
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
-                className="flex gap-6 items-start"
+                className="border-l border-black/10 dark:border-white/10 pl-6"
               >
-                <span className={`text-2xl shrink-0 ${section.accent} ${t.headingFont}`}>{step.number}</span>
                 <div>
                   <h3 className={`text-xl md:text-2xl mb-2 ${t.headingFont} ${t.textPrimary}`}>
                     {step.title}
@@ -118,10 +116,7 @@ export default function ProcessSection({ theme, themeTokens, process, fontSeed }
                 transition={{ duration: 0.8, delay: idx * 0.2 }}
                 className="relative flex flex-col group"
               >
-                <div className={`text-3xl font-bold ${section.accent} ${t.headingFont}`}>
-                  {step.number}
-                </div>
-                <h3 className={`text-2xl mt-4 mb-4 ${t.headingFont} ${t.textPrimary}`}>
+                <h3 className={`text-2xl mb-4 ${t.headingFont} ${t.textPrimary}`}>
                   {step.title}
                 </h3>
                 <p className={`leading-relaxed ${t.bodyFont} ${t.textSecondary}`}>

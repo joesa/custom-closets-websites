@@ -215,23 +215,6 @@ body {
   color: var(--ds-ink, #1c1917);
 }
 
-/* Process step counter (Lumina-style numbered articles) */
-.ds-step-counter {
-  counter-reset: ds-step;
-}
-.ds-step-counter > * {
-  counter-increment: ds-step;
-}
-.ds-step-counter > *::before {
-  content: "0" counter(ds-step);
-  font-family: var(--ds-heading-family, inherit);
-  font-size: 44px;
-  color: var(--ds-accent, currentColor);
-  display: block;
-  margin-bottom: 18px;
-  font-weight: 400;
-}
-
 /* Band/CTA section */
 .ds-band {
   padding: 96px 0;
