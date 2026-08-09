@@ -102,6 +102,22 @@ export function proxy(req: NextRequest) {
     });
   }
 
+  // The spec-preview token arrives once, in a link we texted. Clicking any nav
+  // item would drop the query param and dump the business owner on the
+  // under-construction page, so pin it to a cookie for the rest of the visit.
+  // Host-scoped by default (no Domain attribute), which is what stops one
+  // tenant's token being presented at another tenant's hostname.
+  const specPreviewToken = url.searchParams.get('spec_preview_token');
+  if (specPreviewToken) {
+    response.cookies.set('spec_preview_token', specPreviewToken, {
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 9,
+    });
+  }
+
   // Draft preview cookie is only for layout chrome (skip engine Navbar).
   // Always clear it unless this request explicitly asks for ?draft=1 — otherwise
   // "Visit live site" after Preview kept showing the yellow DRAFT PREVIEW banner.

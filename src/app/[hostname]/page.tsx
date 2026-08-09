@@ -19,6 +19,7 @@ import { PUBLIC_API_URL } from "@/lib/urls";
 import { applyEngineDraftPreview } from "@/lib/engineDraftPreview";
 import type { Metadata } from "next";
 import { verifyContentEditorToken } from "@/lib/contentEditorToken";
+import { verifySpecPreviewToken } from "@/lib/specPreviewToken";
 
 // Custom-mode sites carry per-page titles/descriptions in custom_config;
 // surface them instead of the engine's brandName-only metadata.
@@ -29,12 +30,20 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { hostname } = await params;
   const config = await getActiveConfig(hostname);
+  // A gated site is either mid-build or a spec site the business has not agreed
+  // to. Neither should be indexed: a forwarded preview link must not put a
+  // company's name on a search result for a site they never asked for, and one
+  // they may never accept.
+  const gatedMeta: Metadata =
+    config && config.siteStatus !== 'active'
+      ? { robots: { index: false, follow: false } }
+      : {};
   if (!config || config.renderMode !== "custom" || !isCustomSiteConfig(config.customConfig)) {
-    return {};
+    return gatedMeta;
   }
   const page = getCustomPage(config.customConfig, "/");
-  if (!page) return {};
-  const meta: Metadata = {};
+  if (!page) return gatedMeta;
+  const meta: Metadata = { ...gatedMeta };
   if (page.title?.trim()) meta.title = page.title.trim();
   if (page.description?.trim()) meta.description = page.description.trim().slice(0, 160);
   return meta;
@@ -45,7 +54,13 @@ export default async function Page({
   searchParams,
 }: {
   params: Promise<{ hostname: string }>;
-  searchParams?: Promise<{ draft?: string; admin_bypass?: string; edit_token?: string; content_editor_token?: string }>;
+  searchParams?: Promise<{
+    draft?: string;
+    admin_bypass?: string;
+    edit_token?: string;
+    content_editor_token?: string;
+    spec_preview_token?: string;
+  }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearch = searchParams ? await searchParams : {};
@@ -62,7 +77,13 @@ export default async function Page({
     secret: process.env.ADMIN_BYPASS_SECRET,
   });
   const isContentEditor = verifyContentEditorToken(resolvedSearch.content_editor_token, config.tenantId);
-  const gate = getSiteGate(config, isAdminBypass || isContentEditor);
+  // A spec preview: the one business we built this for, looking at it before
+  // deciding. Tenant-scoped and expiring, unlike admin_bypass.
+  const isSpecPreview = verifySpecPreviewToken(
+    resolvedSearch.spec_preview_token ?? cookieStore.get('spec_preview_token')?.value,
+    config.tenantId
+  );
+  const gate = getSiteGate(config, isAdminBypass || isContentEditor || isSpecPreview);
 
   // Suspended sites are taken offline entirely.
   if (gate === 'blocked') {
