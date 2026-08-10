@@ -23,7 +23,15 @@ const RESERVED_APP_PATH_PREFIXES = [
 // API routes this renderer owns. Everything else under /api belongs to the
 // dashboard app and must be proxied, because the proxied dashboard pages call
 // their API routes with same-origin relative URLs.
-const RENDERER_API_PATH_PREFIXES = ['/api/a', '/api/revalidate'];
+const RENDERER_API_PATH_PREFIXES = [
+  '/api/a',
+  '/api/revalidate',
+  // Unlocking a spec preview has to be served HERE: it verifies against the
+  // password hash on this tenant's site_configs and sets a host-scoped cookie
+  // for this hostname. Proxied to the dashboard it simply 404s, which is
+  // exactly what happened the first time.
+  '/api/spec-preview',
+];
 
 function matchesPrefix(pathname: string, prefixes: string[]): boolean {
   return prefixes.some(
