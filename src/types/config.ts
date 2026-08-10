@@ -224,6 +224,12 @@ export interface BrandConfig {
   tenantId?: string;
   defaultRoom?: string;
   siteStatus?: string;
+  /**
+   * HMAC of the password a spec-build prospect must type to view the site.
+   * Present only while a site is being pitched; cleared the moment the owner
+   * accepts, so a paying customer is never challenged for their own site.
+   */
+  specPreviewPasswordHash?: string;
   /** Agentic site-validation gate result (see siteGate.ts) — 'failed' forces
    *  the holding page regardless of siteStatus, as a defense-in-depth safety
    *  net against an approved-but-broken site becoming publicly visible. */

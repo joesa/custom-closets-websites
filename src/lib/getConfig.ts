@@ -55,6 +55,7 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
           logo_url,
           pricing_notes,
           launch_pay_url,
+          spec_preview_password_hash,
           design_variant,
           theme_tokens,
           quiz_config,

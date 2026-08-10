@@ -20,6 +20,7 @@ import { applyEngineDraftPreview } from "@/lib/engineDraftPreview";
 import type { Metadata } from "next";
 import { verifyContentEditorToken } from "@/lib/contentEditorToken";
 import { verifySpecPreviewToken } from "@/lib/specPreviewToken";
+import SpecPreviewGate from "@/components/SpecPreviewGate";
 
 // Custom-mode sites carry per-page titles/descriptions in custom_config;
 // surface them instead of the engine's brandName-only metadata.
@@ -60,6 +61,7 @@ export default async function Page({
     edit_token?: string;
     content_editor_token?: string;
     spec_preview_token?: string;
+    preview_error?: string;
   }>;
 }) {
   const resolvedParams = await params;
@@ -88,6 +90,20 @@ export default async function Page({
   // Suspended sites are taken offline entirely.
   if (gate === 'blocked') {
     notFound();
+  }
+
+  // A spec site with a password set is being pitched to a business that has not
+  // agreed to it. Show the password screen rather than the generic
+  // under-construction page: the recipient was sent here deliberately and needs
+  // to know what they are looking at and that only they can see it.
+  if (gate === 'pending' && config.specPreviewPasswordHash) {
+    return (
+      <SpecPreviewGate
+        businessName={config.brandName}
+        nextPath={'/'}
+        error={resolvedSearch.preview_error === '1'}
+      />
+    );
   }
 
   if (gate === 'pending' || gate === 'edit_locked') {

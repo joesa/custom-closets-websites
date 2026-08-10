@@ -29,6 +29,7 @@ type SiteConfigRow = {
   logo_url?: string | null;
   pricing_notes?: string | null;
   launch_pay_url?: string | null;
+  spec_preview_password_hash?: string | null;
   design_variant?: string | null;
   theme_tokens?: BrandConfig['themeTokens'] | null;
   quiz_config?: BrandConfig['quiz'] | null;
@@ -99,6 +100,7 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     defaultRoom: configRow.default_room,
     layoutStyle: configRow.layout_style,
     siteStatus: tenant.site_status,
+    specPreviewPasswordHash: configRow.spec_preview_password_hash ?? undefined,
     validationStatus: tenant.validation_status ?? undefined,
     navLinks: configRow.nav_links || [],
     pagesConfig: configRow.pages_config || [],

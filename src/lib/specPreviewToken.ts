@@ -41,3 +41,44 @@ export function verifySpecPreviewToken(
     Number(body.exp) >= Math.floor(Date.now() / 1000)
   );
 }
+
+/**
+ * Mint a preview token after a correct password.
+ *
+ * The renderer holds the same SPEC_PREVIEW_SECRET as the dashboard, so once the
+ * password checks out it can issue the very token the gate already understands
+ * — one unlock mechanism rather than two.
+ */
+export function mintSpecPreviewToken(tenantId: string, ttlSeconds = 9 * 24 * 60 * 60): string {
+  const secret =
+    process.env.SPEC_PREVIEW_SECRET?.trim() || process.env.CONTENT_EDITOR_SECRET?.trim();
+  if (!secret) throw new Error('SPEC_PREVIEW_SECRET is not configured');
+  const payload = Buffer.from(
+    JSON.stringify({
+      tenantId,
+      kind: 'spec_preview',
+      exp: Math.floor(Date.now() / 1000) + ttlSeconds,
+    })
+  ).toString('base64url');
+  const signature = createHmac('sha256', secret).update(payload).digest('base64url');
+  return `${payload}.${signature}`;
+}
+
+/** Constant-time check of a typed password against the stored hash. */
+export function verifySpecPreviewPassword(
+  password: string | null | undefined,
+  storedHash: string | null | undefined
+): boolean {
+  if (!password || !storedHash) return false;
+  const secret =
+    process.env.SPEC_PREVIEW_SECRET?.trim() || process.env.CONTENT_EDITOR_SECRET?.trim();
+  if (!secret) return false;
+
+  const expected = createHmac('sha256', secret)
+    .update(`spec-preview-hash:${password.trim().toUpperCase()}`)
+    .digest('base64url');
+
+  const a = Buffer.from(expected);
+  const b = Buffer.from(storedHash);
+  return a.length === b.length && timingSafeEqual(a, b);
+}

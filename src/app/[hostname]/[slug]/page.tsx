@@ -29,6 +29,8 @@ import { PUBLIC_API_URL } from "@/lib/urls";
 import type { Metadata } from "next";
 import { applyEngineDraftPreview } from "@/lib/engineDraftPreview";
 import { verifyContentEditorToken } from "@/lib/contentEditorToken";
+import { verifySpecPreviewToken } from "@/lib/specPreviewToken";
+import SpecPreviewGate from "@/components/SpecPreviewGate";
 
 // Custom-mode sites carry per-page titles/descriptions in custom_config;
 // surface them instead of the engine's brandName-only metadata.
@@ -39,12 +41,21 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { hostname, slug } = await params;
   const config = await getActiveConfig(hostname);
+  // Same rule as the homepage: a gated site is either mid-build or a spec site
+  // the business has not agreed to, and neither should be indexed. Without this
+  // the holding page is crawlable and its <title> carries the business name, so
+  // a company could end up in search results pointing at a subdomain they never
+  // asked for.
+  const gatedMeta: Metadata =
+    config && config.siteStatus !== 'active'
+      ? { robots: { index: false, follow: false } }
+      : {};
   if (!config || config.renderMode !== "custom" || !isCustomSiteConfig(config.customConfig)) {
-    return {};
+    return gatedMeta;
   }
   const page = getCustomPage(config.customConfig, `/${slug}`);
-  if (!page) return {};
-  const meta: Metadata = {};
+  if (!page) return gatedMeta;
+  const meta: Metadata = { ...gatedMeta };
   if (page.title?.trim()) meta.title = page.title.trim();
   if (page.description?.trim()) meta.description = page.description.trim().slice(0, 160);
   return meta;
@@ -55,7 +66,14 @@ export default async function SubPage({
   searchParams,
 }: {
   params: Promise<{ hostname: string; slug: string }>;
-  searchParams?: Promise<{ draft?: string; admin_bypass?: string; edit_token?: string; content_editor_token?: string }>;
+  searchParams?: Promise<{
+    draft?: string;
+    admin_bypass?: string;
+    edit_token?: string;
+    content_editor_token?: string;
+    spec_preview_token?: string;
+    preview_error?: string;
+  }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearch = searchParams ? await searchParams : {};
@@ -72,10 +90,27 @@ export default async function SubPage({
     secret: process.env.ADMIN_BYPASS_SECRET,
   });
   const isContentEditor = verifyContentEditorToken(resolvedSearch.content_editor_token, config.tenantId);
-  const gate = getSiteGate(config, isAdminBypass || isContentEditor);
+  // Without this, a business that unlocked the homepage was blocked the moment
+  // they clicked any nav item — the token is read from the cookie the proxy
+  // pinned, so it survives navigation.
+  const isSpecPreview = verifySpecPreviewToken(
+    resolvedSearch.spec_preview_token ?? cookieStore.get("spec_preview_token")?.value,
+    config.tenantId
+  );
+  const gate = getSiteGate(config, isAdminBypass || isContentEditor || isSpecPreview);
 
   if (gate === "blocked") {
     notFound();
+  }
+
+  if (gate === "pending" && config.specPreviewPasswordHash) {
+    return (
+      <SpecPreviewGate
+        businessName={config.brandName}
+        nextPath={`/${resolvedParams.slug}`}
+        error={resolvedSearch.preview_error === "1"}
+      />
+    );
   }
 
   if (gate === "pending" || gate === "edit_locked") {
