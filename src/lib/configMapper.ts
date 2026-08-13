@@ -49,6 +49,7 @@ type TenantRow = {
   id?: string;
   widget_id?: string;
   site_status?: string;
+  temp_preview_expires_at?: string | null;
   validation_status?: string | null;
   site_configs?: SiteConfigRow | SiteConfigRow[] | null;
 };
@@ -100,6 +101,7 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     defaultRoom: configRow.default_room,
     layoutStyle: configRow.layout_style,
     siteStatus: tenant.site_status,
+    tempPreviewExpiresAt: tenant.temp_preview_expires_at ?? undefined,
     specPreviewPasswordHash: configRow.spec_preview_password_hash ?? undefined,
     validationStatus: tenant.validation_status ?? undefined,
     navLinks: configRow.nav_links || [],

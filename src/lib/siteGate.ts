@@ -24,11 +24,16 @@ export function getSiteGate(config: BrandConfig, isAdminBypass: boolean): SiteGa
   if (isAdminBypass) return 'ok';
   if (config.editInPlace) return 'edit_locked';
   if (config.validationStatus === 'failed') return 'pending';
+  const tempPreviewActive = Boolean(
+    config.tempPreviewExpiresAt &&
+      Number.isFinite(Date.parse(config.tempPreviewExpiresAt)) &&
+      Date.parse(config.tempPreviewExpiresAt) > Date.now()
+  );
   switch (config.siteStatus) {
     case 'pending_approval':
-      return 'pending';
+      return tempPreviewActive ? 'ok' : 'pending';
     case 'awaiting_launch_payment':
-      return 'launch_locked';
+      return tempPreviewActive ? 'ok' : 'launch_locked';
     case 'suspended':
       return 'blocked';
     default:

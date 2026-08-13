@@ -36,6 +36,7 @@ function buildRow(overrides?: {
   const tenant = {
     widget_id: overrides?.widgetId ?? 'tenant-123',
     site_status: 'active',
+    temp_preview_expires_at: '2026-08-14T00:00:00.000Z',
     site_configs: overrides?.configsAsArray ? [config] : config,
   };
   return {
@@ -54,6 +55,7 @@ describe('mapRowToConfig', () => {
     expect(config!.defaultRoom).toBe('Walk-In Closet');
     expect(config!.widgetId).toBe('tenant-123');
     expect(config!.siteStatus).toBe('active');
+    expect(config!.tempPreviewExpiresAt).toBe('2026-08-14T00:00:00.000Z');
   });
 
   it('normalizes array-shaped tenants and site_configs relations', () => {

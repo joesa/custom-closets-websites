@@ -25,6 +25,30 @@ describe('getSiteGate', () => {
     );
   });
 
+  it('opens an unpaid site during an active temporary preview window', () => {
+    const cfg = {
+      ...config('awaiting_launch_payment', 'https://pay'),
+      tempPreviewExpiresAt: new Date(Date.now() + 60_000).toISOString(),
+    };
+    expect(getSiteGate(cfg, false)).toBe('ok');
+  });
+
+  it('closes the site as soon as a temporary preview expires', () => {
+    const cfg = {
+      ...config('awaiting_launch_payment', 'https://pay'),
+      tempPreviewExpiresAt: new Date(Date.now() - 1).toISOString(),
+    };
+    expect(getSiteGate(cfg, false)).toBe('launch_locked');
+  });
+
+  it('does not let temporary preview bypass validation or suspension safeguards', () => {
+    const tempPreviewExpiresAt = new Date(Date.now() + 60_000).toISOString();
+    expect(
+      getSiteGate({ ...config('active'), validationStatus: 'failed', tempPreviewExpiresAt }, false)
+    ).toBe('pending');
+    expect(getSiteGate({ ...config('suspended'), tempPreviewExpiresAt }, false)).toBe('blocked');
+  });
+
   it('bypasses gate for admin preview', () => {
     expect(getSiteGate(config('awaiting_launch_payment'), true)).toBe('ok');
   });

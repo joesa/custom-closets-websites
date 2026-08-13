@@ -37,6 +37,7 @@ async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
         id,
         widget_id,
         site_status,
+        temp_preview_expires_at,
         validation_status,
         site_configs (
           brand_name,

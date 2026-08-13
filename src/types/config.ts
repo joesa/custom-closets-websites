@@ -224,6 +224,8 @@ export interface BrandConfig {
   tenantId?: string;
   defaultRoom?: string;
   siteStatus?: string;
+  /** Admin-granted, self-expiring bypass of pending/payment gates. */
+  tempPreviewExpiresAt?: string;
   /**
    * HMAC of the password a spec-build prospect must type to view the site.
    * Present only while a site is being pitched; cleared the moment the owner
