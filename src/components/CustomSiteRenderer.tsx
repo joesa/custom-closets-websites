@@ -201,6 +201,7 @@ export default function CustomSiteRenderer({
           id="custom-site-content"
           tabIndex={-1}
           className="overflow-x-clip"
+          ref={siteRef}
           dangerouslySetInnerHTML={{ __html: html }}
         />
       )}
