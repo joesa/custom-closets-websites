@@ -3,98 +3,18 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import Script from 'next/script';
 import { PUBLIC_API_URL, WIDGET_CDN_URL } from '@/lib/urls';
+import type { CustomPageArtifact, CustomSiteConfig } from '@/lib/customSite';
+import { htmlHasInjectableWidget } from '@/lib/customSite';
 import {
-  type CustomPageArtifact,
-  type CustomSiteConfig,
-  CUSTOM_SITE_IMG_PERF_CSS,
-  WIDGET_MOUNT_RESET_CSS,
-  appendPreviewQueryToInternalLinks,
-  decorateCustomSiteImages,
-  injectWidgetPlaceholder,
-  sanitizeCustomCss,
-  sanitizeCustomHtml,
-  scopeCss,
-} from '@/lib/customSite';
+  type EngagementModel,
+  buildSrcDoc,
+  prepareInlineHtml,
+  renderedHtmlHasLiveWidget,
+} from '@/lib/customSiteRender';
 import EditInPlaceLayer from '@/components/EditInPlaceLayer';
 import ContentEditorBridge from '@/components/ContentEditorBridge';
 
-const SCOPE = '[data-custom-site]';
-
-export type EngagementModel = 'quote' | 'order' | 'booking' | 'ticket';
-
-function buildWidgetElement(widgetId: string, engagementModel: EngagementModel = 'quote'): string {
-  // Web components from closet-widget/dist/widget.js — same attrs ClientPage uses.
-  const tag =
-    engagementModel === 'order'
-      ? 'closet-order-widget'
-      : engagementModel === 'booking'
-        ? 'closet-booking-widget'
-        : engagementModel === 'ticket'
-          ? 'closet-ticket-widget'
-          : 'closet-quote-widget';
-  return `<${tag} data-contractor-id="${widgetId}" data-api-url="${PUBLIC_API_URL}"></${tag}>`;
-}
-
-function prepareInlineHtml(
-  page: CustomPageArtifact,
-  custom: CustomSiteConfig,
-  widgetId: string,
-  engagementModel: EngagementModel,
-  previewQuery?: string | null
-): { html: string; css: string } {
-  const widgetEl = buildWidgetElement(widgetId, engagementModel);
-  const rawHtml = injectWidgetPlaceholder(page.html || '', widgetEl);
-  let html = decorateCustomSiteImages(sanitizeCustomHtml(rawHtml));
-  if (previewQuery) {
-    html = appendPreviewQueryToInternalLinks(html, previewQuery);
-  }
-  const combinedCss = [custom.globalCss || '', page.css || ''].filter(Boolean).join('\n');
-  // Site CSS first, then mount reset so AI grey "outer boxes" cannot win.
-  const css = [
-    scopeCss(sanitizeCustomCss(combinedCss), SCOPE),
-    scopeCss(WIDGET_MOUNT_RESET_CSS, SCOPE),
-    scopeCss(CUSTOM_SITE_IMG_PERF_CSS, SCOPE),
-  ]
-    .filter(Boolean)
-    .join('\n');
-  return { html, css };
-}
-
-function buildSrcDoc(
-  page: CustomPageArtifact,
-  custom: CustomSiteConfig,
-  widgetId: string,
-  engagementModel: EngagementModel,
-  previewQuery?: string | null
-): string {
-  const widgetEl = buildWidgetElement(widgetId, engagementModel);
-  // Still sanitize HTML even in iframe mode — sandbox is not a substitute
-  // for stripping script/event-handler payloads from AI/admin content.
-  let bodyHtml = decorateCustomSiteImages(
-    sanitizeCustomHtml(injectWidgetPlaceholder(page.html || '', widgetEl))
-  );
-  if (previewQuery) {
-    bodyHtml = appendPreviewQueryToInternalLinks(bodyHtml, previewQuery);
-  }
-  const css = [
-    sanitizeCustomCss([custom.globalCss || '', page.css || ''].filter(Boolean).join('\n')),
-    WIDGET_MOUNT_RESET_CSS,
-    CUSTOM_SITE_IMG_PERF_CSS,
-  ]
-    .filter(Boolean)
-    .join('\n');
-  const title = page.title ? `<title>${escapeHtml(page.title)}</title>` : '';
-  // Widget script is the only intentional script; body HTML is sanitized.
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${title}<style>${css}</style></head><body>${bodyHtml}<script src="${WIDGET_CDN_URL}" defer></script></body></html>`;
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
+export type { EngagementModel } from '@/lib/customSiteRender';
 
 /** Keep draft/admin preview params on in-site navigations (click safety net). */
 function withCurrentPreviewParams(href: string, search: string): string | null {
@@ -177,6 +97,19 @@ export default function CustomSiteRenderer({
   const siteRef = useRef<HTMLDivElement>(null);
   const showEditor = editInPlace && mode === 'inline' && Boolean(tenantId);
   const { html, css } = prepareInlineHtml(page, custom, widgetId, model, previewQuery);
+
+  // Canary: the artifact had a widget mount but the composed HTML lost it —
+  // the exact class of pipeline regression that once shipped widget-less sites.
+  useEffect(() => {
+    if (mode !== 'inline') return;
+    if (htmlHasInjectableWidget(page.html || '') && !renderedHtmlHasLiveWidget(html)) {
+      console.error(
+        '[CustomSiteRenderer] engagement widget lost during render pipeline — artifact has a mount but rendered HTML has no <closet-*-widget>.',
+        { pagePath, widgetId }
+      );
+    }
+  }, [mode, page.html, html, pagePath, widgetId]);
+
 
   // In edit mode, seed the DOM once and never let React rewrite it via
   // dangerouslySetInnerHTML (that wiped contenteditable changes before Save).
