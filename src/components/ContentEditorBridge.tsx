@@ -291,6 +291,8 @@ export default function ContentEditorBridge({
           ? editable.currentSrc || editable.src
           : editable.textContent?.trim() || '',
         element: editable.tagName.toLowerCase(),
+        alt: editable instanceof HTMLImageElement ? editable.alt : undefined,
+        href: editable.closest('a')?.getAttribute('href') ?? null,
       }, editorOrigin);
     };
 
@@ -327,6 +329,17 @@ export default function ContentEditorBridge({
         }
       } else if (action === 'setAlt' && selected instanceof HTMLImageElement) {
         selected.alt = String(event.data.value || '');
+      } else if (action === 'setHref') {
+        const next = String(event.data.value || '');
+        const anchor = selected instanceof HTMLAnchorElement ? selected : selected.closest('a');
+        if (!anchor || !/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(next)) return;
+        anchor.setAttribute('href', next);
+      } else if (action === 'setAlign' && selected instanceof HTMLImageElement) {
+        const align = String(event.data.value || '');
+        if (align !== 'left' && align !== 'center' && align !== 'right') return;
+        selected.style.display = 'block';
+        selected.style.marginLeft = align === 'left' ? '0' : 'auto';
+        selected.style.marginRight = align === 'right' ? '0' : 'auto';
       } else if (action === 'duplicate') {
         selected.insertAdjacentElement('afterend', selected.cloneNode(true) as HTMLElement);
       } else if (action === 'remove') {
