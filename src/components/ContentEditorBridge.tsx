@@ -33,6 +33,22 @@ export function calculateImageResize({
   };
 }
 
+const TEXT_STYLE_PROPERTIES = ['fontFamily', 'fontSize', 'fontWeight', 'color', 'textAlign'] as const;
+const CSS_PROPERTY_NAMES: Record<(typeof TEXT_STYLE_PROPERTIES)[number], string> = {
+  fontFamily: 'font-family',
+  fontSize: 'font-size',
+  fontWeight: 'font-weight',
+  color: 'color',
+  textAlign: 'text-align',
+};
+
+function rgbToHex(rgb: string): string {
+  const match = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!match) return '#000000';
+  const [, r, g, b] = match;
+  return `#${[r, g, b].map((part) => Number(part).toString(16).padStart(2, '0')).join('')}`;
+}
+
 function encodePointer(value: string) {
   return value.replace(/~/g, '~0').replace(/\//g, '~1');
 }
@@ -281,6 +297,7 @@ export default function ContentEditorBridge({
         mode === 'engine' ? editable.dataset.contentPath || '' : `/custom_config/pages/${encodePointer(pagePath)}/html`,
       );
       else removeResizeOverlay();
+      const computed = editable instanceof HTMLImageElement ? null : getComputedStyle(editable);
       window.parent.postMessage({
         type: 'dtf:content-select',
         sessionToken,
@@ -293,6 +310,15 @@ export default function ContentEditorBridge({
         element: editable.tagName.toLowerCase(),
         alt: editable instanceof HTMLImageElement ? editable.alt : undefined,
         href: editable.closest('a')?.getAttribute('href') ?? null,
+        style: computed
+          ? {
+              fontFamily: computed.fontFamily,
+              fontSize: computed.fontSize,
+              fontWeight: computed.fontWeight,
+              color: rgbToHex(computed.color),
+              textAlign: computed.textAlign,
+            }
+          : undefined,
       }, editorOrigin);
     };
 
@@ -340,6 +366,15 @@ export default function ContentEditorBridge({
         selected.style.display = 'block';
         selected.style.marginLeft = align === 'left' ? '0' : 'auto';
         selected.style.marginRight = align === 'right' ? '0' : 'auto';
+      } else if (action === 'setTextStyle' && !(selected instanceof HTMLImageElement)) {
+        const style = event.data.style;
+        if (!style || typeof style !== 'object') return;
+        for (const property of TEXT_STYLE_PROPERTIES) {
+          const value = style[property];
+          if (typeof value === 'string' && value.trim()) {
+            selected.style.setProperty(CSS_PROPERTY_NAMES[property], value.trim());
+          }
+        }
       } else if (action === 'duplicate') {
         selected.insertAdjacentElement('afterend', selected.cloneNode(true) as HTMLElement);
       } else if (action === 'remove') {
