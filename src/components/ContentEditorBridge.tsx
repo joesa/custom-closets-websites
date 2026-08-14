@@ -98,6 +98,28 @@ function resizeTarget(image: HTMLImageElement, path: string, mode: 'engine' | 'c
   return image.parentElement || image;
 }
 
+/**
+ * Width that a `width: 100%` on this element would actually resolve to.
+ *
+ * The parent's border-box width is NOT that number: a grid/flex item resolves
+ * percentages against its grid area / flex base, and a padded parent against
+ * its content box. Sizing against the parent instead collapsed images on the
+ * first pixel of a drag — a 341px image in a 1240px grid became 27.7%, which
+ * the browser then resolved against the 341px track (94px), and each retry
+ * shrank it again from the new, smaller size.
+ *
+ * Probing costs one forced layout per drag, only on pointerdown.
+ */
+function containingBlockWidth(target: HTMLElement): number {
+  const { width: inlineWidth, maxWidth: inlineMaxWidth } = target.style;
+  target.style.maxWidth = 'none';
+  target.style.width = '100%';
+  const measured = target.getBoundingClientRect().width;
+  target.style.width = inlineWidth;
+  target.style.maxWidth = inlineMaxWidth;
+  return measured || target.parentElement?.getBoundingClientRect().width || window.innerWidth;
+}
+
 function applyImagePresentation(target: HTMLElement, presentation: ImagePresentation) {
   target.style.width = `${presentation.widthPercent}%`;
   target.style.aspectRatio = String(presentation.aspectRatio);
@@ -182,7 +204,7 @@ export default function ContentEditorBridge({
         const startX = event.clientX;
         const startY = event.clientY;
         const startRect = target.getBoundingClientRect();
-        const containerWidth = target.parentElement?.getBoundingClientRect().width || window.innerWidth;
+        const containerWidth = containingBlockWidth(target);
         let presentation = calculateImageResize({
           handle,
           startWidth: startRect.width,
