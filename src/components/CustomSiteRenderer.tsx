@@ -13,6 +13,7 @@ import {
 } from '@/lib/customSiteRender';
 import EditInPlaceLayer from '@/components/EditInPlaceLayer';
 import ContentEditorBridge from '@/components/ContentEditorBridge';
+import { isNonNavigationalHref } from '@/lib/brandLink';
 
 export type { EngagementModel } from '@/lib/customSiteRender';
 
@@ -137,8 +138,7 @@ export default function CustomSiteRenderer({
         img.replaceWith(anchor);
         anchor.appendChild(img);
       } else {
-        const href = (anchor.getAttribute('href') || '').trim();
-        if (!href || href === '#' || /^javascript:/i.test(href)) {
+        if (isNonNavigationalHref(anchor.getAttribute('href'))) {
           anchor.setAttribute('href', '/');
         }
         if (!anchor.classList.contains('cs-brand')) anchor.classList.add('cs-brand');
@@ -168,7 +168,7 @@ export default function CustomSiteRenderer({
         anchor.className = 'cs-brand';
         img.replaceWith(anchor);
         anchor.appendChild(img);
-      } else if (!(anchor.getAttribute('href') || '').trim() || anchor.getAttribute('href') === '#') {
+      } else if (isNonNavigationalHref(anchor.getAttribute('href'))) {
         anchor.setAttribute('href', '/');
       }
     });

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { isNonNavigationalHref } from '@/lib/brandLink';
 
 type EngineDocument = Record<string, unknown>;
 type ResizeHandle = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
@@ -198,8 +199,7 @@ export function ensureImageLinksHome(img: HTMLImageElement): void {
     img.replaceWith(anchor);
     anchor.appendChild(img);
   } else {
-    const href = (anchor.getAttribute('href') || '').trim();
-    if (!href || href === '#' || /^javascript:/i.test(href)) {
+    if (isNonNavigationalHref(anchor.getAttribute('href'))) {
       anchor.setAttribute('href', '/');
     }
     if (!anchor.classList.contains('cs-brand')) anchor.classList.add('cs-brand');
@@ -464,10 +464,21 @@ export default function ContentEditorBridge({
       const action = String(event.data.action || '');
       if (action === 'setValue') {
         const next = String(event.data.value || '');
+        const nestedImage = selected.querySelector?.('img') ?? null;
         if (selected instanceof HTMLImageElement) {
           selected.src = next;
           selected.removeAttribute('srcset');
-        } else if (selected instanceof HTMLAnchorElement && /^(https?:\/\/|\/|#|mailto:|tel:)/i.test(next)) {
+        } else if (isNonNavigationalHref(next) && nestedImage instanceof HTMLImageElement) {
+          // Applying an image URL to a link that wraps an image means "swap the
+          // picture", never "point this link at a JPEG". Doing the latter is
+          // how the Alvarado logo ended up linking to /api/a/<token>.
+          nestedImage.src = next;
+          nestedImage.removeAttribute('srcset');
+        } else if (
+          selected instanceof HTMLAnchorElement &&
+          !isNonNavigationalHref(next) &&
+          /^(https?:\/\/|\/|#|mailto:|tel:)/i.test(next)
+        ) {
           selected.href = next;
         } else {
           selected.textContent = next;
@@ -477,7 +488,8 @@ export default function ContentEditorBridge({
       } else if (action === 'setHref') {
         const next = String(event.data.value || '');
         const anchor = selected instanceof HTMLAnchorElement ? selected : selected.closest('a');
-        if (!anchor || !/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(next)) return;
+        if (!anchor || isNonNavigationalHref(next)) return;
+        if (!/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(next)) return;
         anchor.setAttribute('href', next);
       } else if (action === 'setAlign' && selected instanceof HTMLImageElement) {
         const align = String(event.data.value || '');
