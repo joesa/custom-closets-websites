@@ -41,11 +41,8 @@ describe('getSiteGate', () => {
     expect(getSiteGate(cfg, false)).toBe('launch_locked');
   });
 
-  it('does not let temporary preview bypass validation or suspension safeguards', () => {
+  it('does not let temporary preview bypass suspension', () => {
     const tempPreviewExpiresAt = new Date(Date.now() + 60_000).toISOString();
-    expect(
-      getSiteGate({ ...config('active'), validationStatus: 'failed', tempPreviewExpiresAt }, false)
-    ).toBe('pending');
     expect(getSiteGate({ ...config('suspended'), tempPreviewExpiresAt }, false)).toBe('blocked');
   });
 
@@ -57,8 +54,26 @@ describe('getSiteGate', () => {
     expect(getSiteGate(config('suspended'), false)).toBe('blocked');
   });
 
-  it('forces pending holding page when validation has failed, even if active', () => {
+  // Regression guard for the 2026-08-13 outage: a single cosmetic finding (a
+  // missing <h1>) used to blank an entire live site. Validation is enforced at
+  // approval instead; it must never take a serving site down.
+  it('keeps a live site serving when validation has failed', () => {
     const cfg = { ...config('active'), validationStatus: 'failed' };
+    expect(getSiteGate(cfg, false)).toBe('ok');
+  });
+
+  it('keeps a client preview serving when validation has failed', () => {
+    const tempPreviewExpiresAt = new Date(Date.now() + 60_000).toISOString();
+    expect(
+      getSiteGate(
+        { ...config('awaiting_launch_payment'), validationStatus: 'failed', tempPreviewExpiresAt },
+        false
+      )
+    ).toBe('ok');
+  });
+
+  it('still withholds an unapproved site whose validation failed', () => {
+    const cfg = { ...config('pending_approval'), validationStatus: 'failed' };
     expect(getSiteGate(cfg, false)).toBe('pending');
   });
 
