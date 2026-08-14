@@ -280,15 +280,7 @@ export default function ContentEditorBridge({
       });
     }
 
-    const select = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target || target.closest('closet-quote-widget,closet-order-widget,closet-booking-widget,closet-ticket-widget')) return;
-      const editable = mode === 'engine'
-        ? target.closest<HTMLElement>('[data-content-path]')
-        : target.closest<HTMLElement>('[data-content-id]');
-      if (!editable || !root.contains(editable)) return;
-      event.preventDefault();
-      event.stopPropagation();
+    const announceSelection = (editable: HTMLElement) => {
       selectedRef.current?.removeAttribute('data-content-selected');
       selectedRef.current = editable;
       editable.dataset.contentSelected = '1';
@@ -320,6 +312,18 @@ export default function ContentEditorBridge({
             }
           : undefined,
       }, editorOrigin);
+    };
+
+    const select = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target || target.closest('closet-quote-widget,closet-order-widget,closet-booking-widget,closet-ticket-widget')) return;
+      const editable = mode === 'engine'
+        ? target.closest<HTMLElement>('[data-content-path]')
+        : target.closest<HTMLElement>('[data-content-id]');
+      if (!editable || !root.contains(editable)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      announceSelection(editable);
     };
 
     const command = (event: MessageEvent) => {
@@ -375,6 +379,16 @@ export default function ContentEditorBridge({
             selected.style.setProperty(CSS_PROPERTY_NAMES[property], value.trim());
           }
         }
+      } else if (action === 'convertToImage' && !(selected instanceof HTMLImageElement)) {
+        const src = String(event.data.value || '');
+        if (!src) return;
+        const alt = selected.textContent?.trim() || '';
+        const img = window.document.createElement('img');
+        img.src = src;
+        img.alt = alt;
+        img.dataset.contentId = `content-img-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        selected.replaceChildren(img);
+        announceSelection(img);
       } else if (action === 'duplicate') {
         selected.insertAdjacentElement('afterend', selected.cloneNode(true) as HTMLElement);
       } else if (action === 'remove') {
