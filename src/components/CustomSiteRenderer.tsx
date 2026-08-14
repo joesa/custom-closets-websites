@@ -110,6 +110,41 @@ export default function CustomSiteRenderer({
     }
   }, [mode, page.html, html, pagePath, widgetId]);
 
+  // Brand/logo images must navigate home — never open the CSS lightbox.
+  useLayoutEffect(() => {
+    const root = siteRef.current;
+    if (!root) return;
+    if (showEditor && root.dataset.eipSeeded !== '1') return;
+
+    const candidates = root.querySelectorAll<HTMLImageElement>(
+      'a.cs-brand img, .cs-brand img, header img, nav img, .site-header img, .site-nav img, img.logo, .logo img'
+    );
+    candidates.forEach((img) => {
+      const alt = (img.getAttribute('alt') || '').toLowerCase();
+      const cls = `${img.className || ''} ${img.parentElement?.className || ''}`.toLowerCase();
+      const inChrome = Boolean(img.closest('header, nav, .site-header, .site-nav, a.cs-brand, .cs-brand, .logo, .brand'));
+      const looksLogo = /\blogo\b/.test(alt) || /\b(logo|cs-brand|brand)\b/.test(cls);
+      if (!inChrome && !looksLogo) return;
+
+      const wrap = img.closest('label.img-lightbox');
+      if (wrap) wrap.replaceWith(img);
+
+      let anchor = img.closest('a');
+      if (!anchor) {
+        anchor = document.createElement('a');
+        anchor.href = '/';
+        anchor.className = 'cs-brand';
+        img.replaceWith(anchor);
+        anchor.appendChild(img);
+      } else {
+        const href = (anchor.getAttribute('href') || '').trim();
+        if (!href || href === '#' || /^javascript:/i.test(href)) {
+          anchor.setAttribute('href', '/');
+        }
+        if (!anchor.classList.contains('cs-brand')) anchor.classList.add('cs-brand');
+      }
+    });
+  }, [html, showEditor]);
 
   // In edit mode, seed the DOM once and never let React rewrite it via
   // dangerouslySetInnerHTML (that wiped contenteditable changes before Save).
@@ -119,6 +154,24 @@ export default function CustomSiteRenderer({
     if (!el || el.dataset.eipSeeded === '1') return;
     el.innerHTML = html;
     el.dataset.eipSeeded = '1';
+
+    // Same pass as the public-site fix: logos in seeded HTML must link home.
+    el.querySelectorAll<HTMLImageElement>(
+      'a.cs-brand img, .cs-brand img, header img, nav img, .site-header img, .site-nav img, img.logo, .logo img'
+    ).forEach((img) => {
+      const wrap = img.closest('label.img-lightbox');
+      if (wrap) wrap.replaceWith(img);
+      let anchor = img.closest('a');
+      if (!anchor) {
+        anchor = document.createElement('a');
+        anchor.href = '/';
+        anchor.className = 'cs-brand';
+        img.replaceWith(anchor);
+        anchor.appendChild(img);
+      } else if (!(anchor.getAttribute('href') || '').trim() || anchor.getAttribute('href') === '#') {
+        anchor.setAttribute('href', '/');
+      }
+    });
   }, [showEditor, html]);
 
   useEffect(() => {

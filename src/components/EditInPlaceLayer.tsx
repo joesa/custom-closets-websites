@@ -29,6 +29,14 @@ function wrapImgForLightbox(imgHtml: string, useLightbox: boolean): string {
   return `<label class="img-lightbox"><input type="checkbox" class="lightbox-toggle" aria-label="Enlarge image">${imgHtml}</label>`;
 }
 
+function isBrandChromeImage(img: HTMLImageElement): boolean {
+  if (img.closest('a.cs-brand, .cs-brand, .logo, .brand, header, nav, .site-header, .site-nav')) {
+    return true;
+  }
+  const alt = (img.getAttribute('alt') || '').toLowerCase();
+  return /\blogo\b/.test(alt);
+}
+
 function tokenStorageKey(tenantId: string) {
   return `eip-token:${tenantId}`;
 }
@@ -324,6 +332,21 @@ export default function EditInPlaceLayer({
       } else if (replaceImgRef.current) {
         replaceImgRef.current.src = url;
         replaceImgRef.current.removeAttribute('srcset');
+        if (isBrandChromeImage(replaceImgRef.current)) {
+          const wrap = replaceImgRef.current.closest('label.img-lightbox');
+          if (wrap) wrap.replaceWith(replaceImgRef.current);
+          let anchor = replaceImgRef.current.closest('a');
+          if (!anchor) {
+            anchor = document.createElement('a');
+            anchor.href = '/';
+            anchor.className = 'cs-brand';
+            replaceImgRef.current.replaceWith(anchor);
+            anchor.appendChild(replaceImgRef.current);
+          } else {
+            anchor.setAttribute('href', '/');
+            if (!anchor.classList.contains('cs-brand')) anchor.classList.add('cs-brand');
+          }
+        }
         setMessage('Image replaced — click Save.');
       }
       captureHtml();

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Script from "next/script";
 import * as motion from "framer-motion/client";
 import { getThemeStyles, getGridClasses, getThemePrimaryHex, getSectionTokens, applyVoice } from "@/lib/theme";
@@ -554,16 +555,20 @@ function ClientPageContent({ config }: ClientPageProps) {
               className={`text-xl ${theme.headingFont} text-white`}
             >
               {config.logoUrl ? (
-                <Image
-                  src={config.logoUrl}
-                  alt={config.brandName}
-                  width={280}
-                  height={90}
-                  className="h-16 w-auto object-contain sm:h-20"
-                  priority
-                />
+                <Link href="/" className="pointer-events-auto inline-block">
+                  <Image
+                    src={config.logoUrl}
+                    alt={config.brandName}
+                    width={280}
+                    height={90}
+                    className="h-16 w-auto object-contain sm:h-20"
+                    priority
+                  />
+                </Link>
               ) : (
-                config.brandName
+                <Link href="/" className={`pointer-events-auto ${theme.headingFont}`}>
+                  {config.brandName}
+                </Link>
               )}
             </motion.div>
           </div>
