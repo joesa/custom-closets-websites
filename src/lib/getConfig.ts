@@ -10,15 +10,36 @@ export type { SupabaseConfigRow } from './configMapper';
 // Lazily create the Supabase client on first use. Doing this at module scope
 // would throw when env vars are absent (e.g. in unit tests) and would run a
 // side effect just from importing this file's pure helpers.
+//
+// Prefers the service-role key when one is configured. This selection runs only
+// on the server (a React Server Component render), so the key is never shipped
+// to a browser.
+//
+// Why it matters: this query asks for `custom_config_draft` and
+// `spec_preview_password_hash`, and today it asks as `anon` — a key that is
+// public by design, since it ships inside the widget bundle on every customer's
+// site. Anyone holding it can therefore list every tenant's site_configs row
+// and read unpublished drafts directly from PostgREST. The fix is to read these
+// as the service role and then revoke the anon column grant; this half is safe
+// to ship first because it changes nothing until the key is present.
 let supabaseClient: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
   if (!supabaseClient) {
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
     supabaseClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+      serviceKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      serviceKey
+        ? { auth: { persistSession: false, autoRefreshToken: false } }
+        : undefined
     );
   }
   return supabaseClient;
+}
+
+/** True once the renderer is reading with the service role. */
+export function rendererUsesServiceRole(): boolean {
+  return Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
 }
 
 async function loadActiveConfig(hostname: string): Promise<BrandConfig | null> {
