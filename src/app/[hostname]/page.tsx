@@ -35,10 +35,16 @@ export async function generateMetadata({
   // to. Neither should be indexed: a forwarded preview link must not put a
   // company's name on a search result for a site they never asked for, and one
   // they may never accept.
-  const gatedMeta: Metadata =
-    config && config.siteStatus !== 'active'
-      ? { robots: { index: false, follow: false } }
-      : {};
+  // A live, paid site can still be serving a holding page: `edit_in_place`
+  // takes precedence over siteStatus in getSiteGate, with no expiry and no
+  // operator timeout, so "Site Being Updated" was being served at HTTP 200 and
+  // indexed as the business's homepage. Whatever is showing a holding page must
+  // not be indexed, whichever condition put it there.
+  const showsHoldingPage =
+    !!config && (config.siteStatus !== 'active' || config.editInPlace === true);
+  const gatedMeta: Metadata = showsHoldingPage
+    ? { robots: { index: false, follow: false } }
+    : {};
   if (!config || config.renderMode !== "custom" || !isCustomSiteConfig(config.customConfig)) {
     return gatedMeta;
   }

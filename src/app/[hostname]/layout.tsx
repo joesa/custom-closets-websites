@@ -32,9 +32,34 @@ export async function generateMetadata({
     config.about.description?.trim() ||
     `${derived}.`;
   const title = locality ? `${config.brandName} | ${locality}` : config.brandName;
+  const url = `https://${resolvedParams.hostname}`;
+  // The hero is the one image every tenant has, and it is the image a human
+  // would expect to see when the link is shared.
+  const shareImage = config.hero?.backgroundImage?.trim() || undefined;
+  const summary = description.slice(0, 160);
+
   return {
+    metadataBase: new URL(url),
     title,
-    description: description.slice(0, 160),
+    description: summary,
+    // Sharing a link to your own business and getting a bare grey rectangle is
+    // the most visible omission on a product sold as a marketing site. None of
+    // this existed: no Open Graph, no Twitter card, no canonical.
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'website',
+      siteName: config.brandName,
+      title,
+      description: summary,
+      url,
+      ...(shareImage ? { images: [{ url: shareImage, alt: config.brandName }] } : {}),
+    },
+    twitter: {
+      card: shareImage ? 'summary_large_image' : 'summary',
+      title,
+      description: summary,
+      ...(shareImage ? { images: [shareImage] } : {}),
+    },
   };
 }
 
