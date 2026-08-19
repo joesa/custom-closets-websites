@@ -56,8 +56,11 @@ describe('holding pages are never indexed', () => {
 
   it('noindexes an edit-in-place site even though it is active and paid', () => {
     // getSiteGate returns edit_locked before it looks at siteStatus, so a live
-    // site can serve "Site Being Updated" at HTTP 200 indefinitely.
-    expect(source).toContain('config.editInPlace === true')
+    // site can serve "Site Being Updated" while an edit session is open.
+    // The metadata must agree with the gate about when that is happening,
+    // which is why both call editInPlaceActive rather than reading the flag —
+    // an expired session shows the real site and must be indexable again.
+    expect(source).toContain('editInPlaceActive(config)')
     expect(source).toContain('robots: { index: false, follow: false }')
   })
 })

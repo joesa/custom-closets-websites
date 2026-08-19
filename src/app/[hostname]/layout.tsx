@@ -6,6 +6,7 @@ import { getThemeStyles, getSectionTokens, applyVoice, generateCssVars, cssVarsT
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
 import { resolveImageArtDirection } from '@/lib/imageArtDirection';
+import TenantAnalytics from "@/components/TenantAnalytics";
 
 export async function generateMetadata({
   params,
@@ -77,13 +78,21 @@ export default async function HostnameLayout({
     return <>{children}</>;
   }
 
+  // Rendered on every path below, including custom mode, which returns early.
+  const analytics = <TenantAnalytics config={config.analyticsConfig} />;
+
   const cookieStore = await cookies();
   const draftPreview = cookieStore.get('custom_draft_preview')?.value === 'true';
 
   // Custom-mode sites (and draft custom previews) own their own chrome.
   // Skip the engine Navbar so it doesn't double-render over the custom build.
   if (config.renderMode === 'custom' || draftPreview) {
-    return <>{children}</>;
+    return (
+      <>
+        {analytics}
+        {children}
+      </>
+    );
   }
 
   // If there are navLinks, it's a multi-page site.
@@ -118,6 +127,7 @@ export default async function HostnameLayout({
       pricing_notes: config.pricingNotes,
       content_structure: config.contentStructure,
     }}>
+      {analytics}
       <style dangerouslySetInnerHTML={{ __html: cssVarString }} />
       <div
         data-engine-site="v2"

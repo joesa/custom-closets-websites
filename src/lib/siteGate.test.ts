@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getSiteGate } from './siteGate';
+import { EDIT_IN_PLACE_MAX_MS, editInPlaceActive, getSiteGate } from './siteGate';
 import type { BrandConfig } from '@/types/config';
 
 function config(siteStatus: string, launchPayUrl?: string): BrandConfig {
@@ -82,13 +82,59 @@ describe('getSiteGate', () => {
     expect(getSiteGate(cfg, true)).toBe('ok');
   });
 
-  it('holds the public site offline while editInPlace is on', () => {
-    const cfg = { ...config('active'), editInPlace: true };
+  it('holds the public site offline while an edit session is fresh', () => {
+    const cfg = {
+      ...config('active'),
+      editInPlace: true,
+      editInPlaceStartedAt: new Date().toISOString(),
+    };
     expect(getSiteGate(cfg, false)).toBe('edit_locked');
   });
 
   it('admin bypass still opens the site during editInPlace', () => {
-    const cfg = { ...config('active'), editInPlace: true };
+    const cfg = {
+      ...config('active'),
+      editInPlace: true,
+      editInPlaceStartedAt: new Date().toISOString(),
+    };
     expect(getSiteGate(cfg, true)).toBe('ok');
+  });
+
+  it('brings the real site back when an edit session was abandoned', () => {
+    // The failure this prevents: an admin opens edit mode, gets distracted, and
+    // a paying customer's homepage stays a holding page indefinitely.
+    const cfg = {
+      ...config('active'),
+      editInPlace: true,
+      editInPlaceStartedAt: new Date(Date.now() - EDIT_IN_PLACE_MAX_MS - 1000).toISOString(),
+    };
+    expect(getSiteGate(cfg, false)).toBe('ok');
+  });
+
+  it('treats a flag with no timestamp as expired rather than permanent', () => {
+    const cfg = { ...config('active'), editInPlace: true, editInPlaceStartedAt: null };
+    expect(getSiteGate(cfg, false)).toBe('ok');
+  });
+
+  it('does not let an unparseable timestamp hold the site offline', () => {
+    const cfg = { ...config('active'), editInPlace: true, editInPlaceStartedAt: 'whenever' };
+    expect(getSiteGate(cfg, false)).toBe('ok');
+  });
+});
+
+describe('editInPlaceActive', () => {
+  const base = { editInPlace: true, editInPlaceStartedAt: '2026-08-19T12:00:00Z' };
+  const startMs = Date.parse(base.editInPlaceStartedAt);
+
+  it('is false when the flag is off, whatever the timestamp says', () => {
+    expect(editInPlaceActive({ ...base, editInPlace: false }, startMs)).toBe(false);
+  });
+
+  it('is true right up to the edge of the window', () => {
+    expect(editInPlaceActive(base, startMs + EDIT_IN_PLACE_MAX_MS - 1)).toBe(true);
+  });
+
+  it('is false exactly at the edge', () => {
+    expect(editInPlaceActive(base, startMs + EDIT_IN_PLACE_MAX_MS)).toBe(false);
   });
 });

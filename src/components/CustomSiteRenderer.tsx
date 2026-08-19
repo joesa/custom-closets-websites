@@ -98,6 +98,9 @@ export default function CustomSiteRenderer({
   const siteRef = useRef<HTMLDivElement>(null);
   const showEditor = editInPlace && mode === 'inline' && Boolean(tenantId);
   const { html, css } = prepareInlineHtml(page, custom, widgetId, model, previewQuery);
+  // The editor renders an empty shell and fills it client-side, so the mount is
+  // not in `html` there — keep the bundle for that case rather than breaking it.
+  const hasWidgetMount = showEditor || renderedHtmlHasLiveWidget(html);
 
   // Canary: the artifact had a widget mount but the composed HTML lost it —
   // the exact class of pipeline regression that once shipped widget-less sites.
@@ -258,10 +261,13 @@ export default function CustomSiteRenderer({
           dangerouslySetInnerHTML={{ __html: html }}
         />
       )}
-      {/* afterInteractive: do not wait for window.load (blocked by many large
-          gallery images). lazyOnload deferred the 450KB widget until every
-          eager img finished — extending the main-thread hitch. */}
-      <Script src={WIDGET_CDN_URL} strategy="afterInteractive" />
+      {/* Only on pages that actually mount a widget. An about or gallery page
+          has nothing for it to bind to, and it was still downloading and
+          parsing 450KB on every one of them.
+          afterInteractive: do not wait for window.load (blocked by many large
+          gallery images). lazyOnload deferred the widget until every eager img
+          finished — extending the main-thread hitch. */}
+      {hasWidgetMount ? <Script src={WIDGET_CDN_URL} strategy="afterInteractive" /> : null}
     </div>
   );
 }

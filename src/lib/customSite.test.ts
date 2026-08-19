@@ -9,6 +9,8 @@ import {
   validateCustomConfig,
   WIDGET_PLACEHOLDER,
   type CustomSiteConfig,
+  resizedImageUrl,
+  buildImageSrcset,
 } from './customSite'
 
 describe('decorateCustomSiteImages', () => {
@@ -155,5 +157,67 @@ describe('appendPreviewQueryToInternalLinks', () => {
     )
     expect(out).toContain('href="/about?draft=1&admin_bypass=x"')
     expect(out.match(/draft=1/g)?.length).toBe(1)
+  })
+})
+
+describe('responsive images', () => {
+  const supabase =
+    'https://vtlvqatzsolycqzeknru.supabase.co/storage/v1/object/public/site-assets/a/hero.jpg'
+  const unsplash = 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81'
+
+  it('rewrites a supabase storage url to the transform endpoint', () => {
+    expect(resizedImageUrl(supabase, 640)).toBe(
+      'https://vtlvqatzsolycqzeknru.supabase.co/storage/v1/render/image/public/site-assets/a/hero.jpg?width=640'
+    )
+  })
+
+  it('adds width and sensible defaults to an unsplash url', () => {
+    const url = resizedImageUrl(unsplash, 768)
+    expect(url).toContain('w=768')
+    expect(url).toContain('q=75')
+  })
+
+  it('preserves query params already on the url', () => {
+    const url = resizedImageUrl(`${unsplash}?q=90`, 480)
+    expect(url).toContain('q=90')
+    expect(url).toContain('w=480')
+  })
+
+  it('leaves an unrecognized host alone rather than guessing at a transform api', () => {
+    // Inventing a resize URL that does not exist would turn a heavy image into
+    // a broken one, which is strictly worse.
+    expect(resizedImageUrl('https://example.com/photo.jpg', 640)).toBeNull()
+    expect(buildImageSrcset('https://example.com/photo.jpg')).toBeNull()
+  })
+
+  it('builds a full srcset with every declared width', () => {
+    const srcset = buildImageSrcset(supabase)
+    expect(srcset).toBeTruthy()
+    for (const width of [480, 768, 1200, 1600]) {
+      expect(srcset).toContain(`${width}w`)
+    }
+  })
+
+  it('adds srcset and sizes to supported images in a page', () => {
+    const html = decorateCustomSiteImages(`<img src="${supabase}">`)
+    expect(html).toContain('srcset=')
+    expect(html).toContain('sizes=')
+  })
+
+  it('does not add srcset for an unsupported host', () => {
+    const html = decorateCustomSiteImages('<img src="https://example.com/a.jpg">')
+    expect(html).not.toContain('srcset=')
+  })
+
+  it('respects an author-supplied srcset', () => {
+    const html = decorateCustomSiteImages(`<img src="${supabase}" srcset="mine.jpg 100w">`)
+    expect(html).toContain('mine.jpg 100w')
+    expect(html.match(/srcset=/g)).toHaveLength(1)
+  })
+
+  it('still sets loading and decoding alongside the new attributes', () => {
+    const html = decorateCustomSiteImages(`<img src="${supabase}">`)
+    expect(html).toContain('decoding="async"')
+    expect(html).toContain('loading="eager"')
   })
 })

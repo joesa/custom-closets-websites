@@ -8,7 +8,7 @@ import CustomSiteRenderer from "@/components/CustomSiteRenderer";
 import DraftEmptyNotice from "@/components/DraftEmptyNotice";
 import { getCustomPage, isCustomSiteConfig } from "@/lib/customSite";
 import { cloakCustomSiteConfig } from "@/lib/mediaProxy";
-import { getSiteGate } from "@/lib/siteGate";
+import { editInPlaceActive, getSiteGate } from "@/lib/siteGate";
 import {
   buildCustomDraftPreviewQuery,
   shouldPaintCustomDraft,
@@ -41,7 +41,7 @@ export async function generateMetadata({
   // indexed as the business's homepage. Whatever is showing a holding page must
   // not be indexed, whichever condition put it there.
   const showsHoldingPage =
-    !!config && (config.siteStatus !== 'active' || config.editInPlace === true);
+    !!config && (config.siteStatus !== 'active' || editInPlaceActive(config));
   const gatedMeta: Metadata = showsHoldingPage
     ? { robots: { index: false, follow: false } }
     : {};

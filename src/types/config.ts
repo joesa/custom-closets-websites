@@ -296,6 +296,10 @@ export interface BrandConfig {
    * the site so operators can use edit-in-place.
    */
   editInPlace?: boolean;
+  /** When edit-in-place was switched on; used to expire an abandoned session. */
+  editInPlaceStartedAt?: string | null;
+  /** Tenant analytics identifiers, e.g. { ga4, plausible }. */
+  analyticsConfig?: unknown;
   /** Published custom-site artifact (live when renderMode = 'custom'). */
   customConfig?: import('@/lib/customSite').CustomSiteConfig | null;
   /** Draft artifact for admin preview (?draft=1 + admin_bypass). */

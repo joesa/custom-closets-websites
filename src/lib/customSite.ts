@@ -285,6 +285,14 @@ export function decorateCustomSiteImages(html: string): string {
     let a = String(attrs || '')
     const i = index++
     if (!/\bdecoding\s*=/i.test(a)) a += ' decoding="async"'
+    if (!/\bsrcset\s*=/i.test(a)) {
+      const srcMatch = a.match(/\bsrc\s*=\s*"([^"]+)"/i) || a.match(/\bsrc\s*=\s*'([^']+)'/i)
+      const srcset = srcMatch ? buildImageSrcset(srcMatch[1]) : null
+      if (srcset) {
+        a += ` srcset="${srcset}"`
+        if (!/\bsizes\s*=/i.test(a)) a += ` sizes="${DEFAULT_SIZES}"`
+      }
+    }
     if (!/\bloading\s*=/i.test(a)) {
       if (i < 2) {
         a += ' loading="eager"'
@@ -295,6 +303,57 @@ export function decorateCustomSiteImages(html: string): string {
     }
     return `<img${a}>`
   })
+}
+
+/**
+ * Serve images at something close to the size they are displayed.
+ *
+ * Custom sites ship full-resolution originals — a 124KB product photo rendered
+ * into a 400px card, and a phone downloads every byte. Both hosts these sites
+ * actually use can resize on demand, so a srcset costs nothing to add and is
+ * the single largest saving available on these pages.
+ *
+ * Only these two hosts are rewritten. A URL we do not recognize is left exactly
+ * as authored: guessing at a transform API that turns out not to exist would
+ * replace a heavy image with a broken one.
+ */
+const SRCSET_WIDTHS = [480, 768, 1200, 1600]
+
+/** Default: full width on phones, capped on desktop where the grid is capped. */
+const DEFAULT_SIZES = '(max-width: 768px) 100vw, 1200px'
+
+/** Build one candidate URL at the requested width, or null if unsupported. */
+export function resizedImageUrl(src: string, width: number): string | null {
+  if (/^https:\/\/images\.unsplash\.com\//i.test(src)) {
+    const [base, query = ''] = src.split('?')
+    const params = new URLSearchParams(query)
+    params.set('w', String(width))
+    if (!params.has('q')) params.set('q', '75')
+    if (!params.has('auto')) params.set('auto', 'format')
+    return `${base}?${params.toString()}`
+  }
+
+  // Supabase storage: the transform endpoint is the same path with
+  // /object/public/ swapped for /render/image/public/.
+  if (/^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\/public\//i.test(src)) {
+    const [base, query = ''] = src.split('?')
+    const rendered = base.replace('/object/public/', '/render/image/public/')
+    const params = new URLSearchParams(query)
+    params.set('width', String(width))
+    return `${rendered}?${params.toString()}`
+  }
+
+  return null
+}
+
+/** srcset attribute value for a src, or null when the host cannot resize. */
+export function buildImageSrcset(src: string): string | null {
+  const candidates = SRCSET_WIDTHS.map((width) => {
+    const url = resizedImageUrl(src, width)
+    return url ? `${url} ${width}w` : null
+  })
+  if (candidates.some((candidate) => candidate === null)) return null
+  return candidates.join(', ')
 }
 
 /** Cheap paint containment for off-screen custom-site images. */

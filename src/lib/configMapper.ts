@@ -36,6 +36,8 @@ type SiteConfigRow = {
   engagement_model?: string | null;
   render_mode?: string | null;
   edit_in_place?: boolean | null;
+  edit_in_place_started_at?: string | null;
+  analytics_config?: unknown;
   custom_config?: CustomSiteConfig | null;
   custom_config_draft?: CustomSiteConfig | null;
   engine_config_draft?: {
@@ -117,6 +119,8 @@ export function mapRowToConfig(data: SupabaseConfigRow): BrandConfig | null {
     signature,
     renderMode: configRow.render_mode === 'custom' ? 'custom' : 'engine',
     editInPlace: Boolean(configRow.edit_in_place),
+    editInPlaceStartedAt: configRow.edit_in_place_started_at ?? null,
+    analyticsConfig: configRow.analytics_config ?? null,
     customConfig: isCustomSiteConfig(configRow.custom_config) ? configRow.custom_config : null,
     customConfigDraft: isCustomSiteConfig(configRow.custom_config_draft)
       ? configRow.custom_config_draft
