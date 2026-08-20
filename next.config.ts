@@ -35,6 +35,10 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  dev: {
+    // Disable browser auto-open during development
+    strategy: 'custom-server',
+  },
 };
 
 export default withSentryConfig(nextConfig, {
